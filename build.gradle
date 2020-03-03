@@ -40,6 +40,7 @@ sourceSets {
 dependencies {
     def ktor_version = "1.2.4"
     def junit_version = "5.5.2"
+    def exposed_version = "0.21.1"
 
     // Ktor & Ktor-netty (Server)
     implementation "io.ktor:ktor-server-core:$ktor_version"
@@ -53,6 +54,13 @@ dependencies {
     // logging
     implementation 'io.github.microutils:kotlin-logging:1.7.7'
 
+    // exposed, postgres (database)
+    implementation "org.jetbrains.exposed:exposed-core:$exposed_version"
+    implementation "org.jetbrains.exposed:exposed-dao:$exposed_version"
+    implementation "org.jetbrains.exposed:exposed-jdbc:$exposed_version"
+    implementation "org.postgresql:postgresql:42.2.2"
+
+    // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     // testing
