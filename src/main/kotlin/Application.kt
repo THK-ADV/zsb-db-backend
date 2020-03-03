@@ -1,4 +1,5 @@
 import api.demoApi
+import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
@@ -19,6 +20,8 @@ fun Application.main() {
 }
 
 fun main() {
+    recreateTablesAndFillWithDummyData()
+
     embeddedServer(Netty, port = 8080) {
         configureServer(this)
     }.start(wait = true)

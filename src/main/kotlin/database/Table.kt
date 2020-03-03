@@ -10,7 +10,7 @@ object Orte : IntIdTable() {
 object Adressen : IntIdTable() {
     val strasse = text("strasse")
     val hausnummer = varchar("hausnummer", 5)
-    val plz = reference("plz", Orte)
+    val ort = reference("ort", Orte)
 }
 
 object Schulen : IntIdTable() {
