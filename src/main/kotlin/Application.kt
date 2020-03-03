@@ -1,4 +1,5 @@
-import api.demoApi
+import api.schulenApi
+import database.DbSettings
 import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
 import io.ktor.application.install
@@ -20,6 +21,9 @@ fun Application.main() {
 }
 
 fun main() {
+    // connect to db
+    DbSettings.db
+
     recreateTablesAndFillWithDummyData()
 
     embeddedServer(Netty, port = 8080) {
@@ -32,7 +36,7 @@ fun configureServer(server: Application) {
     server.install(Compression)
     server.install(CallLogging)
     server.install(Routing) {
-        // TODO install custom api here
+        schulenApi()
     }
     server.install(ContentNegotiation) {
         serialization(

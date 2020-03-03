@@ -7,11 +7,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun recreateTablesAndFillWithDummyData() {
     val logger = KotlinLogging.logger {}
 
-    // init db
-    DbSettings.db
-
     transaction {
-//        addLogger(StdOutSqlLogger)
+        // addLogger(StdOutSqlLogger)
 
         SchemaUtils.drop(Schulen)
         SchemaUtils.drop(Adressen)

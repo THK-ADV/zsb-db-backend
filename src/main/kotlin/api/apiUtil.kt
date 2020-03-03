@@ -7,6 +7,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.httpMethod
 import io.ktor.request.path
 import io.ktor.response.respondText
+import kotlinx.serialization.json.JsonElement
 import mu.KotlinLogging
 
 fun ApplicationCall.logRequest() {
@@ -20,3 +21,6 @@ suspend fun ApplicationCall.getParameterAsIntOrNullAndRespondError(param: String
     if (id == null) respondText("given $param must be an integer", ContentType.Text.Plain, HttpStatusCode.BadRequest)
     return id
 }
+
+suspend fun ApplicationCall.respondJsonOk(json: JsonElement) =
+    this.respondText(json.toString(), ContentType.Application.Json, HttpStatusCode.OK)
