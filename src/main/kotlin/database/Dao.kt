@@ -1,5 +1,6 @@
 package database
 
+import api.MailNotValidException
 import dto.AdresseDto
 import dto.OrtDto
 import dto.SchuleDto
@@ -14,12 +15,17 @@ class Ort(id: EntityID<Int>) : IntEntity(id) {
         /**
          * persist in db
          */
-        fun save(dto: OrtDto) = transaction {
-            Ort.new(dto.ort_id) {
-                plz = dto.plz
-                bezeichnung = dto.bezeichnung
+        fun save(dto: OrtDto): Result<Ort> {
+            val ort = transaction {
+                Ort.new(dto.ort_id) {
+                    this.plz = dto.plz
+                    this.bezeichnung = dto.bezeichnung
+                }
             }
+
+            return Result.success(ort)
         }
+
     }
 
     fun toDto() = OrtDto(id.value, plz, bezeichnung)
@@ -33,11 +39,18 @@ class Adresse(id: EntityID<Int>) : IntEntity(id) {
         /**
          * persist in db
          */
-        fun save(dto: AdresseDto) = transaction {
-            Adresse.new(dto.adress_id) {
-                strasse = dto.strasse
-                hausnummer = dto.hausnummer
-                ort = Ort.save(dto.ort)
+        fun save(dto: AdresseDto): Result<Adresse> = transaction {
+            val ortResult = Ort.save(dto.ort)
+            val ort = ortResult.getOrNull()
+            if (ort == null || ortResult.isFailure) Result.failure(ortResult.exceptionOrNull()!!)
+            else {
+                val adresse = Adresse.new(dto.adress_id) {
+                    this.strasse = dto.strasse
+                    this.hausnummer = dto.hausnummer
+                    this.ort = ort
+                }
+
+                Result.success(adresse)
             }
         }
     }
@@ -54,22 +67,35 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
         /**
          * persist in db
          */
-        fun save(dto: SchuleDto) = transaction {
-            if (validateMail(dto.stubo_mail) || validateMail(dto.schulleitung_mail)) {
-                Schule.new(dto.schule_id) {
-                    schulform = dto.schulform
-                    schwerpunkt = dto.schwerpunkt
-                    kooperationsvertrag = dto.kooperationsvertrag
-                    adresse = Adresse.save(dto.adresse)
-                    schulleitung_mail = dto.schulleitung_mail
-                    stubo_mail = dto.stubo_mail
-                    schueleranzahl = dto.schueleranzahl
-                    kaoa_hochschule = dto.kaoa_hochschule
-                    talentscouting = dto.talentscouting
+        fun save(dto: SchuleDto): Result<Schule> {
+            if (!validateMail(dto.stubo_mail) || !validateMail(dto.schulleitung_mail))
+                return Result.failure(MailNotValidException("stubo or schulleitungs mail is not a valid email"))
+
+            return transaction {
+                val adresseResult = Adresse.save(dto.adresse)
+                val adresse = adresseResult.getOrNull()
+
+                if (adresse == null) Result.failure(adresseResult.exceptionOrNull()!!)
+                else {
+                    val schule = Schule.new(dto.schule_id) {
+                        this.schulform = dto.schulform
+                        this.schwerpunkt = dto.schwerpunkt
+                        this.kooperationsvertrag = dto.kooperationsvertrag
+                        this.adresse = adresse
+                        this.schulleitung_mail = dto.schulleitung_mail
+                        this.stubo_mail = dto.stubo_mail
+                        this.schueleranzahl = dto.schueleranzahl
+                        this.kaoa_hochschule = dto.kaoa_hochschule
+                        this.talentscouting = dto.talentscouting
+                    }
+
+                    Result.success(schule)
                 }
-            } else null
+            }
+
         }
     }
+
 
     fun toDto() = SchuleDto(
         id.value,

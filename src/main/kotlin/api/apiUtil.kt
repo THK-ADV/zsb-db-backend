@@ -24,3 +24,7 @@ suspend fun ApplicationCall.getParameterAsIntOrNullAndRespondError(param: String
 
 suspend fun ApplicationCall.respondJsonOk(json: JsonElement) =
     this.respondText(json.toString(), ContentType.Application.Json, HttpStatusCode.OK)
+
+suspend fun ApplicationCall.respond(response: HttpServerResponse) {
+    this.respondText(response.text, response.type, response.status)
+}

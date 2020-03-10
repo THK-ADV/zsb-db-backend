@@ -10,6 +10,10 @@ object SchuleService {
         Schule.all().map { it.toDto() }
     }
 
-        return result
-    }
+//    fun update(schuleDto: SchuleDto): SchuleDto {
+//        val result = Schule.save(schuleDto)?.toDto()
+//
+//        return result
+//    }
+
 }

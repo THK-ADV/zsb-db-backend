@@ -4,6 +4,7 @@ import dto.SchuleDto
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get
+import io.ktor.routing.put
 import io.ktor.routing.route
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -21,6 +22,12 @@ fun Route.schulenApi() {
             val json = serializer.toJson(SchuleDto.serializer().list, result)
 
             call.respondJsonOk(json)
+        }
+
+        put {
+            call.logRequest()
+            val schuleId = call.getParameterAsIntOrNullAndRespondError("schule_id")
+
         }
 
     }
