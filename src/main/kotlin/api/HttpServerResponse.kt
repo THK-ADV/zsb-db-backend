@@ -5,10 +5,11 @@ import io.ktor.http.HttpStatusCode
 
 
 data class HttpServerResponse(val text: String, val type: ContentType, val status: HttpStatusCode) {
+
     companion object {
-        fun map(result: Result<String>): HttpServerResponse {
+        fun map(result: Result<String>, successStatus: HttpStatusCode = HttpStatusCode.OK): HttpServerResponse {
             result.onSuccess {
-                return HttpServerResponse(it, ContentType.Application.Json, HttpStatusCode.OK)
+                return HttpServerResponse(it, ContentType.Application.Json, successStatus)
             }
 
             val exception = result.exceptionOrNull()
