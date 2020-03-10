@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SchuleDto(
-    val schule_id: Int?,
+    val schule_id: Int? = null,
     val schulform: String,
     val schwerpunkt: String,
     val kooperationsvertrag: Boolean,
-    val adresse: AdresseDto,
+    val adress_id: Int,
     val schulleitung_mail: String,
     val stubo_mail: String,
     val schueleranzahl: Int,
@@ -21,7 +21,7 @@ data class AdresseDto(
     val adress_id: Int?,
     val strasse: String,
     val hausnummer: String,
-    val ort: OrtDto
+    val ort_id: Int
 )
 
 @Serializable

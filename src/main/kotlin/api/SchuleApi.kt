@@ -2,6 +2,7 @@ package api
 
 import dto.SchuleDto
 import io.ktor.application.call
+import io.ktor.request.receive
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.put
@@ -20,15 +21,14 @@ fun Route.schulenApi() {
             call.logRequest()
             val result = SchuleService.getAll()
             val json = serializer.toJson(SchuleDto.serializer().list, result)
-
             call.respondJsonOk(json)
         }
 
         put {
             call.logRequest()
-            val schuleId = call.getParameterAsIntOrNullAndRespondError("schule_id")
-
+            val obj = call.receive<SchuleDto>()
+            val result = SchuleService.createOrUpdate(obj)
+            call.respond(HttpServerResponse.map(result))
         }
-
     }
 }

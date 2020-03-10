@@ -11,6 +11,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.regex.Pattern
 
 class Ort(id: EntityID<Int>) : IntEntity(id) {
+    var plz by Orte.plz
+    var bezeichnung by Orte.bezeichnung
+
     companion object : IntEntityClass<Ort>(Orte) {
         /**
          * persist in db
@@ -29,87 +32,34 @@ class Ort(id: EntityID<Int>) : IntEntity(id) {
     }
 
     fun toDto() = OrtDto(id.value, plz, bezeichnung)
-
-    var plz by Orte.plz
-    var bezeichnung by Orte.bezeichnung
 }
 
 class Adresse(id: EntityID<Int>) : IntEntity(id) {
+    var strasse by Adressen.strasse
+    var hausnummer by Adressen.hausnummer
+    var ort by Ort referencedOn Adressen.ort
+
     companion object : IntEntityClass<Adresse>(Adressen) {
         /**
          * persist in db
          */
         fun save(dto: AdresseDto): Result<Adresse> = transaction {
-            val ortResult = Ort.save(dto.ort)
-            val ort = ortResult.getOrNull()
-            if (ort == null || ortResult.isFailure) Result.failure(ortResult.exceptionOrNull()!!)
-            else {
-                val adresse = Adresse.new(dto.adress_id) {
-                    this.strasse = dto.strasse
-                    this.hausnummer = dto.hausnummer
-                    this.ort = ort
-                }
+            val ort = Ort[dto.ort_id] // TODO catch exceptions?
 
-                Result.success(adresse)
+            val adresse = Adresse.new(dto.adress_id) {
+                this.strasse = dto.strasse
+                this.hausnummer = dto.hausnummer
+                this.ort = ort
             }
+
+            Result.success(adresse)
         }
     }
 
-    fun toDto() = AdresseDto(id.value, strasse, hausnummer, ort.toDto())
-
-    var strasse by Adressen.strasse
-    var hausnummer by Adressen.hausnummer
-    var ort by Ort referencedOn Adressen.ort
+    fun toDto() = AdresseDto(id.value, strasse, hausnummer, ort.id.value)
 }
 
 class Schule(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Schule>(Schulen) {
-        /**
-         * persist in db
-         */
-        fun save(dto: SchuleDto): Result<Schule> {
-            if (!validateMail(dto.stubo_mail) || !validateMail(dto.schulleitung_mail))
-                return Result.failure(MailNotValidException("stubo or schulleitungs mail is not a valid email"))
-
-            return transaction {
-                val adresseResult = Adresse.save(dto.adresse)
-                val adresse = adresseResult.getOrNull()
-
-                if (adresse == null) Result.failure(adresseResult.exceptionOrNull()!!)
-                else {
-                    val schule = Schule.new(dto.schule_id) {
-                        this.schulform = dto.schulform
-                        this.schwerpunkt = dto.schwerpunkt
-                        this.kooperationsvertrag = dto.kooperationsvertrag
-                        this.adresse = adresse
-                        this.schulleitung_mail = dto.schulleitung_mail
-                        this.stubo_mail = dto.stubo_mail
-                        this.schueleranzahl = dto.schueleranzahl
-                        this.kaoa_hochschule = dto.kaoa_hochschule
-                        this.talentscouting = dto.talentscouting
-                    }
-
-                    Result.success(schule)
-                }
-            }
-
-        }
-    }
-
-
-    fun toDto() = SchuleDto(
-        id.value,
-        schulform,
-        schwerpunkt,
-        kooperationsvertrag,
-        adresse.toDto(),
-        schulleitung_mail,
-        stubo_mail,
-        schueleranzahl,
-        kaoa_hochschule,
-        talentscouting
-    )
-
     var schulform by Schulen.schulform
     var schwerpunkt by Schulen.schwerpunkt
     var kooperationsvertrag by Schulen.kooperationsvertrag
@@ -119,6 +69,57 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
     var schueleranzahl by Schulen.schueleranzahl
     var kaoa_hochschule by Schulen.kaoa_hochschule
     var talentscouting by Schulen.talentscouting
+
+    companion object : IntEntityClass<Schule>(Schulen) {
+        /**
+         * persist in db
+         */
+        fun save(dto: SchuleDto): Result<Schule> {
+            if (!validateMail(dto.stubo_mail) || !validateMail(dto.schulleitung_mail))
+                return Result.failure(MailNotValidException("stubo or schulleitungs mail is not a valid email"))
+
+            return transaction {
+                val adresse = Adresse[dto.adress_id]
+
+
+                val schule: Schule = if (dto.schule_id == null) new {
+                    update(dto, adresse)
+                } else {
+                    val old = Schule[dto.schule_id]
+                    old.update(dto, adresse)
+
+                    Schule[dto.schule_id]
+                }
+
+                Result.success(schule)
+            }
+        }
+    }
+
+    private fun update(dto: SchuleDto, adresse: Adresse) {
+        this.schulform = dto.schulform
+        this.schwerpunkt = dto.schwerpunkt
+        this.kooperationsvertrag = dto.kooperationsvertrag
+        this.adresse = adresse
+        this.schulleitung_mail = dto.schulleitung_mail
+        this.stubo_mail = dto.stubo_mail
+        this.schueleranzahl = dto.schueleranzahl
+        this.kaoa_hochschule = dto.kaoa_hochschule
+        this.talentscouting = dto.talentscouting
+    }
+
+    fun toDto() = SchuleDto(
+        id.value,
+        schulform,
+        schwerpunkt,
+        kooperationsvertrag,
+        adresse.id.value,
+        schulleitung_mail,
+        stubo_mail,
+        schueleranzahl,
+        kaoa_hochschule,
+        talentscouting
+    )
 }
 
 /**
