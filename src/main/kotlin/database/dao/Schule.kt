@@ -1,72 +1,13 @@
-package database
+package database.dao
 
 import api.MailNotValidException
-import dto.AdresseDto
-import dto.OrtDto
+import database.Schulen
+import database.validateMail
 import dto.SchuleDto
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.regex.Pattern
-
-class Ort(id: EntityID<Int>) : IntEntity(id) {
-    var plz by Orte.plz
-    var bezeichnung by Orte.bezeichnung
-
-    companion object : IntEntityClass<Ort>(Orte) {
-        /**
-         * persist in db
-         */
-        fun save(dto: OrtDto): Result<Ort> {
-            val ort = transaction {
-                Ort.new(dto.ort_id) {
-                    this.plz = dto.plz
-                    this.bezeichnung = dto.bezeichnung
-                }
-            }
-
-            return Result.success(ort)
-        }
-
-    }
-
-    fun toDto() = OrtDto(id.value, plz, bezeichnung)
-}
-
-class Adresse(id: EntityID<Int>) : IntEntity(id) {
-    var strasse by Adressen.strasse
-    var hausnummer by Adressen.hausnummer
-    var ort by Ort referencedOn Adressen.ort
-
-    companion object : IntEntityClass<Adresse>(Adressen) {
-        /**
-         * persist in db
-         */
-        fun save(dto: AdresseDto): Result<Adresse> = transaction {
-            val ort = Ort[dto.ort_id] // TODO catch exceptions? EntityNotFoundException
-
-
-            val adresse = if (dto.adress_id == null) Adresse.new(dto.adress_id) {
-                update(dto, ort)
-            } else {
-                val old = Adresse[dto.adress_id]
-                old.update(dto, ort)
-                Adresse[dto.adress_id]
-            }
-
-            Result.success(adresse)
-        }
-    }
-
-    private fun update(dto: AdresseDto, ort: Ort) {
-        this.strasse = dto.strasse
-        this.hausnummer = dto.hausnummer
-        this.ort = ort
-    }
-
-    fun toDto() = AdresseDto(id.value, strasse, hausnummer, ort.id.value)
-}
 
 class Schule(id: EntityID<Int>) : IntEntity(id) {
     var schulform by Schulen.schulform
@@ -130,15 +71,3 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
         talentscouting
     )
 }
-
-/**
- * https://gist.github.com/ironic-name/f8e8479c76e80d470cacd91001e7b45b
- */
-fun validateMail(mail: String): Boolean = Pattern.compile(
-    "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]|[\\w-]{2,}))@"
-            + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-            + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
-            + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-            + "[0-9]{1,2}|25[0-5]|2[0-4][0-9]))|"
-            + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$"
-).matcher(mail).matches()

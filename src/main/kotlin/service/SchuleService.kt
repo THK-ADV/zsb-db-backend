@@ -1,6 +1,6 @@
 package service
 
-import database.Schule
+import database.dao.Schule
 import dto.SchuleDto
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration

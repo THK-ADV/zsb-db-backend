@@ -1,6 +1,6 @@
 package service
 
-import database.Adresse
+import database.dao.Adresse
 import dto.AdresseDto
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration

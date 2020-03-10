@@ -1,5 +1,8 @@
 package database
 
+import database.dao.Adresse
+import database.dao.Ort
+import database.dao.Schule
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
