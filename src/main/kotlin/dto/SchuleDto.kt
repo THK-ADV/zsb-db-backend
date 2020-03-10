@@ -18,7 +18,7 @@ data class SchuleDto(
 
 @Serializable
 data class AdresseDto(
-    val adress_id: Int?,
+    val adress_id: Int? = null,
     val strasse: String,
     val hausnummer: String,
     val ort_id: Int
@@ -26,7 +26,7 @@ data class AdresseDto(
 
 @Serializable
 data class OrtDto(
-    val ort_id: Int?,
+    val ort_id: Int? = null,
     val plz: Int,
     val bezeichnung: String
 )

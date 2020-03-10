@@ -45,7 +45,7 @@ suspend fun ApplicationCall.checkIdAndRespondUsePostIfNull(id: Int?): Boolean {
  */
 suspend fun ApplicationCall.checkIdAndRespondUsePutIfNotNull(id: Int?): Boolean {
     if (id != null) {
-        this.respondText("ID not given. Use post to create.", ContentType.Text.Plain, HttpStatusCode.BadRequest)
+        this.respondText("ID given. Use put to update existing data.", ContentType.Text.Plain, HttpStatusCode.BadRequest)
         return true
     }
     return false

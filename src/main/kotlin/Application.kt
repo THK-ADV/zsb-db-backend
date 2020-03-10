@@ -1,4 +1,5 @@
-import api.schulenApi
+import api.adresseApi
+import api.schuleApi
 import database.DbSettings
 import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
@@ -36,7 +37,8 @@ fun configureServer(server: Application) {
     server.install(Compression)
     server.install(CallLogging)
     server.install(Routing) {
-        schulenApi()
+        schuleApi()
+        adresseApi()
     }
     server.install(ContentNegotiation) {
         serialization(

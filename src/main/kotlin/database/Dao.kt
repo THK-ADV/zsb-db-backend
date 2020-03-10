@@ -44,16 +44,25 @@ class Adresse(id: EntityID<Int>) : IntEntity(id) {
          * persist in db
          */
         fun save(dto: AdresseDto): Result<Adresse> = transaction {
-            val ort = Ort[dto.ort_id] // TODO catch exceptions?
+            val ort = Ort[dto.ort_id] // TODO catch exceptions? EntityNotFoundException
 
-            val adresse = Adresse.new(dto.adress_id) {
-                this.strasse = dto.strasse
-                this.hausnummer = dto.hausnummer
-                this.ort = ort
+
+            val adresse = if (dto.adress_id == null) Adresse.new(dto.adress_id) {
+                update(dto, ort)
+            } else {
+                val old = Adresse[dto.adress_id]
+                old.update(dto, ort)
+                Adresse[dto.adress_id]
             }
 
             Result.success(adresse)
         }
+    }
+
+    private fun update(dto: AdresseDto, ort: Ort) {
+        this.strasse = dto.strasse
+        this.hausnummer = dto.hausnummer
+        this.ort = ort
     }
 
     fun toDto() = AdresseDto(id.value, strasse, hausnummer, ort.id.value)
