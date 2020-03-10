@@ -6,14 +6,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 object SchuleService {
 
-    fun getAll(): List<SchuleDto> {
-        val result = mutableListOf<SchuleDto>()
-
-        transaction {
-            Schule.all().forEach { entity ->
-                result.add(SchuleDto.convert(entity))
-            }
-        }
+    fun getAll(): List<SchuleDto> = transaction {
+        Schule.all().map { it.toDto() }
+    }
 
         return result
     }
