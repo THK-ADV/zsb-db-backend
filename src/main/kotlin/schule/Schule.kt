@@ -1,13 +1,13 @@
-package database.dao
+package schule
 
-import api.MailNotValidException
-import database.Schulen
-import database.validateMail
-import dto.SchuleDto
+import adresse.Adresse
+import error_handling.MailNotValidException
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
+import schule.table.Schulen
+import utilty.validateMail
 
 class Schule(id: EntityID<Int>) : IntEntity(id) {
     var schulform by Schulen.schulform

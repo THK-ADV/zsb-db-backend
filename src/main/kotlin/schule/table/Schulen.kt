@@ -1,17 +1,7 @@
-package database
+package schule.table
 
+import adresse.table.Adressen
 import org.jetbrains.exposed.dao.id.IntIdTable
-
-object Orte : IntIdTable() {
-    val plz = integer("plz")
-    val bezeichnung = text("bezeichnung")
-}
-
-object Adressen : IntIdTable() {
-    val strasse = text("strasse")
-    val hausnummer = varchar("hausnummer", 5)
-    val ort = reference("ort", Orte)
-}
 
 object Schulen : IntIdTable() {
     val schulform = text("schulform")

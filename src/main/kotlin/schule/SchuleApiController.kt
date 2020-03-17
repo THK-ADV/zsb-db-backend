@@ -1,6 +1,6 @@
-package api
+package schule
 
-import dto.SchuleDto
+import error_handling.HttpServerResponse
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
@@ -8,7 +8,7 @@ import io.ktor.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
-import service.SchuleService
+import utilty.*
 
 fun Route.schuleApi() {
     val serializer = Json(JsonConfiguration.Stable)

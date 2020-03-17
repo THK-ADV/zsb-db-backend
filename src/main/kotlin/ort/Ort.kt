@@ -1,11 +1,10 @@
-package database.dao
+package ort
 
-import database.Orte
-import dto.OrtDto
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
+import ort.table.Orte
 
 class Ort(id: EntityID<Int>) : IntEntity(id) {
     var plz by Orte.plz

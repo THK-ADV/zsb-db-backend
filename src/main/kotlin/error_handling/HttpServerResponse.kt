@@ -1,4 +1,4 @@
-package api
+package error_handling
 
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode

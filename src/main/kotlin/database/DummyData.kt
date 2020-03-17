@@ -1,11 +1,14 @@
 package database
 
-import database.dao.Adresse
-import database.dao.Ort
-import database.dao.Schule
+import adresse.Adresse
+import adresse.table.Adressen
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import ort.Ort
+import ort.table.Orte
+import schule.Schule
+import schule.table.Schulen
 
 fun recreateTablesAndFillWithDummyData() {
     val logger = KotlinLogging.logger {}

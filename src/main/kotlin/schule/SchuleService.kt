@@ -1,7 +1,5 @@
-package service
+package schule
 
-import database.dao.Schule
-import dto.SchuleDto
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.exposed.sql.transactions.transaction

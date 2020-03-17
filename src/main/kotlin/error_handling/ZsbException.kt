@@ -1,4 +1,4 @@
-package api
+package error_handling
 
 
 sealed class ZsbException(msg: String): Exception(msg)

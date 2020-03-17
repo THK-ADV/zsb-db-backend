@@ -1,5 +1,4 @@
-import api.adresseApi
-import api.schuleApi
+import adresse.adresseApi
 import database.DbSettings
 import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
@@ -15,6 +14,7 @@ import io.ktor.serialization.serialization
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.serialization.json.Json
+import schule.schuleApi
 
 
 fun Application.main() {

@@ -1,11 +1,11 @@
-package database.dao
+package adresse
 
-import database.Adressen
-import dto.AdresseDto
+import adresse.table.Adressen
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
+import ort.Ort
 
 class Adresse(id: EntityID<Int>) : IntEntity(id) {
     var strasse by Adressen.strasse

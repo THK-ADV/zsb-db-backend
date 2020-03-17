@@ -1,5 +1,6 @@
-package api
+package utilty
 
+import error_handling.HttpServerResponse
 import io.ktor.application.ApplicationCall
 import io.ktor.features.origin
 import io.ktor.http.ContentType
