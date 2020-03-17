@@ -5,19 +5,15 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.routing.*
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
 import utilty.*
 
 fun Route.adresseApi() {
-    val serializer = Json(JsonConfiguration.Stable)
-
     route("adressen") {
         get {
             call.logRequest()
             val result = AdresseService.getAll()
-            val json = serializer.toJson(AdresseDto.serializer().list, result)
+            val json = Serializer.stable.toJson(AdresseDto.serializer().list, result)
             call.respondJsonOk(json)
         }
 
@@ -25,7 +21,7 @@ fun Route.adresseApi() {
             call.logRequest()
             val adressId = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
             val result = AdresseService.getById(adressId)
-            val json = serializer.toJson(AdresseDto.serializer(), result)
+            val json = Serializer.stable.toJson(AdresseDto.serializer(), result)
             call.respondJsonOk(json)
         }
 
@@ -44,7 +40,5 @@ fun Route.adresseApi() {
             val result = AdresseService.createOrUpdate(adresseDto)
             call.respond(HttpServerResponse.map(result))
         }
-
-
     }
 }

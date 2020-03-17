@@ -5,20 +5,16 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.routing.*
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
 import utilty.*
 
 fun Route.schuleApi() {
-    val serializer = Json(JsonConfiguration.Stable)
-
     route("schulen") {
 
         get {
             call.logRequest()
             val result = SchuleService.getAll()
-            val json = serializer.toJson(SchuleDto.serializer().list, result)
+            val json = Serializer.stable.toJson(SchuleDto.serializer().list, result)
             call.respondJsonOk(json)
         }
 
@@ -26,7 +22,7 @@ fun Route.schuleApi() {
             call.logRequest()
             val id = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
             val schule = SchuleService.getById(id)
-            val json = serializer.toJson(SchuleDto.serializer(), schule)
+            val json = Serializer.stable.toJson(SchuleDto.serializer(), schule)
             call.respondJsonOk(json)
         }
 
