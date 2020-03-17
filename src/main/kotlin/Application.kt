@@ -14,6 +14,7 @@ import io.ktor.serialization.serialization
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.serialization.json.Json
+import ort.ortApi
 import schule.schuleApi
 
 
@@ -39,6 +40,7 @@ fun configureServer(server: Application) {
     server.install(Routing) {
         schuleApi()
         adresseApi()
+        ortApi()
     }
     server.install(ContentNegotiation) {
         serialization(

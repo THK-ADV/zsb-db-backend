@@ -14,17 +14,23 @@ class Ort(id: EntityID<Int>) : IntEntity(id) {
         /**
          * persist in db
          */
-        fun save(dto: OrtDto): Result<Ort> {
-            val ort = transaction {
-                new(dto.ort_id) {
-                    this.plz = dto.plz
-                    this.bezeichnung = dto.bezeichnung
-                }
+        fun save(dto: OrtDto): Result<Ort> = transaction {
+            val ort: Ort = if (dto.ort_id == null) new {
+                update(dto)
+            } else {
+                val old = Ort[dto.ort_id]
+                old.update(dto)
+
+                Ort[dto.ort_id]
             }
 
-            return Result.success(ort)
+            Result.success(ort)
         }
+    }
 
+    private fun update(dto: OrtDto) {
+        this.plz = dto.plz
+        this.bezeichnung = dto.bezeichnung
     }
 
     fun toDto() = OrtDto(id.value, plz, bezeichnung)
