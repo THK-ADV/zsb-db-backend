@@ -3,11 +3,10 @@ import database.DbSettings
 import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
 import io.ktor.application.install
-import io.ktor.features.CallLogging
-import io.ktor.features.Compression
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.DefaultHeaders
+import io.ktor.features.*
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.routing.Routing
 import io.ktor.serialization.DefaultJsonConfiguration
 import io.ktor.serialization.serialization
@@ -37,6 +36,13 @@ fun configureServer(server: Application) {
     server.install(DefaultHeaders)
     server.install(Compression)
     server.install(CallLogging)
+    server.install(CORS) {
+        method(HttpMethod.Options)
+        header(HttpHeaders.XForwardedProto)
+        anyHost()
+        allowCredentials = true
+        allowNonSimpleContentTypes = true
+    }
     server.install(Routing) {
         schuleApi()
         adresseApi()
