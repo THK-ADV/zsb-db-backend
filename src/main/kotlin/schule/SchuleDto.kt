@@ -2,9 +2,11 @@ package schule
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class SchuleDto(
     val schule_id: Int? = null,
+    val name: String,
     val schulform: String,
     val schwerpunkt: String,
     val kooperationsvertrag: Boolean,

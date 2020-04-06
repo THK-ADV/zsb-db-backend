@@ -56,36 +56,39 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         Schule.new {
+            schulname = "Tigerentenclub"
             schulform = "Grundschule"
             schwerpunkt = "Kinder"
             kooperationsvertrag = false
             adresse = elementary
-            schulleitung_mail = "masterHand@elementaryGB.de"
-            stubo_mail = "stubo@elemenatryGB.de"
+            schulleitung_mail = "boss@tigerentenclub.de"
+            stubo_mail = "info@tigerentenclub.de"
             schueleranzahl = 250
             kaoa_hochschule = false
             talentscouting = true
         }
 
         Schule.new {
+            schulname = "Hermann-Voss-Realschule"
             schulform = "Realschule"
             schwerpunkt = "Jugentliche"
             kooperationsvertrag = true
             adresse = middle
-            schulleitung_mail = "mediumPeter@middleGM.de"
-            stubo_mail = "stubo@mediumGM.de"
+            schulleitung_mail = "boss@hr-real.de"
+            stubo_mail = "info@hr-real.de"
             schueleranzahl = 500
             kaoa_hochschule = true
             talentscouting = false
         }
 
         Schule.new {
+            schulname = "Uni Köln"
             schulform = "Hochschule"
             schwerpunkt = "Studenten"
             kooperationsvertrag = true
             adresse = high
-            schulleitung_mail = "rank@highCL.de"
-            stubo_mail = "rank@highCL.de"
+            schulleitung_mail = "boss@uni-koeln.de"
+            stubo_mail = "info@uni-koeln.de"
             schueleranzahl = 750
             kaoa_hochschule = true
             talentscouting = true

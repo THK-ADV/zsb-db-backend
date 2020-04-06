@@ -10,6 +10,7 @@ import schule.table.Schulen
 import utilty.validateMail
 
 class Schule(id: EntityID<Int>) : IntEntity(id) {
+    var schulname by Schulen.schulname
     var schulform by Schulen.schulform
     var schwerpunkt by Schulen.schwerpunkt
     var kooperationsvertrag by Schulen.kooperationsvertrag
@@ -47,6 +48,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
     }
 
     private fun update(dto: SchuleDto, adresse: Adresse) {
+        this.schulname = dto.name
         this.schulform = dto.schulform
         this.schwerpunkt = dto.schwerpunkt
         this.kooperationsvertrag = dto.kooperationsvertrag
@@ -60,6 +62,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
 
     fun toDto() = SchuleDto(
         id.value,
+        schulname,
         schulform,
         schwerpunkt,
         kooperationsvertrag,
