@@ -1,6 +1,8 @@
 package schule
 
+import adresse.AdresseDto
 import kotlinx.serialization.Serializable
+import ort.OrtDto
 
 
 @Serializable
@@ -15,5 +17,7 @@ data class SchuleDto(
     val stubo_mail: String,
     val schueleranzahl: Int,
     val kaoa_hochschule: Boolean,
-    val talentscouting: Boolean
+    val talentscouting: Boolean,
+    var adresse: AdresseDto? = null,
+    var ort: OrtDto? = null
 )

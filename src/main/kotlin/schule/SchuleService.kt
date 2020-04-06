@@ -20,4 +20,14 @@ object SchuleService {
             json.toString()
         }
     }
+
+    fun getAllWithResolvedIds(): List<SchuleDto> = transaction {
+        Schule.all().map {
+            val dto = it.toDto()
+            dto.adresse = it.adresse.toDto()
+            dto.ort = it.adresse.ort.toDto()
+
+            dto
+        }
+    }
 }

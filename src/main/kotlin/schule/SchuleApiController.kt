@@ -13,7 +13,13 @@ fun Route.schuleApi() {
 
         get {
             call.logRequest()
-            val result = SchuleService.getAll()
+            val resolveIds = call.parameters["resolve_ids"]
+            val result = if (resolveIds == "true") {
+                SchuleService.getAllWithResolvedIds()
+            } else {
+                SchuleService.getAll()
+            }
+
             val json = Serializer.stable.toJson(SchuleDto.serializer().list, result)
             call.respondJsonOk(json)
         }
