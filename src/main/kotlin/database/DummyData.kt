@@ -71,7 +71,7 @@ fun recreateTablesAndFillWithDummyData() {
         Schule.new {
             schulname = "Hermann-Voss-Realschule"
             schulform = "Realschule"
-            schwerpunkt = "Jugentliche"
+            schwerpunkt = "Jugendliche"
             kooperationsvertrag = true
             adresse = middle
             schulleitung_mail = "boss@hr-real.de"

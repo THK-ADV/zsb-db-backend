@@ -15,9 +15,9 @@ fun Route.schuleApi() {
             call.logRequest()
             val resolveIds = call.parameters["resolve_ids"]
             val result = if (resolveIds == "true") {
-                SchuleService.getAllWithResolvedIds()
+                SchuleDao.getAllAtomic()
             } else {
-                SchuleService.getAll()
+                SchuleDao.getAll()
             }
 
             val json = Serializer.stable.toJson(SchuleDto.serializer().list, result)
@@ -27,7 +27,14 @@ fun Route.schuleApi() {
         get("/{id}") {
             call.logRequest()
             val id = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
-            val schule = SchuleService.getById(id)
+
+            val resolveIds = call.parameters["resolve_ids"]
+            val schule = if (resolveIds == "true") {
+                SchuleDao.getByIdAtomic(id)
+            } else {
+                SchuleDao.getById(id)
+            }
+
             val json = Serializer.stable.toJson(SchuleDto.serializer(), schule)
             call.respondJsonOk(json)
         }
@@ -36,7 +43,7 @@ fun Route.schuleApi() {
             call.logRequest()
             val schuleDto = call.receive<SchuleDto>()
             if (call.checkIdAndRespondUsePutIfNotNull(schuleDto.schule_id)) return@post
-            val result = SchuleService.createOrUpdate(schuleDto)
+            val result = SchuleDao.createOrUpdate(schuleDto)
             call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
         }
 
@@ -44,7 +51,7 @@ fun Route.schuleApi() {
             call.logRequest()
             val schuleDto = call.receive<SchuleDto>()
             if (call.checkIdAndRespondUsePostIfNull(schuleDto.schule_id)) return@put
-            val result = SchuleService.createOrUpdate(schuleDto)
+            val result = SchuleDao.createOrUpdate(schuleDto)
             call.respond(HttpServerResponse.map(result))
         }
     }

@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import schule.table.Schulen
 import utilty.validateMail
 
+// TODO ID in uuids umstellen
 class Schule(id: EntityID<Int>) : IntEntity(id) {
     var schulname by Schulen.schulname
     var schulform by Schulen.schulform

@@ -18,6 +18,10 @@ import schule.schuleApi
 
 
 fun Application.main() {
+    // connect to db
+    DbSettings.db
+    recreateTablesAndFillWithDummyData()
+
     configureServer(this)
 }
 
