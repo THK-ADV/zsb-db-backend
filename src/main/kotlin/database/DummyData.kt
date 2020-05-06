@@ -9,9 +9,10 @@ import ort.Ort
 import ort.table.Orte
 import schule.Schule
 import schule.table.Schulen
+import utilty.ColoredLogging
 
 fun recreateTablesAndFillWithDummyData() {
-    val logger = KotlinLogging.logger {}
+    val log = ColoredLogging(KotlinLogging.logger {})
 
     transaction {
         // addLogger(StdOutSqlLogger)
@@ -91,6 +92,6 @@ fun recreateTablesAndFillWithDummyData() {
             talentscouting = true
         }
 
-        logger.info { "Loaded dummy data" }
+        log.info("Loaded dummy data")
     }
 }
