@@ -57,7 +57,7 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         Schule.new {
-            schulform = "Grundschule"
+            schulform = 1
             schwerpunkt = "Kinder"
             kooperationsvertrag = false
             adresse = elementary
@@ -69,7 +69,7 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         Schule.new {
-            schulform = "Realschule"
+            schulform = 2
             schwerpunkt = "Jugentliche"
             kooperationsvertrag = true
             adresse = middle
@@ -81,7 +81,7 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         Schule.new {
-            schulform = "Hochschule"
+            schulform = 3
             schwerpunkt = "Studenten"
             kooperationsvertrag = true
             adresse = high

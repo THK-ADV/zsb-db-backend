@@ -13,9 +13,12 @@ import io.ktor.serialization.serialization
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.serialization.json.Json
+import mu.KotlinLogging
 import ort.ortApi
 import schule.schuleApi
+import utilty.ColoredLogging
 
+val log = ColoredLogging(KotlinLogging.logger {})
 
 fun Application.main() {
     configureServer(this)
@@ -27,9 +30,12 @@ fun main() {
 
     recreateTablesAndFillWithDummyData()
 
-    embeddedServer(Netty, port = 8080) {
+    val server = embeddedServer(Netty, port = 8080) {
         configureServer(this)
-    }.start(wait = true)
+    }
+
+    log.info("## Start Server ##")
+    server.start(wait = true)
 }
 
 fun configureServer(server: Application) {

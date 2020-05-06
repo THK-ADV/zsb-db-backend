@@ -17,8 +17,9 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 return HttpServerResponse("Unknown error.", ContentType.Text.Plain, HttpStatusCode.InternalServerError)
 
             val (failureMsg, statusCode) = when(exception) {
-                is NotAuthorizedException -> (exception.message ?: "Not authorized.") to HttpStatusCode.Forbidden
-                is MailNotValidException -> (exception.message ?: "Mail is not valid.") to HttpStatusCode.BadRequest
+                is NotAuthorizedException -> exception.message to HttpStatusCode.Forbidden
+                is MailNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is SchulformNotValidException -> exception.message to HttpStatusCode.BadRequest
             }
 
             return HttpServerResponse(failureMsg, ContentType.Text.Plain, statusCode)

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SchuleDto(
     val schule_id: Int? = null,
-    val schulform: String,
+    val schulform: Int,
     val schwerpunkt: String,
     val kooperationsvertrag: Boolean,
     val adress_id: Int,

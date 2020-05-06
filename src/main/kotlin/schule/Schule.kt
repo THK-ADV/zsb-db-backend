@@ -2,6 +2,8 @@ package schule
 
 import adresse.Adresse
 import error_handling.MailNotValidException
+import error_handling.SchulformNotValidException
+import error_handling.ZsbException
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -25,8 +27,8 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
          * persist in db
          */
         fun save(dto: SchuleDto): Result<Schule> {
-            if (!validateMail(dto.stubo_mail) || !validateMail(dto.schulleitung_mail))
-                return Result.failure(MailNotValidException("stubo or schulleitungs mail is not a valid email"))
+            val exception = validateDto(dto)
+            if (exception != null) return Result.failure(exception)
 
             return transaction {
                 val adresse = Adresse[dto.adress_id]
@@ -43,6 +45,17 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
 
                 Result.success(schule)
             }
+        }
+
+        private fun validateDto(dto: SchuleDto): ZsbException? {
+            if (!validateMail(dto.stubo_mail))
+                return MailNotValidException("stubo mail is not a valid email.")
+            if (!validateMail(dto.schulleitung_mail))
+                return MailNotValidException("schulleitungs mail is not a valid email.")
+            if (Schulform.getDescById(dto.schulform) == null)
+                return SchulformNotValidException("This is not a valid index for Schulform.")
+
+            return null
         }
     }
 
