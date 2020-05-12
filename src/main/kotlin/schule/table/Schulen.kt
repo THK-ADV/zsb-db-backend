@@ -5,7 +5,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 
 object Schulen : IntIdTable() {
     val schulname = text("schulname")
-    val schulform = text("schulform")
+    val schulform = integer("schulform")
     val schwerpunkt = text("schwerpunkt")
     val kooperationsvertrag = bool("kooperationsvertrag")
     val adress_id = reference("adress_id", Adressen)

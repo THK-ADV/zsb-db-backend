@@ -9,7 +9,7 @@ import ort.OrtDto
 data class SchuleDto(
     val schule_id: Int? = null,
     val name: String,
-    val schulform: String,
+    val schulform: Int,
     val schwerpunkt: String,
     val kooperationsvertrag: Boolean,
     val adress_id: Int,

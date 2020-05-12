@@ -9,9 +9,10 @@ import ort.Ort
 import ort.table.Orte
 import schule.Schule
 import schule.table.Schulen
+import utilty.ColoredLogging
 
 fun recreateTablesAndFillWithDummyData() {
-    val logger = KotlinLogging.logger {}
+    val log = ColoredLogging(KotlinLogging.logger {})
 
     transaction {
         // addLogger(StdOutSqlLogger)
@@ -56,8 +57,8 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         Schule.new {
+            schulform = 1
             schulname = "Tigerentenclub"
-            schulform = "Grundschule"
             schwerpunkt = "Kinder"
             kooperationsvertrag = false
             adresse = elementary
@@ -69,8 +70,8 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         Schule.new {
+            schulform = 2
             schulname = "Hermann-Voss-Realschule"
-            schulform = "Realschule"
             schwerpunkt = "Jugendliche"
             kooperationsvertrag = true
             adresse = middle
@@ -82,8 +83,8 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         Schule.new {
+            schulform = 3
             schulname = "Uni Köln"
-            schulform = "Hochschule"
             schwerpunkt = "Studenten"
             kooperationsvertrag = true
             adresse = high
@@ -94,6 +95,6 @@ fun recreateTablesAndFillWithDummyData() {
             talentscouting = true
         }
 
-        logger.info { "Loaded dummy data" }
+        log.info("Loaded dummy data")
     }
 }

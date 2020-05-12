@@ -12,9 +12,9 @@ import kotlinx.serialization.json.JsonElement
 import mu.KotlinLogging
 
 fun ApplicationCall.logRequest() {
-    val apiLogger = KotlinLogging.logger {}
+    val log = ColoredLogging(KotlinLogging.logger {})
     val params = if (parameters.isEmpty()) "" else parameters.toString()
-    apiLogger.info { "${request.httpMethod.value} ${request.path()} $params from ${request.origin.remoteHost}" }
+    log.info("${request.httpMethod.value} ${request.path()} $params from ${request.origin.remoteHost}")
 }
 
 suspend fun ApplicationCall.getParameterAsIntOrNullAndRespondError(param: String): Int? {
