@@ -64,7 +64,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
     private fun update(dto: SchuleDto, adresse: Adresse) {
         this.schulname = dto.name
         this.schulform = dto.schulform
-        this.schwerpunkt = dto.schwerpunkt
+        this.schwerpunkt = dto.schwerpunkt.toString() // TODO find better solution. Null values in DB?
         this.kooperationsvertrag = dto.kooperationsvertrag
         this.adresse = adresse
         this.schulleitung_mail = dto.schulleitung_mail

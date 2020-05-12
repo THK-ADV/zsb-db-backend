@@ -58,6 +58,5 @@ fun Route.schuleApi() = route("schulen") {
         call.logRequest()
         val json = Serializer.stable.toJson(SchulformDto.serializer().list, SchulformDto.generate())
         call.respondJsonOk(json)
-
     }
 }
