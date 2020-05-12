@@ -48,6 +48,7 @@ fun configureServer(server: Application) {
     server.install(CallLogging)
     server.install(CORS) {
         method(HttpMethod.Options)
+        method(HttpMethod.Put)
         header(HttpHeaders.XForwardedProto)
         anyHost()
         allowCredentials = true

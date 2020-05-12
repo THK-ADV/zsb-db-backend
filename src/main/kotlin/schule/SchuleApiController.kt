@@ -23,6 +23,12 @@ fun Route.schuleApi() = route("schulen") {
         call.respondJsonOk(json)
     }
 
+    get("/schulformen") {
+        call.logRequest()
+        val json = Serializer.stable.toJson(SchulformDto.serializer().list, SchulformDto.generate())
+        call.respondJsonOk(json)
+    }
+
     get("/{id}") {
         call.logRequest()
         val id = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
@@ -52,11 +58,5 @@ fun Route.schuleApi() = route("schulen") {
         if (call.checkIdAndRespondUsePostIfNull(schuleDto.schule_id)) return@put
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result))
-    }
-
-    get("/schulform") {
-        call.logRequest()
-        val json = Serializer.stable.toJson(SchulformDto.serializer().list, SchulformDto.generate())
-        call.respondJsonOk(json)
     }
 }
