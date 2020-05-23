@@ -12,7 +12,14 @@ fun Route.adresseApi() {
     route("adressen") {
         get {
             call.logRequest()
-            val result = AdresseService.getAll()
+
+            val resolveIds = call.parameters["resolve_ids"]
+            val result = if (resolveIds == "true") {
+                AdresseDao.getAllAtomic()
+            } else {
+                AdresseDao.getAll()
+            }
+
             val json = Serializer.stable.toJson(AdresseDto.serializer().list, result)
             call.respondJsonOk(json)
         }
@@ -20,7 +27,7 @@ fun Route.adresseApi() {
         get("/{id}") {
             call.logRequest()
             val adressId = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
-            val result = AdresseService.getById(adressId)
+            val result = AdresseDao.getById(adressId)
             val json = Serializer.stable.toJson(AdresseDto.serializer(), result)
             call.respondJsonOk(json)
         }
@@ -29,7 +36,7 @@ fun Route.adresseApi() {
             call.logRequest()
             val adresseDto = call.receive<AdresseDto>()
             if (call.checkIdAndRespondUsePutIfNotNull(adresseDto.adress_id)) return@post
-            val result = AdresseService.createOrUpdate(adresseDto)
+            val result = AdresseDao.createOrUpdate(adresseDto)
             call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
         }
 
@@ -37,7 +44,7 @@ fun Route.adresseApi() {
             call.logRequest()
             val adresseDto = call.receive<AdresseDto>()
             if (call.checkIdAndRespondUsePostIfNull(adresseDto.adress_id)) return@put
-            val result = AdresseService.createOrUpdate(adresseDto)
+            val result = AdresseDao.createOrUpdate(adresseDto)
             call.respond(HttpServerResponse.map(result))
         }
     }
