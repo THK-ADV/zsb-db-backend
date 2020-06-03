@@ -24,16 +24,22 @@ fun recreateTablesAndFillWithDummyData() {
         SchemaUtils.create(Orte, Adressen, Schulen)
 
         val gm = Ort.new {
+            kreis = "GM"
+            regierungsbezirk = "Oberberg."
             plz = 51643
             bezeichnung = "Gummersbach"
         }
 
         val kuerten = Ort.new {
+            kreis = "Kürten"
+            regierungsbezirk = "GL"
             plz = 51515
             bezeichnung = "Kürten"
         }
 
         val cologne = Ort.new {
+            kreis = "Südstad"
+            regierungsbezirk = "Köln"
             plz = 50667
             bezeichnung = "Köln"
         }

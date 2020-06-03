@@ -7,5 +7,7 @@ import kotlinx.serialization.Serializable
 data class OrtDto(
     val ort_id: Int? = null,
     val plz: Int,
-    val bezeichnung: String
+    val bezeichnung: String,
+    val kreis: String,
+    val regierungsbezirk: String
 )

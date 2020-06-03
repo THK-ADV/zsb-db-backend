@@ -24,7 +24,9 @@ class Adresse(id: EntityID<Int>) : IntEntity(id) {
                 ?: return@transaction Result.failure<Adresse>(OrtIdNotFoundException("Could't update Adresse due to wrong "))
 
             val matchedAdressen = Adresse.find {
-                (Adressen.ort eq dto.ort_id) and (Adressen.strasse eq dto.strasse) and (Adressen.hausnummer eq dto.hausnummer)
+                (Adressen.ort eq dto.ort_id)
+                    .and(Adressen.strasse eq dto.strasse)
+                    .and(Adressen.hausnummer eq dto.hausnummer)
             }
             val matchedAdresse = if (matchedAdressen.empty()) null else matchedAdressen.first()
 

@@ -14,7 +14,7 @@ fun Route.ortApi() {
    route("orte") {
         get {
             call.logRequest()
-            val result = OrtService.getAll()
+            val result = OrtDao.getAll()
             val json = Serializer.stable.toJson(OrtDto.serializer().list, result)
             call.respondJsonOk(json)
         }
@@ -22,7 +22,7 @@ fun Route.ortApi() {
         get("/{id}") {
             call.logRequest()
             val id = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
-            val ort = OrtService.getById(id)
+            val ort = OrtDao.getById(id)
             val json = Serializer.stable.toJson(OrtDto.serializer(), ort)
             call.respondJsonOk(json)
         }
@@ -34,7 +34,7 @@ fun Route.ortApi() {
 //            call.respondText { "everything is gonna be ok" }
 
             val ortDto = call.receive<OrtDto>()
-            val result = OrtService.createOrUpdate(ortDto)
+            val result = OrtDao.createOrUpdate(ortDto)
             call.respond(HttpServerResponse.map(result))
         }
     }

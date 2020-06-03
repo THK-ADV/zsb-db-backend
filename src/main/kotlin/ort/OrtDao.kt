@@ -3,7 +3,7 @@ package ort
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer
 
-object OrtService {
+object OrtDao {
     fun getAll(): List<OrtDto> = transaction {
         Ort.all().map { it.toDto() }
     }

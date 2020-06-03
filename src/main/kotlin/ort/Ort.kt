@@ -10,13 +10,20 @@ import ort.table.Orte
 class Ort(id: EntityID<Int>) : IntEntity(id) {
     var plz by Orte.plz
     var bezeichnung by Orte.bezeichnung
+    var kreis by Orte.kreis
+    var regierungsbezirk by Orte.regierungsbezirk
 
     companion object : IntEntityClass<Ort>(Orte) {
         /**
          * persist in db
          */
         fun save(dto: OrtDto): Result<Ort> = transaction {
-            val matchedOrte = Ort.find { (Orte.bezeichnung eq dto.bezeichnung) and (Orte.plz eq dto.plz) }
+            val matchedOrte = Ort.find {
+                (Orte.bezeichnung eq dto.bezeichnung)
+                    .and(Orte.plz eq dto.plz)
+                    .and(Orte.kreis eq dto.kreis)
+                    .and(Orte.regierungsbezirk eq dto.regierungsbezirk)
+            }
             val matchedOrt = if (matchedOrte.empty()) null else matchedOrte.first()
 
             val ort: Ort = when {
@@ -37,7 +44,9 @@ class Ort(id: EntityID<Int>) : IntEntity(id) {
     private fun update(dto: OrtDto) {
         this.plz = dto.plz
         this.bezeichnung = dto.bezeichnung
+        this.kreis = dto.kreis
+        this.regierungsbezirk = dto.regierungsbezirk
     }
 
-    fun toDto() = OrtDto(id.value, plz, bezeichnung)
+    fun toDto() = OrtDto(id.value, plz, bezeichnung, kreis, regierungsbezirk)
 }
