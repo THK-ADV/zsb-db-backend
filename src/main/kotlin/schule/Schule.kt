@@ -16,6 +16,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
     var schulname by Schulen.schulname
     var schulform by Schulen.schulform
     var schwerpunkt by Schulen.schwerpunkt
+    var anzahlSus by Schulen.anzahlSus
     var kooperationsvertrag by Schulen.kooperationsvertrag
     var adresse by Adresse referencedOn Schulen.adress_id
     var schulleitung_mail by Schulen.schulleitung_mail
@@ -65,6 +66,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
         this.schulname = dto.name
         this.schulform = dto.schulform
         this.schwerpunkt = dto.schwerpunkt.toString() // TODO find better solution. Null values in DB?
+        this.anzahlSus = dto.anzahlSus
         this.kooperationsvertrag = dto.kooperationsvertrag
         this.adresse = adresse
         this.schulleitung_mail = dto.schulleitung_mail
@@ -79,6 +81,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
         schulname,
         schulform,
         schwerpunkt,
+        anzahlSus,
         kooperationsvertrag,
         adresse.id.value,
         schulleitung_mail,

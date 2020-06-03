@@ -7,6 +7,7 @@ object Schulen : IntIdTable() {
     val schulname = text("schulname")
     val schulform = integer("schulform")
     val schwerpunkt = text("schwerpunkt")
+    val anzahlSus = integer("anzahl_sus")
     val kooperationsvertrag = bool("kooperationsvertrag")
     val adress_id = reference("adress_id", Adressen)
     val schulleitung_mail = varchar("schulleitung_mail", 250)

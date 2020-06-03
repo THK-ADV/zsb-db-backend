@@ -29,6 +29,12 @@ fun Route.schuleApi() = route("schulen") {
         call.respondJsonOk(json)
     }
 
+    get("/anzahl_sus") {
+        call.logRequest()
+        val json = Serializer.stable.toJson(AnzahlSusDto.serializer().list, AnzahlSusDto.generate())
+        call.respondJsonOk(json)
+    }
+
     get("/{id}") {
         call.logRequest()
         val id = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
