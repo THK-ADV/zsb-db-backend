@@ -54,6 +54,10 @@ fun Route.schuleApi() = route("schulen") {
 
     put {
         call.logRequest()
+//        val test = call.receive<String>()
+//        log.debug(test)
+//        log.debug("THE END")
+//        call.respondText { "Alrighty tighty mighty ... ugh" }
         val schuleDto = call.receive<SchuleDto>()
         if (call.checkIdAndRespondUsePostIfNull(schuleDto.schule_id)) return@put
         val result = SchuleDao.createOrUpdate(schuleDto)

@@ -9,6 +9,11 @@ import org.slf4j.Logger
  * Decorate [KLogger] functions trace, info, debug, warn and error with colored versions
  */
 class ColoredLogging(private val logger: KLogger = KotlinLogging.logger {}) : KLogger {
+
+    companion object {
+        val LOG = ColoredLogging()
+    }
+
     override val underlyingLogger: Logger = logger.underlyingLogger
 
     // Modified functions

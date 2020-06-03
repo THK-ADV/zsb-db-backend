@@ -3,7 +3,10 @@ package ort
 import error_handling.HttpServerResponse
 import io.ktor.application.call
 import io.ktor.request.receive
-import io.ktor.routing.*
+import io.ktor.routing.Route
+import io.ktor.routing.get
+import io.ktor.routing.put
+import io.ktor.routing.route
 import kotlinx.serialization.list
 import utilty.*
 
@@ -24,18 +27,13 @@ fun Route.ortApi() {
             call.respondJsonOk(json)
         }
 
-        post {
-            call.logRequest()
-            val ortDto = call.receive<OrtDto>()
-            if (call.checkIdAndRespondUsePutIfNotNull(ortDto.ort_id)) return@post
-            val result = OrtService.createOrUpdate(ortDto)
-            call.respond(HttpServerResponse.map(result))
-        }
-
         put {
             call.logRequest()
+//            val jsonText = call.receive<String>()
+//            ColoredLogging.LOG.debug(jsonText)
+//            call.respondText { "everything is gonna be ok" }
+
             val ortDto = call.receive<OrtDto>()
-            if (call.checkIdAndRespondUsePostIfNull(ortDto.ort_id)) return@put
             val result = OrtService.createOrUpdate(ortDto)
             call.respond(HttpServerResponse.map(result))
         }
