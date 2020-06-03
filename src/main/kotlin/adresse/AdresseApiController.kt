@@ -2,9 +2,11 @@ package adresse
 
 import error_handling.HttpServerResponse
 import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
-import io.ktor.routing.*
+import io.ktor.routing.Route
+import io.ktor.routing.get
+import io.ktor.routing.put
+import io.ktor.routing.route
 import kotlinx.serialization.list
 import utilty.*
 
@@ -32,18 +34,9 @@ fun Route.adresseApi() {
             call.respondJsonOk(json)
         }
 
-        post {
-            call.logRequest()
-            val adresseDto = call.receive<AdresseDto>()
-            if (call.checkIdAndRespondUsePutIfNotNull(adresseDto.adress_id)) return@post
-            val result = AdresseDao.createOrUpdate(adresseDto)
-            call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
-        }
-
         put {
             call.logRequest()
             val adresseDto = call.receive<AdresseDto>()
-            if (call.checkIdAndRespondUsePostIfNull(adresseDto.adress_id)) return@put
             val result = AdresseDao.createOrUpdate(adresseDto)
             call.respond(HttpServerResponse.map(result))
         }
