@@ -70,6 +70,7 @@ fun recreateTablesAndFillWithDummyData() {
             adresse = elementary
             schulleitung_mail = "boss@tigerentenclub.de"
             stubo_mail = "info@tigerentenclub.de"
+            anzahlSus = 1
             schueleranzahl = 250
             kaoa_hochschule = false
             talentscouting = true
@@ -83,6 +84,7 @@ fun recreateTablesAndFillWithDummyData() {
             adresse = middle
             schulleitung_mail = "boss@hr-real.de"
             stubo_mail = "info@hr-real.de"
+            anzahlSus = 2
             schueleranzahl = 500
             kaoa_hochschule = true
             talentscouting = false
@@ -96,6 +98,7 @@ fun recreateTablesAndFillWithDummyData() {
             adresse = high
             schulleitung_mail = "boss@uni-koeln.de"
             stubo_mail = "info@uni-koeln.de"
+            anzahlSus = 3
             schueleranzahl = 750
             kaoa_hochschule = true
             talentscouting = true

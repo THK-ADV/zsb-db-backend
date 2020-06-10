@@ -11,7 +11,7 @@ data class SchuleDto(
     val name: String,
     val schulform: Int,
     val schwerpunkt: String?,
-    val anzahlSus: Int,
+    val anzahl_sus: Int,
     val kooperationsvertrag: Boolean,
     val adress_id: Int,
     val schulleitung_mail: String,

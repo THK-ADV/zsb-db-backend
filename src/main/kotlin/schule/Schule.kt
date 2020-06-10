@@ -66,7 +66,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
         this.schulname = dto.name
         this.schulform = dto.schulform
         this.schwerpunkt = dto.schwerpunkt.toString() // TODO find better solution. Null values in DB?
-        this.anzahlSus = dto.anzahlSus
+        this.anzahlSus = dto.anzahl_sus
         this.kooperationsvertrag = dto.kooperationsvertrag
         this.adresse = adresse
         this.schulleitung_mail = dto.schulleitung_mail
