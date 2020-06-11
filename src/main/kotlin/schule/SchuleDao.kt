@@ -13,6 +13,9 @@ object SchuleDao {
             val dto = it.toDto()
             dto.adresse = it.adresse.toDto()
             dto.ort = it.adresse.ort.toDto()
+            dto.kontakt_a = it.kontaktA?.toDto()
+            dto.kontakt_b = it.kontaktB?.toDto()
+            dto.stubo_kontakt = it.stuboKontakt?.toDto()
 
             dto
         }

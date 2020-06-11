@@ -10,6 +10,7 @@ import io.ktor.request.path
 import io.ktor.response.respondText
 import kotlinx.serialization.json.JsonElement
 import mu.KotlinLogging
+import java.util.*
 
 fun ApplicationCall.logRequest() {
     val log = ColoredLogging(KotlinLogging.logger {})
@@ -21,6 +22,13 @@ suspend fun ApplicationCall.getParameterAsIntOrNullAndRespondError(param: String
     val id = parameters[param]?.toIntOrNull()
     if (id == null) respondText("given $param must be an integer", ContentType.Text.Plain, HttpStatusCode.BadRequest)
     return id
+}
+
+suspend fun ApplicationCall.getParameterAsUuidOrNullAndRespondError(param: String): UUID? {
+    val uuid = fromTry { UUID.fromString(parameters[param]) }
+
+    if (uuid == null) respondText("given $param must be an uuid", ContentType.Text.Plain, HttpStatusCode.BadRequest)
+    return uuid
 }
 
 suspend fun ApplicationCall.respondJsonOk(json: JsonElement) =

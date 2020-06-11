@@ -12,6 +12,7 @@ import io.ktor.serialization.DefaultJsonConfiguration
 import io.ktor.serialization.serialization
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kontakt.kontaktApi
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import ort.ortApi
@@ -58,6 +59,7 @@ fun configureServer(server: Application) {
         schuleApi()
         adresseApi()
         ortApi()
+        kontaktApi()
     }
     server.install(ContentNegotiation) {
         serialization(

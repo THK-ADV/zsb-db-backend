@@ -2,6 +2,7 @@ package database
 
 import adresse.Adresse
 import adresse.table.Adressen
+import kontakt.Kontakt
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -38,7 +39,7 @@ fun recreateTablesAndFillWithDummyData() {
         }
 
         val cologne = Ort.new {
-            kreis = "Südstad"
+            kreis = "Südstadt"
             regierungsbezirk = "Köln"
             plz = 50667
             bezeichnung = "Köln"
@@ -62,17 +63,33 @@ fun recreateTablesAndFillWithDummyData() {
             ort = cologne
         }
 
+        val contactA = Kontakt.new {
+            name = "Alice Meier"
+            email = "alice@studio42.org"
+            funktion = 1
+        }
+
+        val contactB = Kontakt.new {
+            name = "Kefan Starsch"
+            email = "brutal@hackerz.org"
+            funktion = 1
+        }
+
+        val contactC = Kontakt.new {
+            name = "Hans Peter"
+            email = "hans.peter@123.tv"
+            funktion = 2
+        }
+
         Schule.new {
             schulform = 1
             schulname = "Tigerentenclub"
             schwerpunkt = "Kinder"
             kooperationsvertrag = false
             adresse = elementary
-            schulleitung_mail = "boss@tigerentenclub.de"
-            stubo_mail = "info@tigerentenclub.de"
-            anzahlSus = 1
-            schueleranzahl = 250
-            kaoa_hochschule = false
+            stuboKontakt = contactB
+            anzahlSus = 2
+            kaoaHochschule = false
             talentscouting = true
         }
 
@@ -82,11 +99,10 @@ fun recreateTablesAndFillWithDummyData() {
             schwerpunkt = "Jugendliche"
             kooperationsvertrag = true
             adresse = middle
-            schulleitung_mail = "boss@hr-real.de"
-            stubo_mail = "info@hr-real.de"
-            anzahlSus = 2
-            schueleranzahl = 500
-            kaoa_hochschule = true
+            kontaktA = contactA
+            stuboKontakt = contactC
+            anzahlSus = 5
+            kaoaHochschule = true
             talentscouting = false
         }
 
@@ -96,11 +112,9 @@ fun recreateTablesAndFillWithDummyData() {
             schwerpunkt = "Studenten"
             kooperationsvertrag = true
             adresse = high
-            schulleitung_mail = "boss@uni-koeln.de"
-            stubo_mail = "info@uni-koeln.de"
-            anzahlSus = 3
-            schueleranzahl = 750
-            kaoa_hochschule = true
+            kontaktA = contactB
+            anzahlSus = 7
+            kaoaHochschule = true
             talentscouting = true
         }
 

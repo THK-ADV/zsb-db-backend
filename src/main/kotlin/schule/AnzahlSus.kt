@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * PupilCount from few to many (A to I)
  */
 enum class AnzahlSus(val id: Int, val range: String) {
+    Z(0, "k. A."),
     A(1, "50-100"),
     B(2, "101-200"),
     C(3, "201-300"),
