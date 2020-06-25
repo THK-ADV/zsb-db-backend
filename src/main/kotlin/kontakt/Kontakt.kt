@@ -40,7 +40,6 @@ class Kontakt(id: EntityID<UUID>) : UUIDEntity(id) {
             val matchedKontakte = Kontakt.find {
                 (Kontakte.name eq dto.name)
                     .and(Kontakte.email eq dto.email)
-                    .and(Kontakte.funktion eq dto.funktion)
             }
             return if (matchedKontakte.empty()) null else matchedKontakte.first()
         }
@@ -57,7 +56,7 @@ class Kontakt(id: EntityID<UUID>) : UUIDEntity(id) {
     private fun update(dto: KontaktDto) {
         this.name = dto.name
         this.email = dto.email
-        this.funktion = dto.funktion
+        this.funktion = dto.funktion ?: KontaktFunktion.OTHER.ordinal
     }
 
     fun toDto() = KontaktDto(id.value.toString(), name, email, funktion)

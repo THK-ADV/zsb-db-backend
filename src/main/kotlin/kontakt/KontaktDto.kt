@@ -7,5 +7,5 @@ data class KontaktDto(
     val uuid: String?,
     val name: String,
     val email: String,
-    val funktion: Int
+    val funktion: Int? = null
 )

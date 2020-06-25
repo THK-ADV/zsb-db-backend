@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 enum class KontaktFunktion(val id: Int, val desc: String) {
     SCHULLEITUNG(1, "Schulleitung"),
     STUBO(2, "StuBo"),
-    OTHER(3, "Sonstiges")
+    OTHER(3, "Sonstiges"),
+    UNKNOWN(4, "Unbekannt")
 }
 
 @Serializable

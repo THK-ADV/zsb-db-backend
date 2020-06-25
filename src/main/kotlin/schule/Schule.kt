@@ -35,10 +35,9 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
 
             return transaction {
                 val adresse = Adresse[dto.adress_id]
-                val kontaktA = Kontakt[UUID.fromString(dto.kontakt_a_id)]
-                val kontaktB = Kontakt[UUID.fromString(dto.kontakt_b_id)]
-                val stuboKontakt = Kontakt[UUID.fromString(dto.stubo_kontakt_id)]
-
+                val kontaktA = dto.kontakt_a_id?.let { Kontakt[UUID.fromString(it)] }
+                val kontaktB = dto.kontakt_b_id?.let { Kontakt[UUID.fromString(it)] }
+                val stuboKontakt = dto.stubo_kontakt_id?.let { Kontakt[UUID.fromString(it)] }
 
                 val schule: Schule = if (dto.schule_id == null) new {
                     update(dto, adresse, kontaktA, kontaktB, stuboKontakt)
@@ -66,7 +65,7 @@ class Schule(id: EntityID<Int>) : IntEntity(id) {
         }
     }
 
-    private fun update(dto: SchuleDto, adresse: Adresse, kontaktA: Kontakt, kontaktB: Kontakt, stuboKontakt: Kontakt) {
+    private fun update(dto: SchuleDto, adresse: Adresse, kontaktA: Kontakt?, kontaktB: Kontakt?, stuboKontakt: Kontakt?) {
         this.schulname = dto.name
         this.schulform = dto.schulform
         this.schwerpunkt = dto.schwerpunkt.toString() // TODO find better solution. Null values in DB?
