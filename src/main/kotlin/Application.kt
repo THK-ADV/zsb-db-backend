@@ -14,10 +14,12 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kontakt.kontaktApi
 import kotlinx.serialization.json.Json
+import legacy_import.CsvImport
 import mu.KotlinLogging
 import ort.ortApi
 import schule.schuleApi
 import utilty.ColoredLogging
+import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
 
@@ -34,6 +36,8 @@ fun main() {
     DbSettings.db
 
     recreateTablesAndFillWithDummyData()
+    CsvImport(File("src\\main\\resources\\legacy_import\\schule_demo_file.csv")).parseSchule()
+
 
     val server = embeddedServer(Netty, port = 8080) {
         configureServer(this)

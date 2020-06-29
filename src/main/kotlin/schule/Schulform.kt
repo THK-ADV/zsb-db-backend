@@ -8,10 +8,21 @@ enum class Schulform(val id: Int, val desc: String) {
     REALSCHULE(3, "Realschule"),
     GYMNASIUM(4, "Gymnasium"),
     GESAMTSCHULE(5, "Gesamtschule"),
-    BERUFSKOLLEG(6, "Berufskolleg");
+    BERUFSKOLLEG(6, "Berufskolleg"),
+    OTHER(7, "Andere");
 
     companion object {
         fun getDescById(id: Int): String? = values().find { it.id == id }?.desc
+
+        fun getSchulformByDesc(desc: String): Schulform = when (desc) {
+                "Grundschule" -> GRUNDSCHULE
+                "Hauptschule" -> HAUPTSCHULE
+                "Realschule" -> REALSCHULE
+                "Gymnasium" -> GYMNASIUM
+                "Gesamtschule" -> GESAMTSCHULE
+                "Berufskolleg" -> BERUFSKOLLEG
+                else -> OTHER
+        }
     }
 }
 

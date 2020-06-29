@@ -3,6 +3,7 @@ package database
 import adresse.Adresse
 import adresse.table.Adressen
 import kontakt.Kontakt
+import kontakt.table.Kontakte
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -21,8 +22,9 @@ fun recreateTablesAndFillWithDummyData() {
         SchemaUtils.drop(Schulen)
         SchemaUtils.drop(Adressen)
         SchemaUtils.drop(Orte)
+        SchemaUtils.drop(Kontakte)
 
-        SchemaUtils.create(Orte, Adressen, Schulen)
+        SchemaUtils.create(Orte, Adressen, Schulen, Kontakte)
 
         val gm = Ort.new {
             kreis = "GM"

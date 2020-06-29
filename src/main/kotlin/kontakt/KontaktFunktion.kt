@@ -5,8 +5,19 @@ import kotlinx.serialization.Serializable
 enum class KontaktFunktion(val id: Int, val desc: String) {
     SCHULLEITUNG(1, "Schulleitung"),
     STUBO(2, "StuBo"),
-    OTHER(3, "Sonstiges"),
-    UNKNOWN(4, "Unbekannt")
+    SECRETARIAT(3, "Sekretariat"),
+    OTHER(4, "Sonstiges"),
+    UNKNOWN(5, "Unbekannt");
+
+    companion object {
+        fun getFunktionByDesc(desc: String) = when (desc) {
+            "Schulleitung" -> SCHULLEITUNG
+            "StuBo" -> STUBO
+            "Sekretariat" -> SECRETARIAT
+            "Sonstiges" -> OTHER
+            else -> UNKNOWN
+        }
+    }
 }
 
 @Serializable

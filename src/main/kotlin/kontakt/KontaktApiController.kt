@@ -36,6 +36,11 @@ fun Route.kontaktApi() {
 
         put {
             call.logRequest()
+
+//            val test = call.receive<String>()
+//            ColoredLogging.LOG.debug(test)
+//            ColoredLogging.LOG.debug("THE END")
+//            call.respondText { "respond" }
             val kontaktDto = call.receive<KontaktDto>()
             val result = KontaktDao.createOrUpdate(kontaktDto)
             call.respond(HttpServerResponse.map(result))
