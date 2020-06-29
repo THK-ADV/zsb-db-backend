@@ -64,19 +64,21 @@ class CsvImport(file: File) {
 
             // TODO change db model to match n:m for kontakte:schule
             val kontaktADto = parseKontakt(
-                line[SchuleIndices.mailKontaktPerson],
                 line[SchuleIndices.nameStuBo],
+                line[SchuleIndices.mailKontaktPerson],
                 KontaktFunktion.STUBO.id
             ).first()
             val kontaktA = Kontakt.save(kontaktADto).getOrNull()
 
-            val kontaktBDto =
-                parseKontakt(line[SchuleIndices.mailKontaktPerson2], line[SchuleIndices.kontaktPerson2]).first()
+            val kontaktBDto = parseKontakt(
+                line[SchuleIndices.kontaktPerson2],
+                line[SchuleIndices.mailKontaktPerson2]
+            ).first()
             val kontaktB = Kontakt.save(kontaktBDto).getOrNull()
 
             val stuboDto = parseKontakt(
-                line[SchuleIndices.mailStuBO],
                 line[SchuleIndices.nameStuBO2],
+                line[SchuleIndices.mailStuBO],
                 KontaktFunktion.STUBO.id
             ).first()
             val stubo = Kontakt.save(stuboDto).getOrNull()
