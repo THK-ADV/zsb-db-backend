@@ -9,6 +9,10 @@ object KontaktDao {
         Kontakt.all().map { it.toDto() }
     }
 
+    fun getAllById(ids : List<String>): List<Kontakt> = transaction {
+        Kontakt.all().filter { kontakt -> ids.contains(kontakt.id.value.toString()) }
+    }
+
     fun getById(id: UUID): KontaktDto = transaction {
         Kontakt[id].toDto()
     }

@@ -63,18 +63,21 @@ class CsvImport(file: File) {
 
 
             // TODO change db model to match n:m for kontakte:schule
+            val kontakte = mutableListOf<String>()
             val kontaktADto = parseKontakt(
                 line[SchuleIndices.nameStuBo],
                 line[SchuleIndices.mailKontaktPerson],
                 KontaktFunktion.STUBO.id
             ).first()
             val kontaktA = Kontakt.save(kontaktADto).getOrNull()
+            kontaktA?.let { kontakte.add(it.id.value.toString()) }
 
             val kontaktBDto = parseKontakt(
                 line[SchuleIndices.kontaktPerson2],
                 line[SchuleIndices.mailKontaktPerson2]
             ).first()
             val kontaktB = Kontakt.save(kontaktBDto).getOrNull()
+            kontaktB?.let { kontakte.add(it.id.value.toString()) }
 
             val stuboDto = parseKontakt(
                 line[SchuleIndices.nameStuBO2],
@@ -82,6 +85,7 @@ class CsvImport(file: File) {
                 KontaktFunktion.STUBO.id
             ).first()
             val stubo = Kontakt.save(stuboDto).getOrNull()
+            stubo?.let { kontakte.add(it.id.value.toString()) }
 
             val anzahlSus = AnzahlSus.getObjectByString(line[SchuleIndices.anzahlSuS])
             val schulform = Schulform.getSchulformByDesc(line[SchuleIndices.Schulform])
@@ -89,6 +93,7 @@ class CsvImport(file: File) {
             val kooperationsvertrag = parseToBoolean(line[SchuleIndices.Kooperationsvertrag])
             val kAoa = parseToBoolean(line[SchuleIndices.kAoA])
             val talent = parseToBoolean(line[SchuleIndices.talentscout])
+
 
             val schuleDto = SchuleDto(
                 null,
@@ -98,14 +103,12 @@ class CsvImport(file: File) {
                 anzahlSus.id,
                 kooperationsvertrag,
                 adresse.id.value,
-                kontaktA?.id?.value?.toString(),
-                kontaktB?.id?.value?.toString(),
-                stubo?.id?.value?.toString(),
+                kontakte,
                 kAoa,
                 talent
             )
 
-            Schule.save(schuleDto).getOrNull() ?: ImportLog.error("Could not read SCHULE in line: $line")
+            Schule.save(schuleDto).getOrNull() ?: ImportLog.error("Could not read SCHULE in line: $line") // TODO comment back in :>
         }
     }
 

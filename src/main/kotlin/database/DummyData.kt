@@ -6,26 +6,33 @@ import kontakt.Kontakt
 import kontakt.Kontakte
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.transactions.transaction
 import ort.Ort
 import ort.Orte
+import schule.SchulKontakte
 import schule.Schule
 import schule.Schulen
 import utilty.ColoredLogging
+import java.util.*
 
 fun recreateTablesAndFillWithDummyData() {
     val log = ColoredLogging(KotlinLogging.logger {})
 
+    // recreate DB
     transaction {
         // addLogger(StdOutSqlLogger)
-
+        SchemaUtils.drop(SchulKontakte)
         SchemaUtils.drop(Schulen)
         SchemaUtils.drop(Adressen)
         SchemaUtils.drop(Orte)
         SchemaUtils.drop(Kontakte)
 
-        SchemaUtils.create(Orte, Adressen, Schulen, Kontakte)
+        SchemaUtils.create(Orte, Adressen, Schulen, Kontakte, SchulKontakte)
+    }
 
+    // create Orte
+    val orte = transaction {
         val gm = Ort.new {
             kreis = "GM"
             regierungsbezirk = "Oberberg."
@@ -47,24 +54,34 @@ fun recreateTablesAndFillWithDummyData() {
             bezeichnung = "Köln"
         }
 
+        listOf(gm, kuerten, cologne)
+    }
+
+    // create adressen
+    val adressen = transaction {
         val elementary = Adresse.new {
             strasse = "Am Glockenberg"
             hausnummer = "10"
-            ort = kuerten
+            ort = orte[1]
         }
 
         val middle = Adresse.new {
             strasse = "Robert-Koch-Straße"
             hausnummer = "75"
-            ort = gm
+            ort = orte[0]
         }
 
         val high = Adresse.new {
             strasse = "An den Ringen"
             hausnummer = "51a"
-            ort = cologne
+            ort = orte[2]
         }
 
+        listOf(elementary, middle, high)
+    }
+
+    // create kontakte
+    val kontaktList = transaction {
         val contactA = Kontakt.new {
             name = "Alice Meier"
             email = "alice@studio42.org"
@@ -83,43 +100,51 @@ fun recreateTablesAndFillWithDummyData() {
             funktion = 2
         }
 
-        Schule.new {
+        listOf(contactA, contactB, contactC)
+    }
+
+    // create schulen
+    transaction {
+        Schule.new(UUID.randomUUID()) {
             schulform = 1
             schulname = "Tigerentenclub"
             schwerpunkt = "Kinder"
             kooperationsvertrag = false
-            adresse = elementary
-            stuboKontakt = contactB
+            adresse = adressen.first()
             anzahlSus = 2
             kaoaHochschule = false
             talentscouting = true
+            kontakte = SizedCollection(listOf(kontaktList[1]))
         }
+    }
 
-        Schule.new {
+    transaction {
+        Schule.new(UUID.randomUUID()) {
             schulform = 2
             schulname = "Hermann-Voss-Realschule"
             schwerpunkt = "Jugendliche"
             kooperationsvertrag = true
-            adresse = middle
-            kontaktA = contactA
-            stuboKontakt = contactC
+            adresse = adressen[1]
             anzahlSus = 5
             kaoaHochschule = true
             talentscouting = false
+            kontakte = SizedCollection(listOf(kontaktList[0], kontaktList[2]))
         }
+    }
 
-        Schule.new {
+    transaction {
+        Schule.new(UUID.randomUUID()) {
             schulform = 3
             schulname = "Uni Köln"
             schwerpunkt = "Studenten"
             kooperationsvertrag = true
-            adresse = high
-            kontaktA = contactB
+            adresse = adressen.last()
             anzahlSus = 7
             kaoaHochschule = true
             talentscouting = true
+            kontakte = SizedCollection(listOf(kontaktList[1]))
         }
-
-        log.info("Loaded dummy data")
     }
+
+    log.info("Loaded dummy data")
 }

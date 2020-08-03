@@ -17,7 +17,7 @@ object Kontakte : UUIDTable() {
     val funktion = integer("funktion")
 }
 
-class Kontakt(id: EntityID<UUID>) : UUIDEntity(id) {
+class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     var name by Kontakte.name
     var email by Kontakte.email
     var funktion by Kontakte.funktion

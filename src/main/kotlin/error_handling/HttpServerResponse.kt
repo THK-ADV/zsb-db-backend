@@ -21,6 +21,9 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 is MailNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is SchulformNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is OrtIdNotFoundException -> exception.message to HttpStatusCode.BadRequest
+                is AdressIdNotFoundException -> exception.message to HttpStatusCode.NotFound
+                is SchuleIdNotFoundException -> exception.message to HttpStatusCode.NotFound
+                is CouldNotParseUuidException -> exception.message to HttpStatusCode.BadRequest
             }
 
             return HttpServerResponse(failureMsg, ContentType.Text.Plain, statusCode)

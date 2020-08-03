@@ -2,6 +2,7 @@ package schule
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer
+import java.util.*
 
 object SchuleDao {
     fun getAll(): List<SchuleDto> = transaction {
@@ -13,26 +14,22 @@ object SchuleDao {
             val dto = it.toDto()
             dto.adresse = it.adresse.toDto()
             dto.ort = it.adresse.ort.toDto()
-            dto.kontakt_a = it.kontaktA?.toDto()
-            dto.kontakt_b = it.kontaktB?.toDto()
-            dto.stubo_kontakt = it.stuboKontakt?.toDto()
+            dto.kontakte = it.kontakte.map { kontakt -> kontakt.toDto() }
 
             dto
         }
     }
 
-    fun getById(id: Int): SchuleDto = transaction{
+    fun getById(id: UUID): SchuleDto = transaction{
         Schule[id].toDto()
     }
 
-    fun getByIdAtomic(id: Int): SchuleDto = transaction {
+    fun getByIdAtomic(id: UUID): SchuleDto = transaction {
         val entity = Schule[id]
         val dto = entity.toDto()
         dto.adresse = entity.adresse.toDto()
         dto.ort = entity.adresse.ort.toDto()
-        dto.kontakt_a = entity.kontaktA?.toDto()
-        dto.kontakt_b = entity.kontaktB?.toDto()
-        dto.stubo_kontakt = entity.stuboKontakt?.toDto()
+        dto.kontakte = entity.kontakte.map { it.toDto() }
 
         dto
     }

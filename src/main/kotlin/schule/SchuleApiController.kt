@@ -35,15 +35,15 @@ fun Route.schuleApi() = route("schulen") {
         call.respondJsonOk(json)
     }
 
-    get("/{id}") {
+    get("/{uuid}") {
         call.logRequest()
-        val id = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
+        val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
 
         val resolveIds = call.parameters["resolve_ids"]
         val schule = if (resolveIds == "true") {
-            SchuleDao.getByIdAtomic(id)
+            SchuleDao.getByIdAtomic(uuid)
         } else {
-            SchuleDao.getById(id)
+            SchuleDao.getById(uuid)
         }
 
         val json = Serializer.stable.toJson(SchuleDto.serializer(), schule)
