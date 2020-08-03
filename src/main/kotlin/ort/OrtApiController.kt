@@ -21,8 +21,8 @@ fun Route.ortApi() {
 
         get("/{id}") {
             call.logRequest()
-            val id = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
-            val ort = OrtDao.getById(id)
+            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
+            val ort = OrtDao.getById(uuid)
             val json = Serializer.stable.toJson(OrtDto.serializer(), ort)
             call.respondJsonOk(json)
         }

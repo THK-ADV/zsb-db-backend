@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ort.Ort
 import ort.Orte
 import utilty.fromTry
+import java.util.*
 
 object Adressen : IntIdTable() {
     val strasse = varchar("strasse", 250)
@@ -27,11 +28,11 @@ class Adresse(id: EntityID<Int>) : IntEntity(id) {
          * persist in db
          */
         fun save(dto: AdresseDto): Result<Adresse> = transaction {
-            val ort = fromTry { Ort[dto.ort_id] }
-                ?: return@transaction Result.failure<Adresse>(OrtIdNotFoundException("Could't update Adresse due to wrong "))
+            val ort = fromTry { Ort[UUID.fromString(dto.ort_id)] }
+                ?: return@transaction Result.failure<Adresse>(OrtIdNotFoundException("Could't update Adresse due to wrong Ort. ID: ${dto.ort_id}"))
 
             val matchedAdressen = Adresse.find {
-                (Adressen.ort eq dto.ort_id)
+                (Adressen.ort eq UUID.fromString(dto.ort_id))
                     .and(Adressen.strasse eq dto.strasse)
                     .and(Adressen.hausnummer eq dto.hausnummer)
             }
@@ -57,5 +58,5 @@ class Adresse(id: EntityID<Int>) : IntEntity(id) {
         this.ort = ort
     }
 
-    fun toDto() = AdresseDto(id.value, strasse, hausnummer, ort.id.value)
+    fun toDto() = AdresseDto(id.value, strasse, hausnummer, ort.id.value.toString())
 }

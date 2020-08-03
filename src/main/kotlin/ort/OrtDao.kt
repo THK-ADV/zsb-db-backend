@@ -2,13 +2,14 @@ package ort
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer
+import java.util.*
 
 object OrtDao {
     fun getAll(): List<OrtDto> = transaction {
         Ort.all().map { it.toDto() }
     }
 
-    fun getById(id: Int): OrtDto = transaction {
+    fun getById(id: UUID): OrtDto = transaction {
         Ort[id].toDto()
     }
 

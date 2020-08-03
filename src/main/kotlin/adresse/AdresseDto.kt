@@ -8,6 +8,6 @@ data class AdresseDto(
     val adress_id: Int? = null,
     val strasse: String,
     val hausnummer: String,
-    val ort_id: Int,
+    val ort_id: String,
     var ort: OrtDto? = null
 )

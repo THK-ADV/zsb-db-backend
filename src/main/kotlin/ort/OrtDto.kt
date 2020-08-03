@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OrtDto(
-    val ort_id: Int? = null,
+    val ort_id: String? = null,
     val plz: Int,
     val bezeichnung: String,
     val kreis: String,

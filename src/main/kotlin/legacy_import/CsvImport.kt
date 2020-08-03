@@ -52,7 +52,7 @@ class CsvImport(file: File) {
             val adresseDto = AdresseDto(
                 strasse = nummerStrasse.last(),
                 hausnummer = nummerStrasse.first(),
-                ort_id = ort.id.value
+                ort_id = ort.id.value.toString()
             )
 
             val adresse = Adresse.save(adresseDto).getOrNull()

@@ -69,7 +69,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
                     // fetch current Schule
                     val currentSchule = fromTry { Schule[uuid] }
-                        ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Schule with ID: ${dto.schule_id}"))
+                        ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Schule with ID: $uuid"))
 
                     // update Schule
                     currentSchule.update(dto, adresse)
