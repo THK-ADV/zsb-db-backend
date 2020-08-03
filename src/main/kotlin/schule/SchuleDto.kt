@@ -14,7 +14,7 @@ data class SchuleDto(
     val schwerpunkt: String?,
     val anzahl_sus: Int,
     val kooperationsvertrag: Boolean,
-    val adress_id: Int,
+    val adress_id: String,
     val kontakte_ids: List<String>,
     val kaoa_hochschule: Boolean,
     val talentscouting: Boolean,

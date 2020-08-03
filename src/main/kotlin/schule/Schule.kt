@@ -55,7 +55,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             return transaction {
                 // fetch Adresse
-                val adresse = fromTry { Adresse[dto.adress_id] }
+                val adresse = fromTry { Adresse[UUID.fromString(dto.adress_id)] }
                     ?: return@transaction Result.failure(AdressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
 
                 // create or update Schule
@@ -112,7 +112,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         schwerpunkt,
         anzahlSus,
         kooperationsvertrag,
-        adresse.id.value,
+        adresse.id.value.toString(),
         kontakte.map { it.id.value.toString() },
         kaoaHochschule,
         talentscouting

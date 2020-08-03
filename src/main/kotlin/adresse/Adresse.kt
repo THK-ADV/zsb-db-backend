@@ -1,10 +1,10 @@
 package adresse
 
 import error_handling.OrtIdNotFoundException
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.UUIDEntity
+import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import ort.Ort
@@ -12,27 +12,29 @@ import ort.Orte
 import utilty.fromTry
 import java.util.*
 
-object Adressen : IntIdTable() {
+object Adressen : UUIDTable() {
     val strasse = varchar("strasse", 250)
     val hausnummer = varchar("hausnummer", 20)
     val ort = reference("ort", Orte)
 }
 
-class Adresse(id: EntityID<Int>) : IntEntity(id) {
+class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     var strasse by Adressen.strasse
     var hausnummer by Adressen.hausnummer
     var ort by Ort referencedOn Adressen.ort
 
-    companion object : IntEntityClass<Adresse>(Adressen) {
+    companion object : UUIDEntityClass<Adresse>(Adressen) {
         /**
          * persist in db
          */
         fun save(dto: AdresseDto): Result<Adresse> = transaction {
-            val ort = fromTry { Ort[UUID.fromString(dto.ort_id)] }
-                ?: return@transaction Result.failure<Adresse>(OrtIdNotFoundException("Could't update Adresse due to wrong Ort. ID: ${dto.ort_id}"))
+            val ortUUID = UUID.fromString(dto.ort_id)
+
+            val ort = fromTry { Ort[ortUUID] }
+                ?: return@transaction Result.failure<Adresse>(OrtIdNotFoundException("Couldn't update Adresse due to wrong Ort (ID: ${dto.ort_id})"))
 
             val matchedAdressen = Adresse.find {
-                (Adressen.ort eq UUID.fromString(dto.ort_id))
+                (Adressen.ort eq ortUUID)
                     .and(Adressen.strasse eq dto.strasse)
                     .and(Adressen.hausnummer eq dto.hausnummer)
             }
@@ -40,9 +42,10 @@ class Adresse(id: EntityID<Int>) : IntEntity(id) {
 
             val adresse = when {
                 dto.adress_id != null -> {
-                    val old = Adresse[dto.adress_id]
+                    val uuid = UUID.fromString(dto.adress_id)
+                    val old = Adresse[uuid]
                     old.update(dto, ort)
-                    Adresse[dto.adress_id]
+                    Adresse[uuid]
                 }
                 matchedAdresse != null -> matchedAdresse
                 else -> new(dto.adress_id) { update(dto, ort) }
@@ -58,5 +61,5 @@ class Adresse(id: EntityID<Int>) : IntEntity(id) {
         this.ort = ort
     }
 
-    fun toDto() = AdresseDto(id.value, strasse, hausnummer, ort.id.value.toString())
+    fun toDto() = AdresseDto(id.value.toString(), strasse, hausnummer, ort.id.value.toString())
 }

@@ -102,13 +102,13 @@ class CsvImport(file: File) {
                 null,
                 anzahlSus.id,
                 kooperationsvertrag,
-                adresse.id.value,
+                adresse.id.value.toString(),
                 kontakte,
                 kAoa,
                 talent
             )
 
-            Schule.save(schuleDto).getOrNull() ?: ImportLog.error("Could not read SCHULE in line: $line") // TODO comment back in :>
+            Schule.save(schuleDto).getOrNull() ?: ImportLog.error("Could not read SCHULE in line: $line")
         }
     }
 

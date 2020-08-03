@@ -28,7 +28,7 @@ fun Route.adresseApi() {
 
         get("/{id}") {
             call.logRequest()
-            val adressId = call.getParameterAsIntOrNullAndRespondError("id") ?: return@get
+            val adressId = call.getParameterAsUuidOrNullAndRespondError("id") ?: return@get
             val result = AdresseDao.getById(adressId)
             val json = Serializer.stable.toJson(AdresseDto.serializer(), result)
             call.respondJsonOk(json)
