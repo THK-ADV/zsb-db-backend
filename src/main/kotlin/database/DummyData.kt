@@ -1,16 +1,16 @@
 package database
 
 import adresse.Adresse
-import adresse.table.Adressen
+import adresse.Adressen
 import kontakt.Kontakt
-import kontakt.table.Kontakte
+import kontakt.Kontakte
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import ort.Ort
-import ort.table.Orte
+import ort.Orte
 import schule.Schule
-import schule.table.Schulen
+import schule.Schulen
 import utilty.ColoredLogging
 
 fun recreateTablesAndFillWithDummyData() {

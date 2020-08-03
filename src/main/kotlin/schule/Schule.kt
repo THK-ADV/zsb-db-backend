@@ -1,15 +1,31 @@
 package schule
 
 import adresse.Adresse
+import adresse.Adressen
 import error_handling.SchulformNotValidException
 import error_handling.ZsbException
 import kontakt.Kontakt
+import kontakt.Kontakte
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.transactions.transaction
-import schule.table.Schulen
 import java.util.*
+
+object Schulen : IntIdTable() {
+    val schulname = text("schulname")
+    val schulform = integer("schulform")
+    val schwerpunkt = text("schwerpunkt")
+    val anzahlSus = integer("anzahl_sus")
+    val kooperationsvertrag = bool("kooperationsvertrag")
+    val adress_id = reference("adress_id", Adressen)
+    val kontakt_a = reference("kontakt_a", Kontakte).nullable()
+    val kontakt_b = reference("kontakt_b", Kontakte).nullable()
+    val stubo_kontakt = reference("stubo_kontakt", Kontakte).nullable()
+    val kaoa_hochschule = bool("kaoa_hochschule")
+    val talentscouting = bool("talentscouting")
+}
 
 // TODO ID in uuids umstellen
 class Schule(id: EntityID<Int>) : IntEntity(id) {

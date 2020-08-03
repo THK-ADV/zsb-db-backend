@@ -1,14 +1,21 @@
 package adresse
 
-import adresse.table.Adressen
 import error_handling.OrtIdNotFoundException
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import ort.Ort
+import ort.Orte
 import utilty.fromTry
+
+object Adressen : IntIdTable() {
+    val strasse = varchar("strasse", 250)
+    val hausnummer = varchar("hausnummer", 20)
+    val ort = reference("ort", Orte)
+}
 
 class Adresse(id: EntityID<Int>) : IntEntity(id) {
     var strasse by Adressen.strasse

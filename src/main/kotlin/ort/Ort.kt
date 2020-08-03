@@ -3,9 +3,16 @@ package ort
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
-import ort.table.Orte
+
+object Orte : IntIdTable() {
+    val regierungsbezirk = text("regierungsbezirk")
+    val kreis = text("kreis")
+    val plz = integer("plz")
+    val bezeichnung = text("bezeichnung")
+}
 
 class Ort(id: EntityID<Int>) : IntEntity(id) {
     var plz by Orte.plz

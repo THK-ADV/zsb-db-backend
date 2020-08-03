@@ -117,8 +117,6 @@ class CsvImport(file: File) {
     private fun parseKontakt(names: String, emails: String, function: Int? = null): List<KontaktDto> {
         val kontakte = mutableListOf<KontaktDto>()
 
-        // TODO fix empty kontakt in Regenbogenschule
-
         // split multiple kontakte by "und"
         val splitNames = names.split("und")
         val splitEmails = emails.split("und")

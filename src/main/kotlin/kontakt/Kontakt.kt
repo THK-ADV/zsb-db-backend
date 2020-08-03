@@ -2,14 +2,20 @@ package kontakt
 
 import error_handling.MailNotValidException
 import error_handling.ZsbException
-import kontakt.table.Kontakte
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.validateMail
 import java.util.*
+
+object Kontakte : UUIDTable() {
+    val name = text("name")
+    val email = text("email")
+    val funktion = integer("funktion")
+}
 
 class Kontakt(id: EntityID<UUID>) : UUIDEntity(id) {
     var name by Kontakte.name
