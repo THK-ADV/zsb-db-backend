@@ -16,12 +16,9 @@ import schule.Schulen
 import utilty.ColoredLogging
 import java.util.*
 
-fun recreateTablesAndFillWithDummyData() {
-    val log = ColoredLogging(KotlinLogging.logger {})
-
-    // recreate DB
+fun clearDatabase() {
     transaction {
-        // addLogger(StdOutSqlLogger)
+        // recreate DB
         SchemaUtils.drop(SchulKontakte)
         SchemaUtils.drop(Schulen)
         SchemaUtils.drop(Adressen)
@@ -30,6 +27,12 @@ fun recreateTablesAndFillWithDummyData() {
 
         SchemaUtils.create(Orte, Adressen, Schulen, Kontakte, SchulKontakte)
     }
+}
+
+fun recreateTablesAndFillWithDummyData() {
+    val log = ColoredLogging(KotlinLogging.logger {})
+
+    // transaction { addLogger(StdOutSqlLogger) }
 
     // create Orte
     val orte = transaction {

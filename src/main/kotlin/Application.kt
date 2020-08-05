@@ -1,5 +1,6 @@
 import adresse.adresseApi
 import database.DbSettings
+import database.clearDatabase
 import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
 import io.ktor.application.install
@@ -19,6 +20,7 @@ import mu.KotlinLogging
 import ort.ortApi
 import schule.schuleApi
 import utilty.ColoredLogging
+import utilty.fromTry
 import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
@@ -35,8 +37,15 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    recreateTablesAndFillWithDummyData()
-    CsvImport(File("src\\main\\resources\\legacy_import\\schule_demo_file.csv")).parseSchule()
+    // empty db
+    clearDatabase()
+
+    // load csv file or dummy data
+    fromTry {
+        val file = "schule_demo_file.csv"
+        CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
+        log.info("loaded data from '$file'")
+    } ?: recreateTablesAndFillWithDummyData()
 
 
     val server = embeddedServer(Netty, port = 8080) {

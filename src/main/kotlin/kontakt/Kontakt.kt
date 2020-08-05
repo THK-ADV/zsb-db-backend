@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.validateMail
 import java.util.*
 
+// TODO split first- and lastname; add Anrede;
 object Kontakte : UUIDTable() {
     val name = text("name")
     val email = text("email")
