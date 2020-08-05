@@ -11,7 +11,7 @@ import kotlinx.serialization.list
 import utilty.*
 
 fun Route.kontaktApi() {
-    route("kontakt") {
+    route("kontakte") {
         get {
             call.logRequest()
             val result = KontaktDao.getAll()

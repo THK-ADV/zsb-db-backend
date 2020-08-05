@@ -15,7 +15,7 @@ data class SchuleDto(
     val anzahl_sus: Int,
     val kooperationsvertrag: Boolean,
     val adress_id: String,
-    val kontakte_ids: List<String>,
+    val kontakte_ids: List<String> = listOf(),
     val kaoa_hochschule: Boolean,
     val talentscouting: Boolean,
     var kontakte: List<KontaktDto> = listOf(),
