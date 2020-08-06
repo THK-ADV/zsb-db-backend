@@ -63,29 +63,39 @@ class CsvImport(file: File) {
 
 
             // TODO change db model to match n:m for kontakte:schule
-            val kontakte = mutableListOf<String>()
-            val kontaktADto = parseKontakt(
+            val kontakteIds = mutableListOf<String>()
+            val kontakteADto = parseKontakt(
                 line[SchuleIndices.nameStuBo],
                 line[SchuleIndices.mailKontaktPerson],
                 KontaktFunktion.STUBO.id
-            ).first()
-            val kontaktA = Kontakt.save(kontaktADto).getOrNull()
-            kontaktA?.let { kontakte.add(it.id.value.toString()) }
+            )
+            kontakteADto.forEach { kontaktDto ->
+                Kontakt.save(kontaktDto).getOrNull()?.let {
+                    kontakteIds.add(it.id.value.toString())
+                }
+            }
 
-            val kontaktBDto = parseKontakt(
+            val kontakteBDto = parseKontakt(
                 line[SchuleIndices.kontaktPerson2],
                 line[SchuleIndices.mailKontaktPerson2]
-            ).first()
-            val kontaktB = Kontakt.save(kontaktBDto).getOrNull()
-            kontaktB?.let { kontakte.add(it.id.value.toString()) }
+            )
 
-            val stuboDto = parseKontakt(
+            kontakteBDto.forEach { kontaktDto ->
+                Kontakt.save(kontaktDto).getOrNull()?.let {
+                    kontakteIds.add(it.id.value.toString())
+                }
+            }
+
+            val stuboDtos = parseKontakt(
                 line[SchuleIndices.nameStuBO2],
                 line[SchuleIndices.mailStuBO],
                 KontaktFunktion.STUBO.id
-            ).first()
-            val stubo = Kontakt.save(stuboDto).getOrNull()
-            stubo?.let { kontakte.add(it.id.value.toString()) }
+            )
+            stuboDtos.forEach { kontaktDto ->
+                Kontakt.save(kontaktDto).getOrNull()?.let {
+                    kontakteIds.add(it.id.value.toString())
+                }
+            }
 
             val anzahlSus = AnzahlSus.getObjectByString(line[SchuleIndices.anzahlSuS])
             val schulform = Schulform.getSchulformByDesc(line[SchuleIndices.Schulform])
@@ -103,7 +113,7 @@ class CsvImport(file: File) {
                 anzahlSus.id,
                 kooperationsvertrag,
                 adresse.id.value.toString(),
-                kontakte,
+                kontakteIds,
                 kAoa,
                 talent
             )
