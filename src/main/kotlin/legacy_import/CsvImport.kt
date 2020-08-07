@@ -144,8 +144,8 @@ class CsvImport(file: File) {
 
             val kontaktDto = KontaktDto(
                 null,
-                nameAndFunktion?.first ?: "",
-                email ?: "",
+                nameAndFunktion?.first?.trim() ?: "",
+                email?.trim() ?: "",
                 function ?: nameAndFunktion?.second?.id ?: KontaktFunktion.UNKNOWN.id
             )
             kontakte.add(kontaktDto)
