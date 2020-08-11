@@ -20,7 +20,7 @@ object SchuleDao {
         }
     }
 
-    fun getById(id: UUID): SchuleDto = transaction{
+    fun getById(id: UUID): SchuleDto = transaction {
         Schule[id].toDto()
     }
 
@@ -43,5 +43,5 @@ object SchuleDao {
         }
     }
 
-
+    fun delete(schuleId: UUID): Boolean = Schule.delete(schuleId)
 }

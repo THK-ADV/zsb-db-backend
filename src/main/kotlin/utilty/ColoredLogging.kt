@@ -22,7 +22,7 @@ class ColoredLogging(private val logger: KLogger = KotlinLogging.logger {}) : KL
 
     override fun trace(msg: String?) = logger.trace(ColoredStrings.orange(msg ?: ""))
 
-    override fun debug(msg: String) = logger.debug(ColoredStrings.lightBlue(msg))
+    override fun debug(msg: String) = logger.debug(ColoredStrings.blue(msg))
 
     override fun warn(msg: String) = logger.warn(ColoredStrings.yellow(msg))
 

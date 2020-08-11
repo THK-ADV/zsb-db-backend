@@ -12,6 +12,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.fromTry
 import java.util.*
@@ -81,6 +82,16 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                 // return updated or created Schule
                 Result.success(schule)
             }
+        }
+
+        fun delete(schuleId: UUID): Boolean {
+            val result = fromTry {
+                transaction {
+                    Schulen.deleteWhere { Schulen.id eq schuleId }
+                }
+            }
+
+            return result != null
         }
 
         private fun validateDto(dto: SchuleDto): ZsbException? {

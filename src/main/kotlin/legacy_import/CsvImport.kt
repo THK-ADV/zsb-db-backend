@@ -36,7 +36,7 @@ class CsvImport(file: File) {
             val plzOrt = line[SchuleIndices.plz_ort].split(",")
             val ortDto = OrtDto(
                 plz = plzOrt.first().trim().toInt(),
-                bezeichnung = plzOrt.last(),
+                bezeichnung = plzOrt.last().trim(),
                 kreis = line[SchuleIndices.kreis],
                 regierungsbezirk = line[SchuleIndices.regierungsbezirk]
             )
