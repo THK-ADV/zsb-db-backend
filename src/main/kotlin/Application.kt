@@ -63,6 +63,7 @@ fun configureServer(server: Application) {
     server.install(CORS) {
         method(HttpMethod.Options)
         method(HttpMethod.Put)
+        method(HttpMethod.Delete)
         header(HttpHeaders.XForwardedProto)
         anyHost()
         allowCredentials = true

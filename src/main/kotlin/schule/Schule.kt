@@ -86,7 +86,9 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
         fun delete(schuleId: UUID): Boolean {
             val result = fromTry {
+
                 transaction {
+                    SchulKontakte.deleteWhere { SchulKontakte.schule eq schuleId }
                     Schulen.deleteWhere { Schulen.id eq schuleId }
                 }
             }

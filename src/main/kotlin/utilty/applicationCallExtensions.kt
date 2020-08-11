@@ -38,6 +38,10 @@ suspend fun ApplicationCall.respond(response: HttpServerResponse) {
     this.respondText(response.text, response.type, response.status)
 }
 
+suspend fun ApplicationCall.respondTextAsJson(msg: String, status: HttpStatusCode = HttpStatusCode.OK) {
+    this.respondText("{ \"msg\":\"$msg\", \"status\":${status.value} }", status = status)
+}
+
 /**
  * @return true if the id is not given and a respond was send
  */

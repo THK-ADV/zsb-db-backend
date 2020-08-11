@@ -4,7 +4,6 @@ import error_handling.HttpServerResponse
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
-import io.ktor.response.respondText
 import io.ktor.routing.*
 import kotlinx.serialization.list
 import utilty.*
@@ -78,8 +77,8 @@ fun Route.schuleApi() = route("schulen") {
         val result = SchuleDao.delete(uuid)
 
         if (result)
-            call.respondText("Successfully deleted $uuid")
+            call.respondTextAsJson("Successfully deleted $uuid")
         else
-            call.respondText("Schule with id: $uuid could not been found", status = HttpStatusCode.NotFound)
+            call.respondTextAsJson("Couldn't find Schule with id: $uuid", status = HttpStatusCode.NotFound)
     }
 }
