@@ -21,7 +21,7 @@ data class AnredeDto(val id: Int, val desc: String) {
     companion object {
         fun generate(): List<AnredeDto> {
             val list = mutableListOf<AnredeDto>()
-            schule.AnzahlSus.values().forEach { list.add(AnredeDto(it.id, it.range)) }
+            Anrede.values().forEach { list.add(AnredeDto(it.id, it.desc)) }
             return list
         }
     }
