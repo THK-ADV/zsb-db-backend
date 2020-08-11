@@ -62,7 +62,6 @@ class CsvImport(file: File) {
             }
 
 
-            // TODO change db model to match n:m for kontakte:schule
             val kontakteIds = mutableListOf<String>()
             val kontakteADto = parseKontakt(
                 line[SchuleIndices.nameStuBo],

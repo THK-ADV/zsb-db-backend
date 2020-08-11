@@ -97,8 +97,16 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         private fun validateDto(dto: SchuleDto): ZsbException? {
-            // TODO validate anzahlSUS
-            // TODO validate kontaktUUIDs?
+            // valid id for AnzahlSus?
+            if (!(0 until AnzahlSus.values().count()).contains(dto.anzahl_sus)) {
+                return AnzahlSusNotValidException("This is not a valid index for AnzahlSus.")
+            }
+
+            // validate kontaktUUIDs?
+            fromTry { KontaktDao.getAllById(dto.kontakte_ids) }
+                ?: return KontakteIdsNotValidException("kontakte_ids contains non existing kontakt_ids")
+
+            // valid id for schulform?
             if (Schulform.getDescById(dto.schulform) == null)
                 return SchulformNotValidException("This is not a valid index for Schulform.")
 
@@ -109,7 +117,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private fun update(dto: SchuleDto, adresse: Adresse) {
         this.schulname = dto.name
         this.schulform = dto.schulform
-        this.schwerpunkt = dto.schwerpunkt.toString() // TODO find better solution. Null values in DB?
+        this.schwerpunkt = dto.schwerpunkt.toString()
         this.anzahlSus = dto.anzahl_sus
         this.kooperationsvertrag = dto.kooperationsvertrag
         this.adresse = adresse
