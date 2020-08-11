@@ -1,5 +1,6 @@
 package kontakt
 
+import error_handling.AnredeNotValidException
 import error_handling.MailNotValidException
 import error_handling.ZsbException
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -11,15 +12,18 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.validateMail
 import java.util.*
 
-// TODO split first- and lastname; add Anrede;
 object Kontakte : UUIDTable() {
     val name = text("name")
+    val vorname = text("vorname")
+    val anrede = integer("anrede")
     val email = text("email")
     val funktion = integer("funktion")
 }
 
 class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     var name by Kontakte.name
+    var vorname by Kontakte.vorname
+    var anrede by Kontakte.anrede
     var email by Kontakte.email
     var funktion by Kontakte.funktion
 
@@ -52,9 +56,11 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         private fun validateDto(dto: KontaktDto): ZsbException? {
-            // validation should now happen in Kontakt
+            if (!Anrede.values().indices.contains(dto.anrede))
+                return AnredeNotValidException("Anrede for ${dto.name} is not valid.")
+
             if (!validateMail(dto.email))
-                return MailNotValidException("stubo mail is not a valid email.")
+                return MailNotValidException("mail for ${dto.name} is not a valid email.")
 
             return null
         }
@@ -62,9 +68,11 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
     private fun update(dto: KontaktDto) {
         this.name = dto.name
+        this.vorname = dto.vorname
+        this.anrede = dto.anrede ?: Anrede.UNKNOWN.ordinal
         this.email = dto.email
         this.funktion = dto.funktion ?: KontaktFunktion.OTHER.ordinal
     }
 
-    fun toDto() = KontaktDto(id.value.toString(), name, email, funktion)
+    fun toDto() = KontaktDto(id.value.toString(), name, vorname, anrede, email, funktion)
 }

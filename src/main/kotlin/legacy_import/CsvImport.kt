@@ -2,6 +2,7 @@ package legacy_import
 
 import adresse.Adresse
 import adresse.AdresseDto
+import kontakt.Anrede
 import kontakt.Kontakt
 import kontakt.KontaktDto
 import kontakt.KontaktFunktion
@@ -12,6 +13,8 @@ import schule.Schule
 import schule.SchuleDto
 import schule.Schulform
 import java.io.File
+
+data class KontaktLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion)
 
 class CsvImport(file: File) {
     private val lines = mutableListOf<List<String>>()
@@ -139,13 +142,15 @@ class CsvImport(file: File) {
             val name = splitNames.getOrNull(i)
             val email = splitEmails.getOrNull(i)
 
-            val nameAndFunktion = name?.let { parseKontaktFunktion(it) }
+            val kontaktLight = name?.let { parseKontaktLight(it) }
 
             val kontaktDto = KontaktDto(
                 null,
-                nameAndFunktion?.first?.trim() ?: "",
+                kontaktLight?.name ?: "",
+                kontaktLight?.vorname ?: "",
+                kontaktLight?.anrede?.id ?: Anrede.UNKNOWN.id,
                 email?.trim() ?: "",
-                function ?: nameAndFunktion?.second?.id ?: KontaktFunktion.UNKNOWN.id
+                kontaktLight?.funktion?.id ?: function ?: KontaktFunktion.UNKNOWN.id
             )
             kontakte.add(kontaktDto)
         }
@@ -154,13 +159,33 @@ class CsvImport(file: File) {
     }
 
     /**
-     * parse a [KontaktFunktion] from given [text], by extracting the first matching description;
-     * matching descriptions must be in brackets ()
-     * @return a [Pair] of the [text] without the cut function description and the found [KontaktFunktion]
+     * parse a [KontaktLight] (Name, Vorname, [Anrede] and [KontaktFunktion]) from given [text],
+     * by extracting the first matching description; matching descriptions must be in brackets ()
      *
-     * Example [text]: Frau Schulz, Kate (Schulleitung)
-     * Example return: Pair("Frau Schulz, Kate", KontaktFunktion.SCHULLEITUNG)
+     * @param [text] Name of a Person with Anrede and Funktion e.g. "Frau Schulz, Kate (Schulleitung)"
+     *
+     * @return a [Pair] of the [text] without the cut function description and the found [KontaktFunktion]
      */
+    private fun parseKontaktLight(text: String): KontaktLight {
+        // Example fullName: Frau Schulz, Kate
+        // (vorname can be missing)
+        var (fullName, funktion) = parseKontaktFunktion(text)
+
+        // parse vorname
+        val vorname = if (fullName.contains(",")) {
+            val nameSplit = fullName.split(",")
+            fullName = nameSplit.first().trim()
+            nameSplit.last().trim() // vorname
+        } else ""
+
+        // remaining full name example: Frau Schulz
+        val anredeNameSplit = fullName.split(" ")
+        val name = anredeNameSplit.last().trim()
+        val anrede = Anrede.getObjectByString(anredeNameSplit.first().trim())
+
+        return KontaktLight(name, vorname, anrede, funktion)
+    }
+
     private fun parseKontaktFunktion(text: String): Pair<String, KontaktFunktion> {
         if (!text.contains('(') || !text.contains(')')) return Pair(text, KontaktFunktion.UNKNOWN)
 
