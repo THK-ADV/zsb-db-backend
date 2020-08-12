@@ -21,6 +21,7 @@ group 'thk-adv'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+mainClassName = "io.ktor.server.netty.DevelopmentEngine"
 
 repositories {
     mavenCentral()
