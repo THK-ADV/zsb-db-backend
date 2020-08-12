@@ -1,4 +1,4 @@
-package kontakt
+package model.kontakt
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer

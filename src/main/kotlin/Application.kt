@@ -1,4 +1,3 @@
-import adresse.adresseApi
 import database.DbSettings
 import database.clearDatabase
 import database.recreateTablesAndFillWithDummyData
@@ -13,12 +12,13 @@ import io.ktor.serialization.DefaultJsonConfiguration
 import io.ktor.serialization.serialization
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import kontakt.kontaktApi
 import kotlinx.serialization.json.Json
 import legacy_import.CsvImport
+import model.adresse.adresseApi
+import model.kontakt.kontaktApi
+import model.ort.ortApi
+import model.schule.schuleApi
 import mu.KotlinLogging
-import ort.ortApi
-import schule.schuleApi
 import utilty.ColoredLogging
 import utilty.fromTry
 import java.io.File

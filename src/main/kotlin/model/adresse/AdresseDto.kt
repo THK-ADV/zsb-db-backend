@@ -1,7 +1,7 @@
-package adresse
+package model.adresse
 
 import kotlinx.serialization.Serializable
-import ort.OrtDto
+import model.ort.OrtDto
 
 @Serializable
 data class AdresseDto(

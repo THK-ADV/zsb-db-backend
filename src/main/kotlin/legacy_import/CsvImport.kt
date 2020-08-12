@@ -1,17 +1,17 @@
 package legacy_import
 
-import adresse.Adresse
-import adresse.AdresseDto
-import kontakt.Anrede
-import kontakt.Kontakt
-import kontakt.KontaktDto
-import kontakt.KontaktFunktion
-import ort.Ort
-import ort.OrtDto
-import schule.AnzahlSus
-import schule.Schule
-import schule.SchuleDto
-import schule.Schulform
+import model.adresse.Adresse
+import model.adresse.AdresseDto
+import model.kontakt.Anrede
+import model.kontakt.Kontakt
+import model.kontakt.KontaktDto
+import model.kontakt.KontaktFunktion
+import model.ort.Ort
+import model.ort.OrtDto
+import model.schule.AnzahlSus
+import model.schule.Schule
+import model.schule.SchuleDto
+import model.schule.Schulform
 import java.io.File
 
 data class KontaktLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion)
@@ -136,7 +136,7 @@ class CsvImport(file: File) {
         val splitNames = names.split("und")
         val splitEmails = emails.split("und")
 
-        // count of available kontakt data
+        // count of available model.kontakt data
         val count = if (splitEmails.size > splitNames.size) splitEmails.size else splitNames.size
         repeat(count) { i ->
             val name = splitNames.getOrNull(i)

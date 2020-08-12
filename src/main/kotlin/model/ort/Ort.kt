@@ -1,4 +1,4 @@
-package ort
+package model.ort
 
 import error_handling.CouldNotParseUuidException
 import error_handling.SchuleIdNotFoundException

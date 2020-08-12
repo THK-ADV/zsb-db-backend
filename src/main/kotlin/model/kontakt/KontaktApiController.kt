@@ -1,4 +1,4 @@
-package kontakt
+package model.kontakt
 
 import error_handling.HttpServerResponse
 import io.ktor.application.call

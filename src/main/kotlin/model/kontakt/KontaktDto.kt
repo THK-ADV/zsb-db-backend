@@ -1,4 +1,4 @@
-package kontakt
+package model.kontakt
 
 import kotlinx.serialization.Serializable
 

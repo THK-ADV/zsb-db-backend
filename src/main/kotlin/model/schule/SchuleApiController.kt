@@ -1,4 +1,4 @@
-package schule
+package model.schule
 
 import error_handling.HttpServerResponse
 import io.ktor.application.call

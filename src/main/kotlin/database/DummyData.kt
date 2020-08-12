@@ -1,18 +1,18 @@
 package database
 
-import adresse.Adresse
-import adresse.Adressen
-import kontakt.Kontakt
-import kontakt.Kontakte
+import model.adresse.Adresse
+import model.adresse.Adressen
+import model.kontakt.Kontakt
+import model.kontakt.Kontakte
+import model.ort.Ort
+import model.ort.Orte
+import model.schule.SchulKontakte
+import model.schule.Schule
+import model.schule.Schulen
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.transactions.transaction
-import ort.Ort
-import ort.Orte
-import schule.SchulKontakte
-import schule.Schule
-import schule.Schulen
 import utilty.ColoredLogging
 import java.util.*
 

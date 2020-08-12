@@ -1,4 +1,4 @@
-package adresse
+package model.adresse
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer

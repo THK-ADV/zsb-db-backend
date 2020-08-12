@@ -1,9 +1,9 @@
-package schule
+package model.schule
 
-import adresse.AdresseDto
-import kontakt.KontaktDto
 import kotlinx.serialization.Serializable
-import ort.OrtDto
+import model.adresse.AdresseDto
+import model.kontakt.KontaktDto
+import model.ort.OrtDto
 
 
 @Serializable

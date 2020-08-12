@@ -1,4 +1,4 @@
-package kontakt
+package model.kontakt
 
 import error_handling.AnredeNotValidException
 import error_handling.MailNotValidException
@@ -46,7 +46,7 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             Result.success(kontakt)
         }
 
-        // search for existing kontakt
+        // search for existing model.kontakt
         private fun findMatchedKontakt(dto: KontaktDto): Kontakt? {
             val matchedKontakte = Kontakt.find {
                 (Kontakte.name eq dto.name)

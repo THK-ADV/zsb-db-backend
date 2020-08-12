@@ -1,4 +1,4 @@
-package schule
+package model.schule
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer

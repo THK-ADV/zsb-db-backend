@@ -1,11 +1,11 @@
-package schule
+package model.schule
 
-import adresse.Adresse
-import adresse.Adressen
 import error_handling.*
-import kontakt.Kontakt
-import kontakt.KontaktDao
-import kontakt.Kontakte
+import model.adresse.Adresse
+import model.adresse.Adressen
+import model.kontakt.Kontakt
+import model.kontakt.KontaktDao
+import model.kontakt.Kontakte
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -30,8 +30,8 @@ object Schulen : UUIDTable() {
 
 // many to many reference
 object SchulKontakte : Table() {
-    val schule = reference("schule", Schulen)
-    val kontakt = reference("kontakt", Kontakte)
+    val schule = reference("model/schule", Schulen)
+    val kontakt = reference("model/kontakt", Kontakte)
     override val primaryKey = PrimaryKey(schule, kontakt, name = "PK_SchulKontakte")
 }
 

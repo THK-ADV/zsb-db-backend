@@ -1,4 +1,4 @@
-package schule
+package model.schule
 
 import kotlinx.serialization.Serializable
 

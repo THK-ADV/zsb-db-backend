@@ -1,21 +1,21 @@
-package adresse
+package model.adresse
 
 import error_handling.OrtIdNotFoundException
+import model.ort.Ort
+import model.ort.Orte
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
-import ort.Ort
-import ort.Orte
 import utilty.fromTry
 import java.util.*
 
 object Adressen : UUIDTable() {
     val strasse = varchar("strasse", 250)
     val hausnummer = varchar("hausnummer", 20)
-    val ort = reference("ort", Orte)
+    val ort = reference("model/ort", Orte)
 }
 
 class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
