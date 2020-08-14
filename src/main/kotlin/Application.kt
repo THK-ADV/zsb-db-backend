@@ -14,10 +14,11 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.serialization.json.Json
 import legacy_import.CsvImport
-import model.adresse.adresseApi
-import model.kontakt.kontaktApi
-import model.ort.ortApi
-import model.schule.schuleApi
+import model.adresse.adressenApi
+import model.institution.institutionenApi
+import model.kontakt.kontakteApi
+import model.ort.orteApi
+import model.schule.schulenApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
 import utilty.fromTry
@@ -76,10 +77,11 @@ fun configureServer(server: Application) {
         allowNonSimpleContentTypes = true
     }
     server.install(Routing) {
-        schuleApi()
-        adresseApi()
-        ortApi()
-        kontaktApi()
+        schulenApi()
+        adressenApi()
+        orteApi()
+        kontakteApi()
+        institutionenApi()
     }
     server.install(ContentNegotiation) {
         serialization(

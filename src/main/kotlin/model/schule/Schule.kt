@@ -104,7 +104,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             // validate kontaktUUIDs?
             fromTry { KontaktDao.getAllById(dto.kontakte_ids) }
-                ?: return KontakteIdsNotValidException("kontakte_ids contains non existing kontakt_ids")
+                ?: return KontaktIdNotValidException("kontakte_ids contains non existing kontakt_ids")
 
             // valid id for schulform?
             if (Schulform.getDescById(dto.schulform) == null)

@@ -25,8 +25,10 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 is SchuleIdNotFoundException -> exception.message to HttpStatusCode.NotFound
                 is CouldNotParseUuidException -> exception.message to HttpStatusCode.BadRequest
                 is AnzahlSusNotValidException -> exception.message to HttpStatusCode.BadRequest
-                is KontakteIdsNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is KontaktIdNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is AnredeNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is InstitutionIdNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is InternalDbException -> exception.message to HttpStatusCode.InternalServerError
             }
 
             return HttpServerResponse(failureMsg, ContentType.Text.Plain, statusCode)

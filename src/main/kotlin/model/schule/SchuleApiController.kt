@@ -8,7 +8,7 @@ import io.ktor.routing.*
 import kotlinx.serialization.list
 import utilty.*
 
-fun Route.schuleApi() = route("schulen") {
+fun Route.schulenApi() = route("schulen") {
 
     get {
         call.logRequest()

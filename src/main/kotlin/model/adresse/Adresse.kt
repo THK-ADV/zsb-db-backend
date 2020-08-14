@@ -48,7 +48,7 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     Adresse[uuid]
                 }
                 matchedAdresse != null -> matchedAdresse
-                else -> new(dto.adress_id) { update(dto, ort) }
+                else -> new { update(dto, ort) }
             }
 
             Result.success(adresse)

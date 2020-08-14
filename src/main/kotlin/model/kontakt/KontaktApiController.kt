@@ -10,7 +10,7 @@ import io.ktor.routing.route
 import kotlinx.serialization.list
 import utilty.*
 
-fun Route.kontaktApi() {
+fun Route.kontakteApi() {
     route("kontakte") {
         get {
             call.logRequest()
