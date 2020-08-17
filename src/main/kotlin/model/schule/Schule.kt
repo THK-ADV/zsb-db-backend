@@ -6,6 +6,8 @@ import model.adresse.Adressen
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDao
 import model.kontakt.Kontakte
+import model.schule.enum.AnzahlSus
+import model.schule.enum.Schulform
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

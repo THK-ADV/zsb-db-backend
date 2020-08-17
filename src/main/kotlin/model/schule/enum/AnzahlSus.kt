@@ -1,4 +1,4 @@
-package model.schule
+package model.schule.enum
 
 import kotlinx.serialization.Serializable
 
@@ -38,7 +38,12 @@ data class AnzahlSusDto(val id: Int, val range: String) {
     companion object {
         fun generate(): List<AnzahlSusDto> {
             val list = mutableListOf<AnzahlSusDto>()
-            AnzahlSus.values().forEach { list.add(AnzahlSusDto(it.id, it.range)) }
+            AnzahlSus.values().forEach { list.add(
+                AnzahlSusDto(
+                    it.id,
+                    it.range
+                )
+            ) }
             return list
         }
     }

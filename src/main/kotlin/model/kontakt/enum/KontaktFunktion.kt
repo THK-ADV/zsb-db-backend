@@ -1,4 +1,4 @@
-package model.kontakt
+package model.kontakt.enum
 
 import kotlinx.serialization.Serializable
 
@@ -25,7 +25,12 @@ data class KontaktFunktionDto(val id: Int, val desc: String) {
     companion object {
         fun generate(): List<KontaktFunktionDto> {
             val list = mutableListOf<KontaktFunktionDto>()
-            KontaktFunktion.values().forEach { list.add(KontaktFunktionDto(it.id, it.desc)) }
+            KontaktFunktion.values().forEach { list.add(
+                KontaktFunktionDto(
+                    it.id,
+                    it.desc
+                )
+            ) }
             return list
         }
     }

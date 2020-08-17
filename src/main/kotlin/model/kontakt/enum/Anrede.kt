@@ -1,4 +1,4 @@
-package model.kontakt
+package model.kontakt.enum
 
 import kotlinx.serialization.Serializable
 
@@ -21,7 +21,12 @@ data class AnredeDto(val id: Int, val desc: String) {
     companion object {
         fun generate(): List<AnredeDto> {
             val list = mutableListOf<AnredeDto>()
-            Anrede.values().forEach { list.add(AnredeDto(it.id, it.desc)) }
+            Anrede.values().forEach { list.add(
+                AnredeDto(
+                    it.id,
+                    it.desc
+                )
+            ) }
             return list
         }
     }

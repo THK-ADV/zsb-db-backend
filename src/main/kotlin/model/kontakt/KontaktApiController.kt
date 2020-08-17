@@ -8,6 +8,8 @@ import io.ktor.routing.get
 import io.ktor.routing.put
 import io.ktor.routing.route
 import kotlinx.serialization.list
+import model.kontakt.enum.AnredeDto
+import model.kontakt.enum.KontaktFunktionDto
 import utilty.*
 
 fun Route.kontakteApi() {

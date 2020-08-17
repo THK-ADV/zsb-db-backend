@@ -6,6 +6,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.routing.*
 import kotlinx.serialization.list
+import model.schule.enum.AnzahlSusDto
+import model.schule.enum.SchulformDto
 import utilty.*
 
 fun Route.schulenApi() = route("schulen") {

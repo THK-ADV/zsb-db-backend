@@ -2,16 +2,16 @@ package legacy_import
 
 import model.adresse.Adresse
 import model.adresse.AdresseDto
-import model.kontakt.Anrede
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDto
-import model.kontakt.KontaktFunktion
+import model.kontakt.enum.Anrede
+import model.kontakt.enum.KontaktFunktion
 import model.ort.Ort
 import model.ort.OrtDto
-import model.schule.AnzahlSus
 import model.schule.Schule
 import model.schule.SchuleDto
-import model.schule.Schulform
+import model.schule.enum.AnzahlSus
+import model.schule.enum.Schulform
 import java.io.File
 
 data class KontaktLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion)

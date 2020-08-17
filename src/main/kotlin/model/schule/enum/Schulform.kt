@@ -1,4 +1,4 @@
-package model.schule
+package model.schule.enum
 
 import kotlinx.serialization.Serializable
 
@@ -31,7 +31,12 @@ data class SchulformDto(val id: Int, val desc: String) {
     companion object {
         fun generate(): List<SchulformDto> {
             val list = mutableListOf<SchulformDto>()
-            Schulform.values().forEach { list.add(SchulformDto(it.id, it.desc)) }
+            Schulform.values().forEach { list.add(
+                SchulformDto(
+                    it.id,
+                    it.desc
+                )
+            ) }
             return list
         }
     }

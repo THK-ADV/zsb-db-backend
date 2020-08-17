@@ -3,6 +3,8 @@ package model.kontakt
 import error_handling.AnredeNotValidException
 import error_handling.MailNotValidException
 import error_handling.ZsbException
+import model.kontakt.enum.Anrede
+import model.kontakt.enum.KontaktFunktion
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
