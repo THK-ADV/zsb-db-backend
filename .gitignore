@@ -7,6 +7,9 @@
 *.ipr
 *.iws
 
+# import log
+*/legacy_import/log.txt
+
 # Compiled class file
 *.class
 
