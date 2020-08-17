@@ -10,4 +10,6 @@ data class KontaktDto(
     val anrede: Int? = null,
     val email: String,
     val funktion: Int? = null
-)
+) {
+    fun isValid() = !name.isBlank() || !email.isBlank()
+}

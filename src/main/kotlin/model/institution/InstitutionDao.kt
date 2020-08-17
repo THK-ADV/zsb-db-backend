@@ -1,7 +1,7 @@
 package model.institution
 
-import error_handling.InstitutionIdNotValidException
 import error_handling.InternalDbException
+import error_handling.UuidNotFound
 import kotlinx.serialization.list
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer
@@ -10,12 +10,14 @@ import java.util.*
 
 object InstitutionDao {
     fun getAll(atomic: Boolean = false): Result<String> = transaction {
-        val result = fromTry { Institution.all().map {
-            if (atomic) it.toAtomicDto() else it.toDto()
-        } }
+        val result = fromTry {
+            Institution.all().map {
+                if (atomic) it.toAtomicDto() else it.toDto()
+            }
+        }
 
         if (result == null)
-            Result.failure(InternalDbException("Error while trying to gel all Institutionen from db."))
+            Result.failure(InternalDbException("Error while trying to get all Institutionen from db."))
         else
             Result.success(Serializer.stable.toJson(InstitutionDto.serializer().list, result).toString())
     }
@@ -26,7 +28,7 @@ object InstitutionDao {
         }
 
         if (result == null)
-            Result.failure(InstitutionIdNotValidException(""))
+            Result.failure(UuidNotFound("Couldn't fin Institution with ID: $id"))
         else
             Result.success(mapJsonResult(result))
     }

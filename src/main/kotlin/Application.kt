@@ -19,6 +19,7 @@ import model.institution.institutionenApi
 import model.kontakt.kontakteApi
 import model.ort.orteApi
 import model.schule.schulenApi
+import model.veranstalter.veranstalterApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
 import utilty.fromTry
@@ -82,6 +83,7 @@ fun configureServer(server: Application) {
         orteApi()
         kontakteApi()
         institutionenApi()
+        veranstalterApi()
     }
     server.install(ContentNegotiation) {
         serialization(

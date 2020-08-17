@@ -1,21 +1,19 @@
-package model.institution
+package model.veranstalter
 
 import error_handling.HttpServerResponse
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
-import io.ktor.response.respond
 import io.ktor.routing.*
 import utilty.*
 
-fun Route.institutionenApi() {
-    route("institutionen") {
-
+fun Route.veranstalterApi() {
+    route("veranstalter") {
         // get all
         get {
             call.logRequest()
-            val result = InstitutionDao.getAll(call.parameters["resolve_ids"] == "true")
+            val result = VeranstalterDao.getAll(call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
 
@@ -23,7 +21,7 @@ fun Route.institutionenApi() {
         get("/{uuid}") {
             call.logRequest()
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
-            val result = InstitutionDao.getById(uuid, call.parameters["resolve_ids"] == "true")
+            val result = VeranstalterDao.getById(uuid, call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
 
@@ -37,26 +35,25 @@ fun Route.institutionenApi() {
         delete("/{uuid}") {
             call.logRequest()
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
-
-            val result = InstitutionDao.delete(uuid)
+            val result = VeranstalterDao.delete(uuid)
 
             if (result)
-                call.respondTextAsJson("Successfully deleted $uuid")
+                call.respondTextAsJson("Successfully deleted Veranstalter: $uuid")
             else
-                call.respondTextAsJson("Couldn't find Institution with id: $uuid", status = HttpStatusCode.NotFound)
+                call.respondTextAsJson("Couldn't find Veranstalter with id: $uuid", status = HttpStatusCode.NotFound)
         }
     }
 }
 
 private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     call.logRequest()
-    val institutionDto = call.receive<InstitutionDto>()
+    val veranstalterDto = call.receive<VeranstalterDto>()
 
     if (isPost) {
-        if (call.checkIdAndRespondUsePutIfNotNull(institutionDto.uuid)) return
+        if (call.checkIdAndRespondUsePutIfNotNull(veranstalterDto.uuid)) return
     } else
-        if (call.checkIdAndRespondUsePostIfNull(institutionDto.uuid)) return
+        if (call.checkIdAndRespondUsePostIfNull(veranstalterDto.uuid)) return
 
-    val result = InstitutionDao.createOrUpdate(institutionDto)
+    val result = VeranstalterDao.createOrUpdate(veranstalterDto)
     call.respond(HttpServerResponse.map(result))
 }

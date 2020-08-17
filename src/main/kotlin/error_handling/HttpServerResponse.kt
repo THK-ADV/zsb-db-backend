@@ -29,6 +29,8 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 is AnredeNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is InstitutionIdNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is InternalDbException -> exception.message to HttpStatusCode.InternalServerError
+                is VeranstalterIdNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is UuidNotFound -> exception.message to HttpStatusCode.NotFound
             }
 
             return HttpServerResponse(failureMsg, ContentType.Text.Plain, statusCode)
