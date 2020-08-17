@@ -66,7 +66,7 @@ class CsvImport(file: File) {
 
 
             val kontakteIds = mutableListOf<String>()
-            val kontakteADto = parseKontakt(
+            val kontakteADto = parseKontakte(
                 line[SchuleIndices.nameStuBo],
                 line[SchuleIndices.mailKontaktPerson],
                 KontaktFunktion.STUBO.id
@@ -77,7 +77,7 @@ class CsvImport(file: File) {
                 }
             }
 
-            val kontakteBDto = parseKontakt(
+            val kontakteBDto = parseKontakte(
                 line[SchuleIndices.kontaktPerson2],
                 line[SchuleIndices.mailKontaktPerson2]
             )
@@ -88,7 +88,7 @@ class CsvImport(file: File) {
                 }
             }
 
-            val stuboDtos = parseKontakt(
+            val stuboDtos = parseKontakte(
                 line[SchuleIndices.nameStuBO2],
                 line[SchuleIndices.mailStuBO],
                 KontaktFunktion.STUBO.id
@@ -129,7 +129,7 @@ class CsvImport(file: File) {
      */
     private fun parseToBoolean(text: String): Boolean = text.toLowerCase().trim() == "ja"
 
-    private fun parseKontakt(names: String, emails: String, function: Int? = null): List<KontaktDto> {
+    private fun parseKontakte(names: String, emails: String, function: Int? = null): List<KontaktDto> {
         val kontakte = mutableListOf<KontaktDto>()
 
         // split multiple kontakte by "und"
@@ -139,10 +139,10 @@ class CsvImport(file: File) {
         // count of available model.kontakt data
         val count = if (splitEmails.size > splitNames.size) splitEmails.size else splitNames.size
         repeat(count) { i ->
-            val name = splitNames.getOrNull(i)
+            val kontaktLightString = splitNames.getOrNull(i)
             val email = splitEmails.getOrNull(i)
 
-            val kontaktLight = name?.let { parseKontaktLight(it) }
+            val kontaktLight = kontaktLightString?.let { parseKontaktLight(it) }
 
             val kontaktDto = KontaktDto(
                 null,
@@ -152,7 +152,8 @@ class CsvImport(file: File) {
                 email?.trim() ?: "",
                 kontaktLight?.funktion?.id ?: function ?: KontaktFunktion.UNKNOWN.id
             )
-            kontakte.add(kontaktDto)
+            if (kontaktDto.isValid())
+                kontakte.add(kontaktDto)
         }
 
         return kontakte
