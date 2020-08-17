@@ -21,6 +21,7 @@ class CsvImport(file: File) {
 
 
     init {
+        ImportLog.clear()
         val rawLines = file.readLines()
         rawLines.forEach { rawLine ->
             lines.add(rawLine.split(";"))
@@ -180,7 +181,7 @@ class CsvImport(file: File) {
         } else ""
 
         // remaining full name example: Frau Schulz
-        val anredeNameSplit = fullName.split(" ")
+        val anredeNameSplit = fullName.trim().split(" ")
         val name = anredeNameSplit.last().trim()
         val anrede = Anrede.getObjectByString(anredeNameSplit.first().trim())
 
