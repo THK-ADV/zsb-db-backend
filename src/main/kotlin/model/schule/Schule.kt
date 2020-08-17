@@ -1,11 +1,15 @@
 package model.schule
 
 import error_handling.*
+import kotlinx.serialization.Serializable
 import model.adresse.Adresse
+import model.adresse.AdresseDto
 import model.adresse.Adressen
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDao
+import model.kontakt.KontaktDto
 import model.kontakt.Kontakte
+import model.ort.OrtDto
 import model.schule.enum.AnzahlSus
 import model.schule.enum.Schulform
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -141,3 +145,21 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         talentscouting
     )
 }
+
+@Serializable
+data class SchuleDto(
+    val schule_id: String? = null,
+    val name: String,
+    val schulform: Int,
+    val schwerpunkt: String?,
+    val anzahl_sus: Int,
+    val kooperationsvertrag: Boolean,
+    val adress_id: String,
+    val kontakte_ids: List<String> = listOf(),
+    val kaoa_hochschule: Boolean,
+    val talentscouting: Boolean,
+    var kontakte: List<KontaktDto> = listOf(),
+    val ort_id: Int? = null,
+    var adresse: AdresseDto? = null,
+    var ort: OrtDto? = null
+)

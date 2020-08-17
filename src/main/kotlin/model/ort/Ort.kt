@@ -2,6 +2,7 @@ package model.ort
 
 import error_handling.CouldNotParseUuidException
 import error_handling.SchuleIdNotFoundException
+import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -70,3 +71,12 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
     fun toDto() = OrtDto(id.value.toString(), plz, bezeichnung, kreis, regierungsbezirk)
 }
+
+@Serializable
+data class OrtDto(
+    val ort_id: String? = null,
+    val plz: Int,
+    val bezeichnung: String,
+    val kreis: String,
+    val regierungsbezirk: String
+)

@@ -3,6 +3,7 @@ package model.kontakt
 import error_handling.AnredeNotValidException
 import error_handling.MailNotValidException
 import error_handling.ZsbException
+import kotlinx.serialization.Serializable
 import model.kontakt.enum.Anrede
 import model.kontakt.enum.KontaktFunktion
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -77,4 +78,16 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     fun toDto() = KontaktDto(id.value.toString(), name, vorname, anrede, email, funktion)
+}
+
+@Serializable
+data class KontaktDto(
+    val uuid: String?,
+    val name: String,
+    val vorname: String = "",
+    val anrede: Int? = null,
+    val email: String,
+    val funktion: Int? = null
+) {
+    fun isValid() = !name.isBlank() || !email.isBlank()
 }
