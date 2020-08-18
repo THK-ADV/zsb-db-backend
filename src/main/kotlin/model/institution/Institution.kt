@@ -107,7 +107,7 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 }
 
 @Serializable
-class InstitutionDto(
+data class InstitutionDto(
     val uuid: String?,
     val bezeichnung: String,
     val adress_id: String,

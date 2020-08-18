@@ -103,7 +103,7 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 }
 
 @Serializable
-class VeranstalterDto(
+data class VeranstalterDto(
     val uuid: String?,
     val hochschul_id: String,
     val institution_id: String,
