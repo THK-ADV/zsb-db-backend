@@ -49,10 +49,6 @@ fun Route.schulenApi() = route("schulen") {
 
     put {
         call.logRequest()
-//        val test = call.receive<String>()
-//        log.debug(test)
-//        log.debug("THE END")
-//        call.respondText { "respond" }
         val schuleDto = call.receive<SchuleDto>()
         if (call.checkIdAndRespondUsePostIfNull(schuleDto.schule_id)) return@put
         val result = SchuleDao.createOrUpdate(schuleDto)
@@ -62,10 +58,8 @@ fun Route.schulenApi() = route("schulen") {
     delete("/{uuid}") {
         call.logRequest()
         val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
-
-        val result = SchuleDao.delete(uuid)
-
-        if (result)
+        val isDeleted = SchuleDao.delete(uuid)
+        if (isDeleted)
             call.respondTextAsJson("Successfully deleted $uuid")
         else
             call.respondTextAsJson("Couldn't find Schule with id: $uuid", status = HttpStatusCode.NotFound)

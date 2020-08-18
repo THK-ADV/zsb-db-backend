@@ -37,10 +37,8 @@ fun Route.institutionenApi() {
         delete("/{uuid}") {
             call.logRequest()
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
-
-            val result = InstitutionDao.delete(uuid)
-
-            if (result)
+            val isDeleted = InstitutionDao.delete(uuid)
+            if (isDeleted)
                 call.respondTextAsJson("Successfully deleted $uuid")
             else
                 call.respondTextAsJson("Couldn't find Institution with id: $uuid", status = HttpStatusCode.NotFound)

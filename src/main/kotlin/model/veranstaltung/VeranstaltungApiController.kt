@@ -52,18 +52,17 @@ fun Route.veranstaltungenApi() {
         }
 
         // create
-        post { postOrtPut(call, isPost = true) }
+        post { postOrPut(call, isPost = true) }
 
         // update
-        put { postOrtPut(call) }
+        put { postOrPut(call) }
 
         // delete
         delete("/{uuid}") {
             call.logRequest()
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
-            val result = VeranstaltungDao.delete(uuid)
-
-            if (result)
+            val isDeleted = VeranstaltungDao.delete(uuid)
+            if (isDeleted)
                 call.respondTextAsJson("Successfully deleted $uuid")
             else
                 call.respondTextAsJson("Couldn't find Veranstaltung with id: $uuid", status = HttpStatusCode.NotFound)
@@ -71,7 +70,7 @@ fun Route.veranstaltungenApi() {
     }
 }
 
-private suspend fun postOrtPut(call: ApplicationCall, isPost: Boolean = false) {
+private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     call.logRequest()
     val veranstaltungDto = call.receive<VeranstaltungDto>()
 
