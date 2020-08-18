@@ -9,7 +9,6 @@ import model.kontakt.Kontakt
 import model.kontakt.KontaktDao
 import model.kontakt.KontaktDto
 import model.kontakt.Kontakte
-import model.ort.OrtDto
 import model.schule.enum.AnzahlSus
 import model.schule.enum.Schulform
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -144,6 +143,21 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         kaoaHochschule,
         talentscouting
     )
+
+    fun toAtomicDto() = SchuleDto(
+        id.value.toString(),
+        schulname,
+        schulform,
+        schwerpunkt,
+        anzahlSus,
+        kooperationsvertrag,
+        adresse.id.value.toString(),
+        kontakte.map { it.id.value.toString() },
+        kaoaHochschule,
+        talentscouting,
+        kontakte.map { it.toDto() },
+        adresse.toAtomicDto()
+    )
 }
 
 @Serializable
@@ -159,7 +173,5 @@ data class SchuleDto(
     val kaoa_hochschule: Boolean,
     val talentscouting: Boolean,
     var kontakte: List<KontaktDto> = listOf(),
-    val ort_id: Int? = null,
-    var adresse: AdresseDto? = null,
-    var ort: OrtDto? = null
+    val adresse: AdresseDto? = null
 )

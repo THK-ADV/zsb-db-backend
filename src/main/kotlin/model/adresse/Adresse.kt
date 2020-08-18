@@ -64,6 +64,8 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     fun toDto() = AdresseDto(id.value.toString(), strasse, hausnummer, ort.id.value.toString())
+
+    fun toAtomicDto() = AdresseDto(id.value.toString(), strasse, hausnummer, ort.id.value.toString(), ort.toDto())
 }
 
 @Serializable
@@ -72,5 +74,5 @@ data class AdresseDto(
     val strasse: String,
     val hausnummer: String,
     val ort_id: String,
-    var ort: OrtDto? = null
+    val ort: OrtDto? = null
 )
