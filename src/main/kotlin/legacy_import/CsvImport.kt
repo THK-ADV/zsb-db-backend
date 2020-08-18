@@ -14,7 +14,7 @@ import model.schule.enum.AnzahlSus
 import model.schule.enum.Schulform
 import java.io.File
 
-data class KontaktLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion)
+data class KontaktLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion?)
 
 class CsvImport(file: File) {
     private val lines = mutableListOf<List<String>>()
@@ -188,8 +188,8 @@ class CsvImport(file: File) {
         return KontaktLight(name, vorname, anrede, funktion)
     }
 
-    private fun parseKontaktFunktion(text: String): Pair<String, KontaktFunktion> {
-        if (!text.contains('(') || !text.contains(')')) return Pair(text, KontaktFunktion.UNKNOWN)
+    private fun parseKontaktFunktion(text: String): Pair<String, KontaktFunktion?> {
+        if (!text.contains('(') || !text.contains(')')) return Pair(text, null)
 
         // Example split: Schulleitung)
         val split = text.split('(', limit = 2)
