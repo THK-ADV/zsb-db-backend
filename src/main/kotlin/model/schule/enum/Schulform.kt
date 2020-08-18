@@ -29,15 +29,6 @@ enum class Schulform(val id: Int, val desc: String) {
 @Serializable
 data class SchulformDto(val id: Int, val desc: String) {
     companion object {
-        fun generate(): List<SchulformDto> {
-            val list = mutableListOf<SchulformDto>()
-            Schulform.values().forEach { list.add(
-                SchulformDto(
-                    it.id,
-                    it.desc
-                )
-            ) }
-            return list
-        }
+        fun generate(): List<SchulformDto> = Schulform.values().map { SchulformDto(it.id, it.desc) }
     }
 }

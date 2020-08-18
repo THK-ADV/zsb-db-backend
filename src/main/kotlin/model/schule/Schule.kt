@@ -172,6 +172,6 @@ data class SchuleDto(
     val kontakte_ids: List<String> = listOf(),
     val kaoa_hochschule: Boolean,
     val talentscouting: Boolean,
-    var kontakte: List<KontaktDto> = listOf(),
+    val kontakte: List<KontaktDto> = listOf(),
     val adresse: AdresseDto? = null
 )
