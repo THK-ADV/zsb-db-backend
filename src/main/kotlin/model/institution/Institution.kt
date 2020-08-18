@@ -28,9 +28,9 @@ object Institutionen : UUIDTable() {
 }
 
 class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var bezeichnung by Institutionen.bezeichnung
-    var adresse by Adresse referencedOn Institutionen.adress_id
-    var ansprechpartner by Kontakt referencedOn Institutionen.ansprechpartner_id
+    private var bezeichnung by Institutionen.bezeichnung
+    private var adresse by Adresse referencedOn Institutionen.adress_id
+    private var ansprechpartner by Kontakt referencedOn Institutionen.ansprechpartner_id
 
     companion object : UUIDEntityClass<Institution>(Institutionen) {
 

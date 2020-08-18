@@ -27,8 +27,8 @@ object VeranstalterTable : UUIDTable() {
 }
 
 class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var hochschule by Schule referencedOn VeranstalterTable.hochschul_id
-    var institution by Institution referencedOn VeranstalterTable.institution_id
+    private var hochschule by Schule referencedOn VeranstalterTable.hochschul_id
+    private var institution by Institution referencedOn VeranstalterTable.institution_id
 
     companion object : UUIDEntityClass<Veranstalter>(VeranstalterTable) {
         fun save(dto: VeranstalterDto): Result<Veranstalter> = transaction {
@@ -60,12 +60,12 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                         ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Veranstalter is not a valid uuid."))
                     val old = fromTry { Veranstalter[uuid] }
                         ?: return@transaction Result.failure(VeranstalterIdNotValidException("UUID ($uuid) is not a valid ID for Veranstalter"))
-                    old.update(dto, hochschule, institution)
+                    old.update(hochschule, institution)
 
                     Veranstalter[uuid]
                 }
                 matchedVeranstalter != null -> matchedVeranstalter
-                else -> new { update(dto, hochschule, institution) }
+                else -> new { update(hochschule, institution) }
             }
 
             Result.success(veranstalter)
@@ -82,7 +82,7 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(dto: VeranstalterDto, hochschule: Schule, institution: Institution) {
+    private fun update(hochschule: Schule, institution: Institution) {
         this.hochschule = hochschule
         this.institution = institution
     }

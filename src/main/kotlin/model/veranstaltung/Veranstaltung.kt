@@ -33,17 +33,17 @@ object Veranstaltungen : UUIDTable() {
 }
 
 class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var bezeichnung by Veranstaltungen.bezeichnung
-    var veranstalter by Veranstalter referencedOn Veranstaltungen.veranstalter_id
-    var kategorie by Veranstaltungen.kategorie
-    var thema by Veranstaltungen.thema
-    var vortragsart by Veranstaltungen.vortragsart
-    var datum by Veranstaltungen.datum
-    var kontaktperson by Kontakt referencedOn Veranstaltungen.kontaktperson
-    var anzahlSus by Veranstaltungen.anzahlSus
-    var stufe by Veranstaltungen.stufe
-    var ablauf by Veranstaltungen.ablauf
-    var durchlaeufe by Veranstaltungen.durchlaeufe
+    private var bezeichnung by Veranstaltungen.bezeichnung
+    private var veranstalter by Veranstalter referencedOn Veranstaltungen.veranstalter_id
+    private var kategorie by Veranstaltungen.kategorie
+    private var thema by Veranstaltungen.thema
+    private var vortragsart by Veranstaltungen.vortragsart
+    private var datum by Veranstaltungen.datum
+    private var kontaktperson by Kontakt referencedOn Veranstaltungen.kontaktperson
+    private var anzahlSus by Veranstaltungen.anzahlSus
+    private var stufe by Veranstaltungen.stufe
+    private var ablauf by Veranstaltungen.ablauf
+    private var durchlaeufe by Veranstaltungen.durchlaeufe
 
     companion object : UUIDEntityClass<Veranstaltung>(Veranstaltungen) {
         fun save(dto: VeranstaltungDto): Result<Veranstaltung> = transaction {

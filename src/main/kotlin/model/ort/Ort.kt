@@ -20,10 +20,10 @@ object Orte : UUIDTable() {
 }
 
 class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var plz by Orte.plz
-    var bezeichnung by Orte.bezeichnung
-    var kreis by Orte.kreis
-    var regierungsbezirk by Orte.regierungsbezirk
+    private var plz by Orte.plz
+    private var bezeichnung by Orte.bezeichnung
+    private var kreis by Orte.kreis
+    private var regierungsbezirk by Orte.regierungsbezirk
 
     companion object : UUIDEntityClass<Ort>(Orte) {
         /**

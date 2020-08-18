@@ -21,9 +21,9 @@ object Adressen : UUIDTable() {
 }
 
 class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var strasse by Adressen.strasse
-    var hausnummer by Adressen.hausnummer
-    var ort by Ort referencedOn Adressen.ort
+    private var strasse by Adressen.strasse
+    private var hausnummer by Adressen.hausnummer
+    private var ort by Ort referencedOn Adressen.ort
 
     companion object : UUIDEntityClass<Adresse>(Adressen) {
         /**

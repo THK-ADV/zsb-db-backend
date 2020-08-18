@@ -42,15 +42,15 @@ object SchulKontakte : Table() {
 }
 
 class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var schulname by Schulen.schulname
-    var schulform by Schulen.schulform
-    var schwerpunkt by Schulen.schwerpunkt
-    var anzahlSus by Schulen.anzahlSus
-    var kooperationsvertrag by Schulen.kooperationsvertrag
-    var adresse by Adresse referencedOn Schulen.adress_id
-    var kontakte by Kontakt via SchulKontakte
-    var kaoaHochschule by Schulen.kaoa_hochschule
-    var talentscouting by Schulen.talentscouting
+    private var schulname by Schulen.schulname
+    private var schulform by Schulen.schulform
+    private var schwerpunkt by Schulen.schwerpunkt
+    private var anzahlSus by Schulen.anzahlSus
+    private var kooperationsvertrag by Schulen.kooperationsvertrag
+    private var adresse by Adresse referencedOn Schulen.adress_id
+    private var kontakte by Kontakt via SchulKontakte
+    private var kaoaHochschule by Schulen.kaoa_hochschule
+    private var talentscouting by Schulen.talentscouting
 
     companion object : UUIDEntityClass<Schule>(Schulen) {
         /**

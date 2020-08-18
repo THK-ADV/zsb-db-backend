@@ -22,9 +22,9 @@ object Berichte : UUIDTable() {
 }
 
 class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var title by Berichte.title
-    var text by Berichte.text
-    var veranstaltung by Veranstaltung referencedOn Berichte.veranstaltung_id
+    private var title by Berichte.title
+    private var text by Berichte.text
+    private var veranstaltung by Veranstaltung referencedOn Berichte.veranstaltung_id
 
     companion object : UUIDEntityClass<Bericht>(Berichte) {
 
