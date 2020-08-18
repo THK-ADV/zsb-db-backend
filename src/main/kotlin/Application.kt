@@ -1,6 +1,5 @@
 import database.DbSettings
 import database.clearDatabase
-import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.*
@@ -55,7 +54,7 @@ fun main() {
         val file = "schule_demo_file.csv"
         CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
         log.info("loaded data from '$file'")
-    } ?: recreateTablesAndFillWithDummyData()
+    } ?: log.warn("Couldn't import CSV-File!")
 
 
     val server = embeddedServer(Netty, port = 8080) {
