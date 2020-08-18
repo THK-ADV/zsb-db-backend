@@ -7,6 +7,9 @@
 *.ipr
 *.iws
 
+# enviroment
+.env
+
 # import log
 */legacy_import/log.txt
 
