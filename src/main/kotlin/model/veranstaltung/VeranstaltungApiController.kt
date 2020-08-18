@@ -6,10 +6,35 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.routing.*
+import kotlinx.serialization.list
+import model.veranstaltung.enum.KategorieDto
+import model.veranstaltung.enum.StufeDto
+import model.veranstaltung.enum.VortragsartDto
 import utilty.*
 
 fun Route.veranstaltungenApi() {
     route("veranstaltungen") {
+
+        // get Kategorie options
+        get("/kategorien") {
+            call.logRequest()
+            val json = Serializer.stable.toJson(KategorieDto.serializer().list, KategorieDto.generate())
+            call.respondJsonOk(json)
+        }
+
+        // get stufe options
+        get("/stufen") {
+            call.logRequest()
+            val json = Serializer.stable.toJson(StufeDto.serializer().list, StufeDto.generate())
+            call.respondJsonOk(json)
+        }
+
+        // get vortragsart options
+        get("/vortragsarten") {
+            call.logRequest()
+            val json = Serializer.stable.toJson(VortragsartDto.serializer().list, VortragsartDto.generate())
+            call.respondJsonOk(json)
+        }
 
         // get all
         get {

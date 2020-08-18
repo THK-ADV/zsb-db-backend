@@ -1,5 +1,7 @@
 package model.veranstaltung.enum
 
+import kotlinx.serialization.Serializable
+
 enum class Vortragsart(val id: Int, val desc: String) {
     STUDIENANGEBOT(1, "Vortrag zum Studienangebot der TH Köln"),
     STUDIENTHEMEN(2, "Vortrag zu Themen der Allgemeinen Studienorientierung"),
@@ -16,6 +18,7 @@ enum class Vortragsart(val id: Int, val desc: String) {
     }
 }
 
+@Serializable
 data class VortragsartDto(val id: Int, val desc: String) {
     companion object {
         fun generate(): List<VortragsartDto> = Vortragsart.values().map { VortragsartDto(it.id, it.desc) }
