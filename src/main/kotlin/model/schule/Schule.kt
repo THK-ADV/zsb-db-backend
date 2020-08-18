@@ -19,7 +19,7 @@ import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object Schulen : UUIDTable() {
@@ -61,7 +61,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             return transaction {
                 // fetch Adresse
-                val adresse = fromTry { Adresse[UUID.fromString(dto.adress_id)] }
+                val adresse = anyOrNull { Adresse[UUID.fromString(dto.adress_id)] }
                     ?: return@transaction Result.failure(AdressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
 
                 // create or update Schule
@@ -70,11 +70,11 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     update(dto, adresse)
                 } else {
                     // parse UUID
-                    val uuid = fromTry { UUID.fromString(dto.schule_id) }
+                    val uuid = anyOrNull { UUID.fromString(dto.schule_id) }
                         ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.schule_id}"))
 
                     // fetch current Schule
-                    val currentSchule = fromTry { Schule[uuid] }
+                    val currentSchule = anyOrNull { Schule[uuid] }
                         ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Schule with ID: $uuid"))
 
                     // update Schule
@@ -90,7 +90,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         fun delete(schuleId: UUID): Boolean {
-            val result = fromTry {
+            val result = anyOrNull {
 
                 transaction {
                     SchulKontakte.deleteWhere { SchulKontakte.schule eq schuleId }
@@ -108,7 +108,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             }
 
             // validate kontaktUUIDs?
-            fromTry { KontaktDao.getAllById(dto.kontakte_ids) }
+            anyOrNull { KontaktDao.getAllById(dto.kontakte_ids) }
                 ?: return KontaktIdNotValidException("kontakte_ids contains non existing kontakt_ids")
 
             // valid id for schulform?

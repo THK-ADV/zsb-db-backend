@@ -5,12 +5,12 @@ import error_handling.VeranstalterIdNotValidException
 import kotlinx.serialization.list
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object VeranstalterDao {
     fun getAll(atomic: Boolean = false): Result<String> = transaction {
-        val result = fromTry {
+        val result = anyOrNull {
             Veranstalter.all().map {
                 if (atomic) it.toAtomicDto() else it.toDto()
             }
@@ -23,7 +23,7 @@ object VeranstalterDao {
     }
 
     fun getById(id: UUID, atomic: Boolean = false) = transaction {
-        val result = fromTry {
+        val result = anyOrNull {
             if (atomic) Veranstalter[id].toAtomicDto() else Veranstalter[id].toDto()
         }
 

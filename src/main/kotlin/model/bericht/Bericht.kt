@@ -12,7 +12,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object Berichte : UUIDTable() {
@@ -30,20 +30,20 @@ class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
         fun save(dto: BerichtDto): Result<Bericht> = transaction {
             // validate ids
-            val veranstaltungId = fromTry { UUID.fromString(dto.veranstaltung_id) }
+            val veranstaltungId = anyOrNull { UUID.fromString(dto.veranstaltung_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("veranstaltungId for Bericht isn't valid.")
                 )
 
             // get veranstaltung by id
-            val veranstaltung = fromTry { Veranstaltung[veranstaltungId] }
+            val veranstaltung = anyOrNull { Veranstaltung[veranstaltungId] }
                 ?: return@transaction Result.failure(UuidNotFound("Could not find Veranstaltung with ID: $veranstaltungId"))
 
             // update/create
             val bericht = if (dto.uuid != null) {
-                val uuid = fromTry { UUID.fromString(dto.uuid) }
+                val uuid = anyOrNull { UUID.fromString(dto.uuid) }
                     ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Bericht not valid."))
-                val old = fromTry { Bericht[uuid] }
+                val old = anyOrNull { Bericht[uuid] }
                     ?: return@transaction Result.failure(UuidNotFound("Couldn't find Bericht with ID: $uuid"))
 
                 old.update(dto, veranstaltung)
@@ -56,7 +56,7 @@ class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         fun delete(berichtId: UUID): Boolean {
-            val result = fromTry { transaction {
+            val result = anyOrNull { transaction {
                 Berichte.deleteWhere { Berichte.id eq berichtId }
             } }
 

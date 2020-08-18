@@ -18,7 +18,7 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object VeranstalterTable : UUIDTable() {
@@ -33,19 +33,19 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     companion object : UUIDEntityClass<Veranstalter>(VeranstalterTable) {
         fun save(dto: VeranstalterDto): Result<Veranstalter> = transaction {
             // validate ids
-            val hochschulId = fromTry { UUID.fromString(dto.hochschul_id) }
+            val hochschulId = anyOrNull { UUID.fromString(dto.hochschul_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("hochschul_id for Veranstalter not valid.")
                 )
-            val institutionId = fromTry { UUID.fromString(dto.institution_id) }
+            val institutionId = anyOrNull { UUID.fromString(dto.institution_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("institution_id for Veranstalter not valid.")
                 )
 
             // get objects by ids
-            val hochschule = fromTry { Schule[hochschulId] }
+            val hochschule = anyOrNull { Schule[hochschulId] }
                 ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Schule with ID: ${dto.hochschul_id}"))
-            val institution = fromTry { Institution[institutionId] }
+            val institution = anyOrNull { Institution[institutionId] }
                 ?: return@transaction Result.failure(InstitutionIdNotValidException("UUID (${dto.institution_id}) is not a valid ID for Institution"))
 
             // find matched veranstalter
@@ -56,9 +56,9 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             // update/create
             val veranstalter = when {
                 dto.uuid != null -> {
-                    val uuid = fromTry { UUID.fromString(dto.uuid) }
+                    val uuid = anyOrNull { UUID.fromString(dto.uuid) }
                         ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Veranstalter is not a valid uuid."))
-                    val old = fromTry { Veranstalter[uuid] }
+                    val old = anyOrNull { Veranstalter[uuid] }
                         ?: return@transaction Result.failure(VeranstalterIdNotValidException("UUID ($uuid) is not a valid ID for Veranstalter"))
                     old.update(hochschule, institution)
 
@@ -72,7 +72,7 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         fun delete(veranstalterId: UUID): Boolean {
-            val result = fromTry {
+            val result = anyOrNull {
                 transaction {
                     VeranstalterTable.deleteWhere { VeranstalterTable.id eq veranstalterId }
                 }

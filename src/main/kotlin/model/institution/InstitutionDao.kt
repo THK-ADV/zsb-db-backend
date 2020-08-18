@@ -5,12 +5,12 @@ import error_handling.UuidNotFound
 import kotlinx.serialization.list
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object InstitutionDao {
     fun getAll(atomic: Boolean = false): Result<String> = transaction {
-        val result = fromTry {
+        val result = anyOrNull {
             Institution.all().map {
                 if (atomic) it.toAtomicDto() else it.toDto()
             }
@@ -23,7 +23,7 @@ object InstitutionDao {
     }
 
     fun getById(id: UUID, atomic: Boolean = false): Result<String> = transaction {
-        val result = fromTry {
+        val result = anyOrNull {
             if (atomic) Institution[id].toAtomicDto() else Institution[id].toDto()
         }
 

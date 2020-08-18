@@ -18,7 +18,7 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object Institutionen : UUIDTable() {
@@ -36,19 +36,19 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
         fun save(dto: InstitutionDto): Result<Institution> = transaction {
             // validate ids
-            val ansprechpartnerId = fromTry { UUID.fromString(dto.ansprechpartner_id) }
+            val ansprechpartnerId = anyOrNull { UUID.fromString(dto.ansprechpartner_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("ansprechpartner_id for Institution not valid.")
                 )
-            val adresseId = fromTry { UUID.fromString(dto.adress_id) }
+            val adresseId = anyOrNull { UUID.fromString(dto.adress_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("adress_id for Institution not valid.")
                 )
 
             // get kontakt/adresse from db
-            val adresse = fromTry { Adresse[adresseId] }
+            val adresse = anyOrNull { Adresse[adresseId] }
                 ?: return@transaction Result.failure(AdressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
-            val ansprechpartner = fromTry { Kontakt[ansprechpartnerId] }
+            val ansprechpartner = anyOrNull { Kontakt[ansprechpartnerId] }
                 ?: return@transaction Result.failure(KontaktIdNotValidException("Could not find Kontakt with ID: ${dto.ansprechpartner_id}"))
 
             // matched institution
@@ -58,9 +58,9 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             val institution = when {
                 dto.uuid != null -> {
-                    val uuid = fromTry { UUID.fromString(dto.uuid) }
+                    val uuid = anyOrNull { UUID.fromString(dto.uuid) }
                         ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Institution not valid."))
-                    val old = fromTry { Institution[uuid] }
+                    val old = anyOrNull { Institution[uuid] }
                         ?: return@transaction Result.failure(InstitutionIdNotValidException("UUID ($uuid) is not a valid ID for Institution"))
 
                     old.update(dto, adresse, ansprechpartner)
@@ -75,7 +75,7 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         fun delete(institutionsId: UUID): Boolean {
-            val result = fromTry { transaction {
+            val result = anyOrNull { transaction {
                 Institutionen.deleteWhere { Institutionen.id eq institutionsId }
             } }
 

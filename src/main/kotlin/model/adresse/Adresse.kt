@@ -11,7 +11,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object Adressen : UUIDTable() {
@@ -32,7 +32,7 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         fun save(dto: AdresseDto): Result<Adresse> = transaction {
             val ortUUID = UUID.fromString(dto.ort_id)
 
-            val ort = fromTry { Ort[ortUUID] }
+            val ort = anyOrNull { Ort[ortUUID] }
                 ?: return@transaction Result.failure<Adresse>(OrtIdNotFoundException("Couldn't update Adresse due to wrong Ort (ID: ${dto.ort_id})"))
 
             val matchedAdressen = Adresse.find {
