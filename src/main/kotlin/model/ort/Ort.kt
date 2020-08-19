@@ -9,7 +9,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object Orte : UUIDTable() {
@@ -20,10 +20,10 @@ object Orte : UUIDTable() {
 }
 
 class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var plz by Orte.plz
-    var bezeichnung by Orte.bezeichnung
-    var kreis by Orte.kreis
-    var regierungsbezirk by Orte.regierungsbezirk
+    private var plz by Orte.plz
+    private var bezeichnung by Orte.bezeichnung
+    private var kreis by Orte.kreis
+    private var regierungsbezirk by Orte.regierungsbezirk
 
     companion object : UUIDEntityClass<Ort>(Orte) {
         /**
@@ -41,11 +41,11 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val ort: Ort = when {
                 dto.ort_id != null -> {
                     // parse UUID
-                    val uuid = fromTry { UUID.fromString(dto.ort_id) }
+                    val uuid = anyOrNull { UUID.fromString(dto.ort_id) }
                         ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.ort_id}"))
 
                     // fetch current Ort
-                    val currentOrt = fromTry { Ort[uuid] }
+                    val currentOrt = anyOrNull { Ort[uuid] }
                         ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Ort with ID: $uuid"))
 
                     // update Ort

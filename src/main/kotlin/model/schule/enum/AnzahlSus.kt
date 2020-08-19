@@ -36,15 +36,6 @@ enum class AnzahlSus(val id: Int, val range: String) {
 @Serializable
 data class AnzahlSusDto(val id: Int, val range: String) {
     companion object {
-        fun generate(): List<AnzahlSusDto> {
-            val list = mutableListOf<AnzahlSusDto>()
-            AnzahlSus.values().forEach { list.add(
-                AnzahlSusDto(
-                    it.id,
-                    it.range
-                )
-            ) }
-            return list
-        }
+        fun generate(): List<AnzahlSusDto> = AnzahlSus.values().map { AnzahlSusDto(it.id, it.range) }
     }
 }

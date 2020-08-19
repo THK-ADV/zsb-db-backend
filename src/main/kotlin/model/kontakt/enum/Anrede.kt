@@ -19,15 +19,6 @@ enum class Anrede(val id: Int, val desc: String) {
 @Serializable
 data class AnredeDto(val id: Int, val desc: String) {
     companion object {
-        fun generate(): List<AnredeDto> {
-            val list = mutableListOf<AnredeDto>()
-            Anrede.values().forEach { list.add(
-                AnredeDto(
-                    it.id,
-                    it.desc
-                )
-            ) }
-            return list
-        }
+        fun generate(): List<AnredeDto> = Anrede.values().map { AnredeDto(it.id, it.desc) }
     }
 }

@@ -5,33 +5,12 @@ import utilty.Serializer
 import java.util.*
 
 object SchuleDao {
-    fun getAll(): List<SchuleDto> = transaction {
-        Schule.all().map { it.toDto() }
+    fun getAll(atomic: Boolean = false): List<SchuleDto> = transaction {
+        Schule.all().map { if (atomic) it.toAtomicDto() else it.toDto() }
     }
 
-    fun getAllAtomic(): List<SchuleDto> = transaction {
-        Schule.all().map {
-            val dto = it.toDto()
-            dto.adresse = it.adresse.toDto()
-            dto.ort = it.adresse.ort.toDto()
-            dto.kontakte = it.kontakte.map { kontakt -> kontakt.toDto() }
-
-            dto
-        }
-    }
-
-    fun getById(id: UUID): SchuleDto = transaction {
-        Schule[id].toDto()
-    }
-
-    fun getByIdAtomic(id: UUID): SchuleDto = transaction {
-        val entity = Schule[id]
-        val dto = entity.toDto()
-        dto.adresse = entity.adresse.toDto()
-        dto.ort = entity.adresse.ort.toDto()
-        dto.kontakte = entity.kontakte.map { it.toDto() }
-
-        dto
+    fun getById(id: UUID, atomic: Boolean = false): SchuleDto = transaction {
+        if (atomic) Schule[id].toAtomicDto() else Schule[id].toDto()
     }
 
     fun createOrUpdate(schuleDto: SchuleDto): Result<String> = transaction {

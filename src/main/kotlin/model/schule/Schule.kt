@@ -9,7 +9,6 @@ import model.kontakt.Kontakt
 import model.kontakt.KontaktDao
 import model.kontakt.KontaktDto
 import model.kontakt.Kontakte
-import model.ort.OrtDto
 import model.schule.enum.AnzahlSus
 import model.schule.enum.Schulform
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -20,7 +19,7 @@ import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.fromTry
+import utilty.anyOrNull
 import java.util.*
 
 object Schulen : UUIDTable() {
@@ -42,15 +41,15 @@ object SchulKontakte : Table() {
 }
 
 class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var schulname by Schulen.schulname
-    var schulform by Schulen.schulform
-    var schwerpunkt by Schulen.schwerpunkt
-    var anzahlSus by Schulen.anzahlSus
-    var kooperationsvertrag by Schulen.kooperationsvertrag
-    var adresse by Adresse referencedOn Schulen.adress_id
-    var kontakte by Kontakt via SchulKontakte
-    var kaoaHochschule by Schulen.kaoa_hochschule
-    var talentscouting by Schulen.talentscouting
+    private var schulname by Schulen.schulname
+    private var schulform by Schulen.schulform
+    private var schwerpunkt by Schulen.schwerpunkt
+    private var anzahlSus by Schulen.anzahlSus
+    private var kooperationsvertrag by Schulen.kooperationsvertrag
+    private var adresse by Adresse referencedOn Schulen.adress_id
+    private var kontakte by Kontakt via SchulKontakte
+    private var kaoaHochschule by Schulen.kaoa_hochschule
+    private var talentscouting by Schulen.talentscouting
 
     companion object : UUIDEntityClass<Schule>(Schulen) {
         /**
@@ -62,7 +61,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             return transaction {
                 // fetch Adresse
-                val adresse = fromTry { Adresse[UUID.fromString(dto.adress_id)] }
+                val adresse = anyOrNull { Adresse[UUID.fromString(dto.adress_id)] }
                     ?: return@transaction Result.failure(AdressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
 
                 // create or update Schule
@@ -71,11 +70,11 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     update(dto, adresse)
                 } else {
                     // parse UUID
-                    val uuid = fromTry { UUID.fromString(dto.schule_id) }
+                    val uuid = anyOrNull { UUID.fromString(dto.schule_id) }
                         ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.schule_id}"))
 
                     // fetch current Schule
-                    val currentSchule = fromTry { Schule[uuid] }
+                    val currentSchule = anyOrNull { Schule[uuid] }
                         ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Schule with ID: $uuid"))
 
                     // update Schule
@@ -91,7 +90,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         fun delete(schuleId: UUID): Boolean {
-            val result = fromTry {
+            val result = anyOrNull {
 
                 transaction {
                     SchulKontakte.deleteWhere { SchulKontakte.schule eq schuleId }
@@ -109,7 +108,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             }
 
             // validate kontaktUUIDs?
-            fromTry { KontaktDao.getAllById(dto.kontakte_ids) }
+            anyOrNull { KontaktDao.getAllById(dto.kontakte_ids) }
                 ?: return KontaktIdNotValidException("kontakte_ids contains non existing kontakt_ids")
 
             // valid id for schulform?
@@ -144,6 +143,21 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         kaoaHochschule,
         talentscouting
     )
+
+    fun toAtomicDto() = SchuleDto(
+        id.value.toString(),
+        schulname,
+        schulform,
+        schwerpunkt,
+        anzahlSus,
+        kooperationsvertrag,
+        adresse.id.value.toString(),
+        kontakte.map { it.id.value.toString() },
+        kaoaHochschule,
+        talentscouting,
+        kontakte.map { it.toDto() },
+        adresse.toAtomicDto()
+    )
 }
 
 @Serializable
@@ -158,8 +172,6 @@ data class SchuleDto(
     val kontakte_ids: List<String> = listOf(),
     val kaoa_hochschule: Boolean,
     val talentscouting: Boolean,
-    var kontakte: List<KontaktDto> = listOf(),
-    val ort_id: Int? = null,
-    var adresse: AdresseDto? = null,
-    var ort: OrtDto? = null
+    val kontakte: List<KontaktDto> = listOf(),
+    val adresse: AdresseDto? = null
 )

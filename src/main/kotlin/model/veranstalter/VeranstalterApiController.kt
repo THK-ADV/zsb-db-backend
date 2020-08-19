@@ -35,9 +35,8 @@ fun Route.veranstalterApi() {
         delete("/{uuid}") {
             call.logRequest()
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
-            val result = VeranstalterDao.delete(uuid)
-
-            if (result)
+            val isDeleted = VeranstalterDao.delete(uuid)
+            if (isDeleted)
                 call.respondTextAsJson("Successfully deleted Veranstalter: $uuid")
             else
                 call.respondTextAsJson("Couldn't find Veranstalter with id: $uuid", status = HttpStatusCode.NotFound)

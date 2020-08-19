@@ -24,11 +24,11 @@ object Kontakte : UUIDTable() {
 }
 
 class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    var name by Kontakte.name
-    var vorname by Kontakte.vorname
-    var anrede by Kontakte.anrede
-    var email by Kontakte.email
-    var funktion by Kontakte.funktion
+    private var name by Kontakte.name
+    private var vorname by Kontakte.vorname
+    private var anrede by Kontakte.anrede
+    private var email by Kontakte.email
+    private var funktion by Kontakte.funktion
 
     companion object : UUIDEntityClass<Kontakt>(Kontakte) {
         fun save(dto: KontaktDto): Result<Kontakt> = transaction {

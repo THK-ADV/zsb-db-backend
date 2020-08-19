@@ -14,13 +14,7 @@ fun Route.schulenApi() = route("schulen") {
 
     get {
         call.logRequest()
-        val resolveIds = call.parameters["resolve_ids"]
-        val result = if (resolveIds == "true") {
-            SchuleDao.getAllAtomic()
-        } else {
-            SchuleDao.getAll()
-        }
-
+        val result = SchuleDao.getAll(call.parameters["resolve_ids"] == "true")
         val json = Serializer.stable.toJson(SchuleDto.serializer().list, result)
         call.respondJsonOk(json)
     }
@@ -40,14 +34,7 @@ fun Route.schulenApi() = route("schulen") {
     get("/{uuid}") {
         call.logRequest()
         val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
-
-        val resolveIds = call.parameters["resolve_ids"]
-        val schule = if (resolveIds == "true") {
-            SchuleDao.getByIdAtomic(uuid)
-        } else {
-            SchuleDao.getById(uuid)
-        }
-
+        val schule = SchuleDao.getById(uuid, call.parameters["resolve_ids"] == "true")
         val json = Serializer.stable.toJson(SchuleDto.serializer(), schule)
         call.respondJsonOk(json)
     }
@@ -62,10 +49,6 @@ fun Route.schulenApi() = route("schulen") {
 
     put {
         call.logRequest()
-//        val test = call.receive<String>()
-//        log.debug(test)
-//        log.debug("THE END")
-//        call.respondText { "respond" }
         val schuleDto = call.receive<SchuleDto>()
         if (call.checkIdAndRespondUsePostIfNull(schuleDto.schule_id)) return@put
         val result = SchuleDao.createOrUpdate(schuleDto)
@@ -75,10 +58,8 @@ fun Route.schulenApi() = route("schulen") {
     delete("/{uuid}") {
         call.logRequest()
         val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
-
-        val result = SchuleDao.delete(uuid)
-
-        if (result)
+        val isDeleted = SchuleDao.delete(uuid)
+        if (isDeleted)
             call.respondTextAsJson("Successfully deleted $uuid")
         else
             call.respondTextAsJson("Couldn't find Schule with id: $uuid", status = HttpStatusCode.NotFound)
