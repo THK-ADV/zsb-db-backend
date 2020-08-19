@@ -32,13 +32,15 @@ val log = ColoredLogging(KotlinLogging.logger {})
 fun Application.main() {
     // connect to db
     DbSettings.connect(environment)
+    clearDatabase() // TODO remove when prod
 
+    // TODO address table is currently broken
     // load csv file or dummy data
-    fromTry {
+/*    fromTry {
         val file = "schule_demo_file.csv"
         CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
         log.info("loaded data from '$file'")
-    } ?: log.warn("Couldn't import CSV-File!")
+    } ?: log.warn("Couldn't import CSV-File!")*/
 
     configureServer(this)
 }
@@ -58,7 +60,7 @@ fun main() {
     } ?: recreateTablesAndFillWithDummyData()
 
 
-    val server = embeddedServer(Netty, port = 8080) {
+    val server = embeddedServer(Netty, port = 9000) {
         configureServer(this)
     }
 
@@ -80,6 +82,7 @@ fun configureServer(server: Application) {
         allowNonSimpleContentTypes = true
     }
     server.install(Routing) {
+        index()
         schulenApi()
         adressenApi()
         orteApi()
