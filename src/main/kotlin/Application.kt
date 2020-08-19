@@ -39,7 +39,7 @@ fun Application.main() {
         val file = "schule_demo_file.csv"
         CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
         log.info("loaded data from '$file'")
-    } ?: log.warn("Couldn't import CSV-File!")*/
+    } ?: log.warn("Couldn't import CSV-File!")
 
     configureServer(this)
 }
