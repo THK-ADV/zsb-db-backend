@@ -15,23 +15,28 @@ object DbSettings {
     }
 
     fun connect(env: ApplicationEnvironment): Database {
-        val (user, password) = loadDbCredentials(env)
+        val (url, user, password) = loadDbSettings(env)
 
         return Database.connect(
-            "jdbc:postgresql://localhost:5432/zsb",
+            url,
             driver = "org.postgresql.Driver",
-            user = user, password = password
+            user = user,
+            password = password
         )
     }
 
-    private fun loadDbCredentials(env: ApplicationEnvironment): Pair<String, String> {
+    private fun loadDbSettings(env: ApplicationEnvironment): Triple<String, String, String> {
         // read credentials from .conf
+        val url = env.config.propertyOrNull("db.url")?.getString()
         val user = env.config.propertyOrNull("db.user")?.getString()
         val password = env.config.propertyOrNull("db.password")?.getString()
 
-        if (user != null && password != null)
-            return Pair(user, password)
+        when {
+            user != null && password != null && url != null ->
+                return Triple(url, user, password)
+            else ->
+                throw CouldNotLoadDbCredentialsException("Could not load database credentials, pleas make sure .conf includes valid credentials")
+        }
 
-        throw CouldNotLoadDbCredentialsException("Could not load database credentials, pleas make sure .conf includes valid credentials")
     }
 }
