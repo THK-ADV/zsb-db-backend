@@ -1,7 +1,8 @@
 #!/bin/sh
 
 img_name=zsb-backend
-imgs_name=${img_name}-images.tar
+packed_img_name=${img_name}.tar
+# imgs_name=all-images.tar
 
 buildApp() {
   ./gradlew build
@@ -12,29 +13,30 @@ buildDockerImage() {
   docker build -t ${img_name} .
 }
 
-packDockerImages() {
-  echo packing images...
-#  docker save -o ${imgs_name} $(docker-compose config | awk '{if ($1 == "image:") print $2;}' ORS=" ")
-#  echo images packed
+packBackend() {
+  echo packing image...
+  # docker save -o ${imgs_name} $(docker-compose config | awk '{if ($1 == "image:") print $2;}' ORS=" ")
+  docker save -o ${packed_img_name} ${img_name}
+  echo image packed
 }
 
 clearDockerImages() {
   docker-compose stop &&
     docker-compose down &&
-    docker image rm ${img_name} &&
+    docker image rm ${img_name}
     docker image prune -f
 }
 
 deployDockerImages() {
-  # docker load -i ${imgs_name} &&
+  docker load -i ${packed_img_name} &&
     docker-compose up -d
 }
 
 uploadToDevServer() {
   echo uploading to dev server...
-#  scp ${imgs_name} dev@lwivs43.gm.fh-koeln.de:/home/dev/${img_name} &&
-#    rm ${imgs_name} &&
-#    echo images uploaded
+  scp ${packed_img_name} $1 &&
+  rm ${packed_img_name} &&
+  echo image uploaded
 }
 
 case "$1" in
@@ -42,8 +44,8 @@ case "$1" in
   clearDockerImages &&
     buildApp &&
     buildDockerImage &&
-    packDockerImages &&
-    uploadToDevServer
+    packBackend &&
+    uploadToDevServer $2
   ;;
 "run")
   deployDockerImages
