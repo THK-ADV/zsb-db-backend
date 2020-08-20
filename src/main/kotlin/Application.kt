@@ -1,6 +1,5 @@
 import database.DbSettings
 import database.clearDatabase
-import database.recreateTablesAndFillWithDummyData
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.*
@@ -24,7 +23,7 @@ import model.veranstalter.veranstalterApi
 import model.veranstaltung.veranstaltungenApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
-import utilty.fromTry
+import utilty.anyOrNull
 import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
@@ -36,11 +35,11 @@ fun Application.main() {
 
     // TODO address table is currently broken
     // load csv file or dummy data
-/*    fromTry {
+    anyOrNull {
         val file = "schule_demo_file.csv"
         CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
         log.info("loaded data from '$file'")
-    } ?: log.warn("Couldn't import CSV-File!")*/
+    } ?: log.warn("Couldn't import CSV-File!")
 
     configureServer(this)
 }
@@ -53,11 +52,11 @@ fun main() {
     clearDatabase()
 
     // load csv file or dummy data
-    fromTry {
+    anyOrNull {
         val file = "schule_demo_file.csv"
         CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
         log.info("loaded data from '$file'")
-    } ?: recreateTablesAndFillWithDummyData()
+    } ?: log.warn("Couldn't import CSV-File!")
 
 
     val server = embeddedServer(Netty, port = 9000) {

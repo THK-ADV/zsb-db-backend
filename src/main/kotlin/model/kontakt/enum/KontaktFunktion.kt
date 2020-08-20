@@ -23,15 +23,6 @@ enum class KontaktFunktion(val id: Int, val desc: String) {
 @Serializable
 data class KontaktFunktionDto(val id: Int, val desc: String) {
     companion object {
-        fun generate(): List<KontaktFunktionDto> {
-            val list = mutableListOf<KontaktFunktionDto>()
-            KontaktFunktion.values().forEach { list.add(
-                KontaktFunktionDto(
-                    it.id,
-                    it.desc
-                )
-            ) }
-            return list
-        }
+        fun generate(): List<KontaktFunktionDto> = KontaktFunktion.values().map { KontaktFunktionDto(it.id, it.desc) }
     }
 }

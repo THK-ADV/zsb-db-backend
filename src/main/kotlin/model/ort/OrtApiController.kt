@@ -29,10 +29,6 @@ fun Route.orteApi() {
 
         put {
             call.logRequest()
-//            val jsonText = call.receive<String>()
-//            ColoredLogging.LOG.debug(jsonText)
-//            call.respondText { "everything is gonna be ok" }
-
             val ortDto = call.receive<OrtDto>()
             val result = OrtDao.createOrUpdate(ortDto)
             call.respond(HttpServerResponse.map(result))
