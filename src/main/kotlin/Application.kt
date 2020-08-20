@@ -31,9 +31,7 @@ val log = ColoredLogging(KotlinLogging.logger {})
 fun Application.main() {
     // connect to db
     DbSettings.connect(environment)
-    clearDatabase() // TODO remove when prod
 
-    // TODO address table is currently broken
     // load csv file or dummy data
     anyOrNull {
         val file = "schule_demo_file.csv"
@@ -51,7 +49,6 @@ fun main() {
     // empty db
     clearDatabase()
 
-    // load csv file or dummy data
     anyOrNull {
         val file = "schule_demo_file.csv"
         CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
