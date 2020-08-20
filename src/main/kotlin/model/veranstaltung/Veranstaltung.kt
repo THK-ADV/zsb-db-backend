@@ -95,6 +95,7 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     private fun update(dto: VeranstaltungDto, veranstalter: Veranstalter, kontaktperson: Kontakt) {
+        this.bezeichnung = dto.bezeichnung
         this.veranstalter = veranstalter
         this.kategorie = dto.kategorie
         this.thema = dto.thema
