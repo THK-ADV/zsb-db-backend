@@ -69,13 +69,7 @@ fun configureServer(server: Application) {
     server.install(Compression)
     server.install(CallLogging)
     server.install(CORS) {
-        method(HttpMethod.Options)
-        method(HttpMethod.Put)
-        method(HttpMethod.Delete)
-        header(HttpHeaders.XForwardedProto)
         anyHost()
-        allowCredentials = true
-        allowNonSimpleContentTypes = true
     }
     server.install(Routing) {
         index()
