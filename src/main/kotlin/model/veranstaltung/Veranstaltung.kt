@@ -3,6 +3,7 @@ package model.veranstaltung
 import error_handling.CouldNotParseUuidException
 import error_handling.UuidNotFound
 import kotlinx.serialization.Serializable
+import model.bericht.Berichte
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDto
 import model.kontakt.Kontakte
@@ -83,9 +84,13 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             Result.success(veranstaltung)
         }
 
+        /**
+         * Delete veranstaltung with [veranstaltungId] and all attached [Berichte]
+         */
         fun delete(veranstaltungId: UUID): Boolean {
             val result = anyOrNull {
                 transaction {
+                    Berichte.deleteWhere { Berichte.veranstaltung_id eq veranstaltungId }
                     Veranstaltungen.deleteWhere { Veranstaltungen.id eq veranstaltungId }
                 }
             }
