@@ -19,6 +19,7 @@ class UuidNotFound(msg: String): ZsbException(msg)
 
 // other
 class MailNotValidException(msg: String) : ZsbException(msg)
+class ToManyVeranstalterException(msg: String) : ZsbException(msg)
 class NotAuthorizedException(msg: String) : ZsbException(msg)
 class CouldNotParseUuidException(msg: String) : ZsbException(msg)
 class InternalDbException(msg: String) : ZsbException(msg)
