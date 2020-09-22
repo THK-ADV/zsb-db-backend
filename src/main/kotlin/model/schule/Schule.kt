@@ -10,6 +10,7 @@ import model.kontakt.KontaktDao
 import model.kontakt.KontaktDto
 import model.kontakt.Kontakte
 import model.schule.enum.AnzahlSus
+import model.schule.enum.Kooperationspartner
 import model.schule.enum.Schulform
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
@@ -30,7 +31,9 @@ object Schulen : UUIDTable() {
     val kooperationsvertrag = bool("kooperationsvertrag")
     val adress_id = reference("adress_id", Adressen)
     val kaoa_hochschule = bool("kaoa_hochschule")
+    val kaoa_partner = integer("kaoa_partner")
     val talentscouting = bool("talentscouting")
+    val talentscouting_partner = integer("talentscouting_partner")
 }
 
 // many to many reference
@@ -49,7 +52,9 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var adresse by Adresse referencedOn Schulen.adress_id
     private var kontakte by Kontakt via SchulKontakte
     private var kaoaHochschule by Schulen.kaoa_hochschule
+    private var kaoaPartner by Schulen.kaoa_partner
     private var talentscouting by Schulen.talentscouting
+    private var talentscoutingPartner by Schulen.talentscouting_partner
 
     companion object : UUIDEntityClass<Schule>(Schulen) {
         /**
@@ -102,6 +107,13 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         private fun validateDto(dto: SchuleDto): ZsbException? {
+            val kooperationspartnerRange = (-1 until Kooperationspartner.values().count())
+            if (!kooperationspartnerRange.contains(dto.kaoa_partner)
+                || !kooperationspartnerRange.contains(dto.talentscouting_partner)
+            ) {
+                return KooperationspartnerNotValidException("This is not a valid index for Kooperationspartner.")
+            }
+
             // valid id for AnzahlSus?
             if (!(0 until AnzahlSus.values().count()).contains(dto.anzahl_sus)) {
                 return AnzahlSusNotValidException("This is not a valid index for AnzahlSus.")
@@ -127,7 +139,9 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         this.kooperationsvertrag = dto.kooperationsvertrag
         this.adresse = adresse
         this.kaoaHochschule = dto.kaoa_hochschule
+        this.kaoaPartner = dto.kaoa_partner
         this.talentscouting = dto.talentscouting
+        this.talentscoutingPartner = dto.talentscouting_partner
         this.kontakte = SizedCollection(KontaktDao.getAllById(dto.kontakte_ids))
     }
 
@@ -141,7 +155,9 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         adresse.id.value.toString(),
         kontakte.map { it.id.value.toString() },
         kaoaHochschule,
-        talentscouting
+        kaoaPartner,
+        talentscouting,
+        talentscoutingPartner
     )
 
     fun toAtomicDto() = SchuleDto(
@@ -154,7 +170,9 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         adresse.id.value.toString(),
         kontakte.map { it.id.value.toString() },
         kaoaHochschule,
+        kaoaPartner,
         talentscouting,
+        talentscoutingPartner,
         kontakte.map { it.toDto() },
         adresse.toAtomicDto()
     )
@@ -171,7 +189,9 @@ data class SchuleDto(
     val adress_id: String,
     val kontakte_ids: List<String> = listOf(),
     val kaoa_hochschule: Boolean,
+    val kaoa_partner: Int,
     val talentscouting: Boolean,
+    val talentscouting_partner: Int,
     val kontakte: List<KontaktDto> = listOf(),
     val adresse: AdresseDto? = null
 )

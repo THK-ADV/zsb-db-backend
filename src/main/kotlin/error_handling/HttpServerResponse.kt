@@ -31,6 +31,9 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 is InternalDbException -> exception.message to HttpStatusCode.InternalServerError
                 is VeranstalterIdNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is UuidNotFound -> exception.message to HttpStatusCode.NotFound
+                is ToManyVeranstalterException -> exception.message to HttpStatusCode.BadRequest
+                is CouldNotGenerateSerialLetterException -> exception.message to HttpStatusCode.InternalServerError
+                is KooperationspartnerNotValidException -> exception.message to HttpStatusCode.BadRequest
             }
 
             return HttpServerResponse(failureMsg, ContentType.Text.Plain, statusCode)

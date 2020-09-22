@@ -25,9 +25,11 @@ import model.veranstaltung.veranstaltungenApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
 import utilty.anyOrNull
+import word.wordApi
 import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
+const val RESOURCE_PATH = "src\\main\\resources\\signatures\\"
 
 fun Application.main() {
     // connect to db
@@ -84,6 +86,7 @@ fun configureServer(server: Application) {
         veranstalterApi()
         veranstaltungenApi()
         berichteApi()
+        wordApi()
     }
     server.install(ContentNegotiation) {
         serialization(

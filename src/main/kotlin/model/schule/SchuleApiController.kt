@@ -7,6 +7,7 @@ import io.ktor.request.receive
 import io.ktor.routing.*
 import kotlinx.serialization.list
 import model.schule.enum.AnzahlSusDto
+import model.schule.enum.KooperationspartnerDto
 import model.schule.enum.SchulformDto
 import utilty.*
 
@@ -16,6 +17,12 @@ fun Route.schulenApi() = route("schulen") {
         call.logRequest()
         val result = SchuleDao.getAll(call.parameters["resolve_ids"] == "true")
         val json = Serializer.stable.toJson(SchuleDto.serializer().list, result)
+        call.respondJsonOk(json)
+    }
+
+    get("/kooperationspartner") {
+        call.logRequest()
+        val json = Serializer.stable.toJson(KooperationspartnerDto.serializer().list, KooperationspartnerDto.generate())
         call.respondJsonOk(json)
     }
 

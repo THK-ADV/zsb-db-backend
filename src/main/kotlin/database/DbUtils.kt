@@ -12,7 +12,6 @@ import model.kontakt.KontaktDao
 import model.kontakt.Kontakte
 import model.ort.Orte
 import model.schule.SchulKontakte
-import model.schule.SchuleDao
 import model.schule.Schulen
 import model.schule.enum.AnzahlSus
 import model.veranstalter.Veranstalter
@@ -60,7 +59,6 @@ fun recreateDatabase() {
  * Generates dummy data for, Berichte, Veranstaltungen, Veranstalter und Institutionen
  */
 fun generateDummyData() {
-    val schulen = SchuleDao.getAll(true)
     val adressen = AdresseDao.getAll(true)
     val kontakte = KontaktDao.getAll()
 
@@ -76,7 +74,7 @@ fun generateDummyData() {
     val veranstalterResult = Veranstalter.save(
         VeranstalterDto(
             null,
-            schulen.first().schule_id ?: "",
+            null,
             institutionResult.getOrNull()?.id?.value.toString()
         )
     )

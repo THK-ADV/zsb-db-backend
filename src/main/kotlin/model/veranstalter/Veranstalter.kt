@@ -2,7 +2,7 @@ package model.veranstalter
 
 import error_handling.CouldNotParseUuidException
 import error_handling.InstitutionIdNotValidException
-import error_handling.SchuleIdNotFoundException
+import error_handling.ToManyVeranstalterException
 import error_handling.VeranstalterIdNotValidException
 import kotlinx.serialization.Serializable
 import model.institution.Institution
@@ -15,42 +15,46 @@ import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.anyOrNull
 import java.util.*
 
 object VeranstalterTable : UUIDTable() {
-    val hochschul_id = reference("hochschul_id", Schulen)
-    val institution_id = reference("institution_id", Institutionen)
+    val hochschul_id = reference("hochschul_id", Schulen).nullable()
+    val institution_id = reference("institution_id", Institutionen).nullable()
 }
 
 class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var hochschule by Schule referencedOn VeranstalterTable.hochschul_id
-    private var institution by Institution referencedOn VeranstalterTable.institution_id
+    private var hochschule by Schule optionalReferencedOn VeranstalterTable.hochschul_id
+    private var institution by Institution optionalReferencedOn VeranstalterTable.institution_id
 
     companion object : UUIDEntityClass<Veranstalter>(VeranstalterTable) {
         fun save(dto: VeranstalterDto): Result<Veranstalter> = transaction {
-            // validate ids
+            // get validate ids
             val hochschulId = anyOrNull { UUID.fromString(dto.hochschul_id) }
-                ?: return@transaction Result.failure(
-                    CouldNotParseUuidException("hochschul_id for Veranstalter not valid.")
-                )
             val institutionId = anyOrNull { UUID.fromString(dto.institution_id) }
-                ?: return@transaction Result.failure(
-                    CouldNotParseUuidException("institution_id for Veranstalter not valid.")
-                )
+
+            if (hochschulId == null && institutionId == null) return@transaction Result.failure(
+                CouldNotParseUuidException("institution_id or hochschul_id for Veranstalter not valid.")
+            )
 
             // get objects by ids
-            val hochschule = anyOrNull { Schule[hochschulId] }
-                ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Schule with ID: ${dto.hochschul_id}"))
-            val institution = anyOrNull { Institution[institutionId] }
-                ?: return@transaction Result.failure(InstitutionIdNotValidException("UUID (${dto.institution_id}) is not a valid ID for Institution"))
+            val hochschule = anyOrNull { Schule[hochschulId!!] }
+            val institution = anyOrNull { Institution[institutionId!!] }
+
+            if (hochschule == null && institution == null) return@transaction Result.failure(
+                InstitutionIdNotValidException("UUID for hochschule or institution is not valid")
+            )
+
+            if (hochschule != null && institution != null) return@transaction Result.failure(
+                ToManyVeranstalterException("There should only be one uuid for either hochschule or institution")
+            )
 
             // find matched veranstalter
             val matchedVeranstalter = Veranstalter.find {
-                (VeranstalterTable.hochschul_id eq hochschulId) and (VeranstalterTable.institution_id eq institutionId)
+                (VeranstalterTable.hochschul_id eq hochschulId) or (VeranstalterTable.institution_id eq institutionId)
             }.firstOrNull()
 
             // update/create
@@ -82,31 +86,31 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(hochschule: Schule, institution: Institution) {
+    private fun update(hochschule: Schule?, institution: Institution?) {
         this.hochschule = hochschule
         this.institution = institution
     }
 
     fun toDto() = VeranstalterDto(
         id.value.toString(),
-        hochschule.id.value.toString(),
-        institution.id.value.toString()
+        hochschule?.id?.value?.toString(),
+        institution?.id?.value?.toString()
     )
 
     fun toAtomicDto() = VeranstalterDto(
         id.value.toString(),
-        hochschule.id.value.toString(),
-        institution.id.value.toString(),
-        hochschule.toDto(),
-        institution.toDto()
+        hochschule?.id?.value?.toString(),
+        institution?.id?.value?.toString(),
+        hochschule?.toDto(),
+        institution?.toDto()
     )
 }
 
 @Serializable
 data class VeranstalterDto(
     val uuid: String?,
-    val hochschul_id: String,
-    val institution_id: String,
+    val hochschul_id: String? = null,
+    val institution_id: String? = null,
     val hochschule: SchuleDto? = null,
     val institution: InstitutionDto? = null
 )

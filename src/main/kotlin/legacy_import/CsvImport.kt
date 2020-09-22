@@ -118,7 +118,9 @@ class CsvImport(file: File) {
                 adresse.id.value.toString(),
                 kontakteIds,
                 kAoa,
-                talent
+                if (kAoa) 0 else -1,
+                talent,
+                if (talent) 0 else -1
             )
 
             Schule.save(schuleDto).getOrNull() ?: ImportLog.error("Could not read SCHULE in line: $line")
