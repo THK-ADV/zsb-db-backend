@@ -48,6 +48,9 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:$ktor_version"
     implementation "ch.qos.logback:logback-classic:1.2.3"
 
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    implementation "org.apache.poi:poi-ooxml:3.9"
+
     // kotlinx-serialization (json support)
     implementation "io.ktor:ktor-serialization:$ktor_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
