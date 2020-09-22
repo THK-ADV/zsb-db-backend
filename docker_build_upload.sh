@@ -23,7 +23,7 @@ clearDockerImages() {
   docker-compose stop &&
     docker-compose down &&
     docker image rm ${img_name}
-    docker image prune -f
+  docker image prune -f
 }
 
 deployDockerImages() {
@@ -34,11 +34,17 @@ deployDockerImages() {
 uploadToDevServer() {
   echo uploading to dev server...
   scp ${packed_img_name} $1 &&
-  rm ${packed_img_name} &&
-  echo image uploaded
+    rm ${packed_img_name} &&
+    echo image uploaded
 }
 
 case "$1" in
+"local")
+  clearDockerImages &&
+    buildApp &&
+    buildDockerImage &&
+    docker-compose up -d
+  ;;
 "stage")
   clearDockerImages &&
     buildApp &&
@@ -50,7 +56,7 @@ case "$1" in
   deployDockerImages
   ;;
 *)
-  echo expected stage or run, but was $1
+  echo expected stage, local or run, but was $1
   exit 1
   ;;
 esac
