@@ -15,7 +15,6 @@ buildDockerImage() {
 
 packBackend() {
   echo packing image...
-  # docker save -o ${imgs_name} $(docker-compose config | awk '{if ($1 == "image:") print $2;}' ORS=" ")
   docker save -o ${packed_img_name} ${img_name}
   echo image packed
 }
