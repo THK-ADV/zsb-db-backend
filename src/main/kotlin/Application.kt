@@ -75,6 +75,16 @@ fun configureServer(server: Application) {
     server.install(CallLogging)
     server.install(CORS) {
         anyHost()
+        allowSameOrigin = true
+        method(HttpMethod.Put)
+        method(HttpMethod.Post)
+        method(HttpMethod.Get)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Options)
+        header(HttpHeaders.XForwardedProto)
+        anyHost()
+        allowCredentials = true
+        allowNonSimpleContentTypes = true
     }
     server.install(Routing) {
         index()

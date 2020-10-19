@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 
 img_name=zsb-backend
 packed_img_name=${img_name}.tar
