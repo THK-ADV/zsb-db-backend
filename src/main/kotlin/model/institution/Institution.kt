@@ -3,20 +3,21 @@ package model.institution
 import error_handling.AdressIdNotFoundException
 import error_handling.CouldNotParseUuidException
 import error_handling.InstitutionIdNotValidException
-import error_handling.KontaktIdNotValidException
 import kotlinx.serialization.Serializable
 import model.adresse.Adresse
 import model.adresse.AdresseDto
 import model.adresse.Adressen
-import model.kontakt.Kontakt
-import model.kontakt.KontaktDto
-import model.kontakt.Kontakte
+import model.bericht.Bericht
+import model.bericht.Berichte
+import model.veranstalter.Veranstalter
+import model.veranstalter.VeranstalterTable
+import model.veranstaltung.Veranstaltung
+import model.veranstaltung.Veranstaltungen
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.anyOrNull
 import java.util.*
@@ -24,22 +25,18 @@ import java.util.*
 object Institutionen : UUIDTable() {
     val bezeichnung = text("bezeichnung")
     val adress_id = reference("adress_id", Adressen)
-    val ansprechpartner_id = reference("ansprechpartner_id", Kontakte)
+    val email = text("email")
 }
 
 class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var bezeichnung by Institutionen.bezeichnung
     private var adresse by Adresse referencedOn Institutionen.adress_id
-    private var ansprechpartner by Kontakt referencedOn Institutionen.ansprechpartner_id
+    private var email by Institutionen.email
 
     companion object : UUIDEntityClass<Institution>(Institutionen) {
 
         fun save(dto: InstitutionDto): Result<Institution> = transaction {
             // validate ids
-            val ansprechpartnerId = anyOrNull { UUID.fromString(dto.ansprechpartner_id) }
-                ?: return@transaction Result.failure(
-                    CouldNotParseUuidException("ansprechpartner_id for Institution not valid.")
-                )
             val adresseId = anyOrNull { UUID.fromString(dto.adress_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("adress_id for Institution not valid.")
@@ -48,12 +45,10 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             // get kontakt/adresse from db
             val adresse = anyOrNull { Adresse[adresseId] }
                 ?: return@transaction Result.failure(AdressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
-            val ansprechpartner = anyOrNull { Kontakt[ansprechpartnerId] }
-                ?: return@transaction Result.failure(KontaktIdNotValidException("Could not find Kontakt with ID: ${dto.ansprechpartner_id}"))
 
             // matched institution
             val matchedInstitution = Institution.find {
-                (Institutionen.bezeichnung eq dto.bezeichnung) and (Institutionen.adress_id eq adresseId) and (Institutionen.ansprechpartner_id eq ansprechpartnerId)
+                (Institutionen.bezeichnung eq dto.bezeichnung) and (Institutionen.adress_id eq adresseId) and (Institutionen.email eq dto.email)
             }.firstOrNull()
 
             val institution = when {
@@ -63,46 +58,63 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     val old = anyOrNull { Institution[uuid] }
                         ?: return@transaction Result.failure(InstitutionIdNotValidException("UUID ($uuid) is not a valid ID for Institution"))
 
-                    old.update(dto, adresse, ansprechpartner)
+                    old.update(dto, adresse)
 
                     Institution[uuid]
                 }
                 matchedInstitution != null -> matchedInstitution
-                else -> new { update(dto, adresse, ansprechpartner) }
+                else -> new { update(dto, adresse) }
             }
 
             Result.success(institution)
         }
 
         fun delete(institutionsId: UUID): Boolean {
-            val result = anyOrNull { transaction {
-                Institutionen.deleteWhere { Institutionen.id eq institutionsId }
-            } }
+            val result = anyOrNull {
+                transaction {
+                    val institution = Institution.find { Institutionen.id eq institutionsId }.first()
+                    val veranstalterList = Veranstalter.find { VeranstalterTable.institution_id eq institution.id }.toList()
+
+                    val veranstaltungen = mutableListOf<Veranstaltung>()
+                    veranstalterList.forEach {
+                        veranstaltungen.addAll(Veranstaltung.find { Veranstaltungen.veranstalter_id eq it.id })
+                    }
+
+                    val berichte = mutableListOf<Bericht>()
+                    veranstaltungen.forEach {
+                        berichte.addAll(Bericht.find { Berichte.veranstaltung_id eq it.id})
+                    }
+
+                    berichte.forEach { it.delete() }
+                    veranstaltungen.forEach { it.delete() }
+                    veranstalterList.forEach { it.delete() }
+                    institution.delete()
+                }
+            }
 
             return result != null
         }
     }
 
-    private fun update(dto: InstitutionDto, adresse: Adresse, ansprechpartner: Kontakt) {
+    private fun update(dto: InstitutionDto, adresse: Adresse) {
         this.bezeichnung = dto.bezeichnung
         this.adresse = adresse
-        this.ansprechpartner = ansprechpartner
+        this.email = dto.email
     }
 
     fun toDto() = InstitutionDto(
         id.value.toString(),
         bezeichnung,
         adresse.id.value.toString(),
-        ansprechpartner.id.value.toString()
+        email
     )
 
     fun toAtomicDto() = InstitutionDto(
         id.value.toString(),
         bezeichnung,
         adresse.id.value.toString(),
-        ansprechpartner.id.value.toString(),
-        adresse.toDto(),
-        ansprechpartner.toDto()
+        email,
+        adresse.toAtomicDto()
     )
 }
 
@@ -111,7 +123,6 @@ data class InstitutionDto(
     val uuid: String?,
     val bezeichnung: String,
     val adress_id: String,
-    val ansprechpartner_id: String,
-    val adresse: AdresseDto? = null,
-    val ansprechpartner: KontaktDto? = null
+    val email: String,
+    val adresse: AdresseDto? = null
 )
