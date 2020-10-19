@@ -4,14 +4,11 @@ import database.recreateDatabase
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.*
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.routing.Routing
-import io.ktor.serialization.DefaultJsonConfiguration
-import io.ktor.serialization.serialization
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.http.*
+import io.ktor.routing.*
+import io.ktor.serialization.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import kotlinx.serialization.json.Json
 import legacy_import.CsvImport
 import model.adresse.adressenApi
@@ -75,16 +72,11 @@ fun configureServer(server: Application) {
     server.install(CallLogging)
     server.install(CORS) {
         anyHost()
-        allowSameOrigin = true
         method(HttpMethod.Put)
         method(HttpMethod.Post)
         method(HttpMethod.Get)
         method(HttpMethod.Delete)
         method(HttpMethod.Options)
-        header(HttpHeaders.XForwardedProto)
-        anyHost()
-        allowCredentials = true
-        allowNonSimpleContentTypes = true
     }
     server.install(Routing) {
         index()
