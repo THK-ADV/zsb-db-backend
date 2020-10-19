@@ -4,9 +4,6 @@ import error_handling.CouldNotParseUuidException
 import error_handling.UuidNotFound
 import kotlinx.serialization.Serializable
 import model.bericht.Berichte
-import model.kontakt.Kontakt
-import model.kontakt.KontaktDto
-import model.kontakt.Kontakte
 import model.veranstalter.Veranstalter
 import model.veranstalter.VeranstalterDto
 import model.veranstalter.VeranstalterTable
@@ -26,7 +23,6 @@ object Veranstaltungen : UUIDTable() {
     val thema = text("thema")
     val vortragsart = integer("vortragsart").nullable() // only available if kategorie == vortrag
     val datum = text("datum") // TODO should be format date...
-    val kontaktperson = reference("kontaktperson", Kontakte)
     val anzahlSus = integer("anzahl_sus")
     val stufe = integer("stufe")
     val ablauf = text("ablauf_und_bewertung")
@@ -40,7 +36,6 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var thema by Veranstaltungen.thema
     private var vortragsart by Veranstaltungen.vortragsart
     private var datum by Veranstaltungen.datum
-    private var kontaktperson by Kontakt referencedOn Veranstaltungen.kontaktperson
     private var anzahlSus by Veranstaltungen.anzahlSus
     private var stufe by Veranstaltungen.stufe
     private var ablauf by Veranstaltungen.ablauf
@@ -53,16 +48,10 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("veranstalter_id for Veranstaltung is not valid.")
                 )
-            val kontaktpersonId = anyOrNull { UUID.fromString(dto.kontaktperson_id) }
-                ?: return@transaction Result.failure(
-                    CouldNotParseUuidException("kontaktperson_id for Veranstaltung is not valid.")
-                )
 
             // get related objects from db
             val veranstalter = anyOrNull { Veranstalter[veranstalterId] }
                 ?: return@transaction Result.failure(UuidNotFound("Could not find Veranstalter with ID: $veranstalterId"))
-            val kontaktperson = anyOrNull { Kontakt[kontaktpersonId] }
-                ?: return@transaction Result.failure(UuidNotFound("Could not find Kontakt(Person) with ID: $kontaktpersonId"))
 
             // finding a matched Veranstaltung is skipped here due to the unique
 
@@ -74,10 +63,10 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     ?: return@transaction Result.failure(UuidNotFound("Couldn't find Veranstaltung with UUID: $uuid"))
 
                 // update and safe
-                old.update(dto, veranstalter, kontaktperson)
+                old.update(dto, veranstalter)
                 Veranstaltung[uuid]
             } else {
-                new { update(dto, veranstalter, kontaktperson) }
+                new { update(dto, veranstalter) }
             }
 
             // return result
@@ -99,14 +88,13 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(dto: VeranstaltungDto, veranstalter: Veranstalter, kontaktperson: Kontakt) {
+    private fun update(dto: VeranstaltungDto, veranstalter: Veranstalter) {
         this.bezeichnung = dto.bezeichnung
         this.veranstalter = veranstalter
         this.kategorie = dto.kategorie
         this.thema = dto.thema
         this.vortragsart = dto.vortragsart
         this.datum = dto.datum
-        this.kontaktperson = kontaktperson
         this.anzahlSus = dto.anzahlSus
         this.stufe = dto.stufe
         this.ablauf = dto.ablauf
@@ -121,7 +109,6 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         thema,
         vortragsart,
         datum,
-        kontaktperson.id.value.toString(),
         anzahlSus,
         stufe,
         ablauf,
@@ -136,13 +123,11 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         thema,
         vortragsart,
         datum,
-        kontaktperson.id.value.toString(),
         anzahlSus,
         stufe,
         ablauf,
         durchlaeufe,
-        veranstalter.toDto(),
-        kontaktperson.toDto()
+        veranstalter.toDto()
     )
 }
 
@@ -155,11 +140,9 @@ data class VeranstaltungDto(
     val thema: String,
     val vortragsart: Int?,
     val datum: String,
-    val kontaktperson_id: String,
     val anzahlSus: Int,
     val stufe: Int,
     val ablauf: String,
     val durchlaeufe: String,
-    val veranstalter: VeranstalterDto? = null,
-    val kontaktperson: KontaktDto? = null
+    val veranstalter: VeranstalterDto? = null
 )

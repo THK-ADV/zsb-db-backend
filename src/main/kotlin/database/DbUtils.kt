@@ -8,7 +8,6 @@ import model.bericht.Berichte
 import model.institution.Institution
 import model.institution.InstitutionDto
 import model.institution.Institutionen
-import model.kontakt.KontaktDao
 import model.kontakt.Kontakte
 import model.ort.Orte
 import model.schule.SchulKontakte
@@ -60,14 +59,13 @@ fun recreateDatabase() {
  */
 fun generateDummyData() {
     val adressen = AdresseDao.getAll(true)
-    val kontakte = KontaktDao.getAll()
 
     val institutionResult = Institution.save(
         InstitutionDto(
             null,
             "Otto Fuchs",
             adressen.first().adress_id ?: "",
-            kontakte.first().uuid ?: ""
+            "test@mail.net"
         )
     )
 
@@ -88,7 +86,22 @@ fun generateDummyData() {
             "Felgengußtechniken",
             Vortragsart.SONSTIGES.id,
             LocalDateTime.now().toString(),
-            kontakte.last().uuid ?: "",
+            AnzahlSus.D.id,
+            Stufe.UNKNOWN.id,
+            "1. Begrüßung\n2. Vortrag\n3. Fragen\n4. Party",
+            "k.A."
+        )
+    )
+
+    Veranstaltung.save(
+        VeranstaltungDto(
+            null,
+            "Studienberatung",
+            veranstalterResult.getOrNull()?.id?.value.toString(),
+            Kategorie.VORTRAG.id,
+            "Studienmöglichkeiten an der TH Köln",
+            Vortragsart.SONSTIGES.id,
+            LocalDateTime.now().toString(),
             AnzahlSus.D.id,
             Stufe.UNKNOWN.id,
             "1. Begrüßung\n2. Vortrag\n3. Fragen\n4. Party",
