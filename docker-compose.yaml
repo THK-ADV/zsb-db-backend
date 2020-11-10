@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: ${ZSB_PASSWORD}
       POSTGRES_DB: ${ZSB_USER}
     volumes:
-      - psql_vol:/var/lib/postgresql/datas
+      - psql_vol:/var/lib/postgresql/data
 
   backend:
     container_name: zsb-backend
