@@ -12,7 +12,6 @@ import model.kontakt.Kontakte
 import model.ort.Orte
 import model.schule.SchulKontakte
 import model.schule.Schulen
-import model.schule.enum.AnzahlSus
 import model.veranstalter.Veranstalter
 import model.veranstalter.VeranstalterDto
 import model.veranstalter.VeranstalterTable
@@ -21,7 +20,6 @@ import model.veranstaltung.VeranstaltungDto
 import model.veranstaltung.Veranstaltungen
 import model.veranstaltung.enum.Kategorie
 import model.veranstaltung.enum.Stufe
-import model.veranstaltung.enum.Vortragsart
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.ColoredLogging
@@ -82,14 +80,14 @@ fun generateDummyData() {
             null,
             "Neue Felgen für Porsche",
             veranstalterResult.getOrNull()?.id?.value.toString(),
-            Kategorie.VORTRAG.id,
+            listOf(Kategorie.VORTRAG_TH.id),
             "Felgengußtechniken",
-            Vortragsart.SONSTIGES.id,
             LocalDateTime.now().toString(),
-            AnzahlSus.D.id,
-            Stufe.UNKNOWN.id,
+            "Anzahl sus",
+            listOf(Stufe.UNKNOWN.id),
             "1. Begrüßung\n2. Vortrag\n3. Fragen\n4. Party",
-            "k.A."
+            "k.A.",
+            "Hans Peter"
         )
     )
 
@@ -98,14 +96,14 @@ fun generateDummyData() {
             null,
             "Studienberatung",
             veranstalterResult.getOrNull()?.id?.value.toString(),
-            Kategorie.VORTRAG.id,
+            listOf(Kategorie.WORKSHOP_EXTERN.id),
             "Studienmöglichkeiten an der TH Köln",
-            Vortragsart.SONSTIGES.id,
             LocalDateTime.now().toString(),
-            AnzahlSus.D.id,
-            Stufe.UNKNOWN.id,
+            "Anzahl SUS: 100k",
+            listOf(Stufe.UNKNOWN.id),
             "1. Begrüßung\n2. Vortrag\n3. Fragen\n4. Party",
-            "k.A."
+            "k.A.",
+            "Fridolin Fröhlich"
         )
     )
 

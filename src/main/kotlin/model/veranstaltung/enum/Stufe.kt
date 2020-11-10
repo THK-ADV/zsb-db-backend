@@ -3,12 +3,18 @@ package model.veranstaltung.enum
 import kotlinx.serialization.Serializable
 
 enum class Stufe(val id: Int, val desc: String) {
-    STUFE_1(1, "Stufe 1"),
-    UNKNOWN(9, "Unbekannt");
+    UNKNOWN(0, "Unbekannt"),
+    EF(1, "EF"),
+    Q1(2, "Q1"),
+    Q2(3, "Q2"),
+    SEK(4, "Sek. I");
 
     companion object {
         fun getStufeByDesc(desc: String) = when (desc) {
-            "Stufe 1" -> STUFE_1
+            "EF" -> EF
+            "Q1" -> Q1
+            "Q2" -> Q2
+            "Sek. I" -> SEK
             else -> UNKNOWN
         }
     }
@@ -17,6 +23,6 @@ enum class Stufe(val id: Int, val desc: String) {
 @Serializable
 data class StufeDto(val id: Int, val desc: String) {
     companion object {
-        fun generate(): List<StufeDto> = Stufe.values().map { StufeDto(it.id, it.desc)  }
+        fun generate(): List<StufeDto> = Stufe.values().map { StufeDto(it.id, it.desc) }
     }
 }

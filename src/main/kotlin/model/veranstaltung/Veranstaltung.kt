@@ -19,14 +19,14 @@ import java.util.*
 object Veranstaltungen : UUIDTable() {
     val bezeichnung = text("bezeichnung")
     val veranstalter_id = reference("veranstalter_id", VeranstalterTable)
-    val kategorie = integer("kategorie")
+    val kategorie = text("kategorie")
     val thema = text("thema")
-    val vortragsart = integer("vortragsart").nullable() // only available if kategorie == vortrag
-    val datum = text("datum") // TODO should be format date...
-    val anzahlSus = integer("anzahl_sus")
-    val stufe = integer("stufe")
+    val datum = text("datum")
+    val anzahlSus = text("anzahl_sus")
+    val stufe = text("stufe")
     val ablauf = text("ablauf_und_bewertung")
     val durchlaeufe = text("anzahl_der_durchlaeufe")
+    val ansprechpartner = text("ansprechpartner")
 }
 
 class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
@@ -34,12 +34,12 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var veranstalter by Veranstalter referencedOn Veranstaltungen.veranstalter_id
     private var kategorie by Veranstaltungen.kategorie
     private var thema by Veranstaltungen.thema
-    private var vortragsart by Veranstaltungen.vortragsart
     private var datum by Veranstaltungen.datum
     private var anzahlSus by Veranstaltungen.anzahlSus
     private var stufe by Veranstaltungen.stufe
     private var ablauf by Veranstaltungen.ablauf
     private var durchlaeufe by Veranstaltungen.durchlaeufe
+    private var ansprechpartner by Veranstaltungen.ansprechpartner
 
     companion object : UUIDEntityClass<Veranstaltung>(Veranstaltungen) {
         fun save(dto: VeranstaltungDto): Result<Veranstaltung> = transaction {
@@ -91,44 +91,53 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private fun update(dto: VeranstaltungDto, veranstalter: Veranstalter) {
         this.bezeichnung = dto.bezeichnung
         this.veranstalter = veranstalter
-        this.kategorie = dto.kategorie
+        this.kategorie = transformMultiSelect(dto.kategorie)
         this.thema = dto.thema
-        this.vortragsart = dto.vortragsart
         this.datum = dto.datum
         this.anzahlSus = dto.anzahlSus
-        this.stufe = dto.stufe
+        this.stufe = transformMultiSelect(dto.stufe)
         this.ablauf = dto.ablauf
         this.durchlaeufe = dto.durchlaeufe
+        this.ansprechpartner = dto.ansprechpartner
     }
 
     fun toDto() = VeranstaltungDto(
         id.value.toString(),
         bezeichnung,
         veranstalter.id.value.toString(),
-        kategorie,
+        transformMultiSelect(kategorie),
         thema,
-        vortragsart,
         datum,
         anzahlSus,
-        stufe,
+        transformMultiSelect(stufe),
         ablauf,
-        durchlaeufe
+        durchlaeufe,
+        ansprechpartner
     )
 
     fun toAtomicDto() = VeranstaltungDto(
         id.value.toString(),
         bezeichnung,
         veranstalter.id.value.toString(),
-        kategorie,
+        transformMultiSelect(kategorie),
         thema,
-        vortragsart,
         datum,
         anzahlSus,
-        stufe,
+        transformMultiSelect(stufe),
         ablauf,
         durchlaeufe,
+        ansprechpartner,
         veranstalter.toDto()
     )
+
+    private val separator = ":"
+
+    private fun transformMultiSelect(ids: List<Int>) = ids.fold("") {acc, it -> acc + separator + it}
+    private fun transformMultiSelect(ids: String): List<Int> {
+        val list = mutableListOf<Int?>()
+        ids.split(separator).forEach { list.add(it.toIntOrNull()) }
+        return list.filterNotNull()
+    }
 }
 
 @Serializable
@@ -136,13 +145,13 @@ data class VeranstaltungDto(
     val uuid: String?,
     val bezeichnung: String,
     val veranstalter_id: String,
-    val kategorie: Int,
+    val kategorie: List<Int>,
     val thema: String,
-    val vortragsart: Int?,
     val datum: String,
-    val anzahlSus: Int,
-    val stufe: Int,
+    val anzahlSus: String,
+    val stufe: List<Int>,
     val ablauf: String,
     val durchlaeufe: String,
+    val ansprechpartner: String,
     val veranstalter: VeranstalterDto? = null
 )
