@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: ${ZSB_PASSWORD}
       POSTGRES_DB: ${ZSB_USER}
     volumes:
-      - psql_vol:/var/lib/postgresql/data
+      - psql_vol:/var/lib/postgresql/datas
 
   backend:
     container_name: zsb-backend
@@ -26,6 +26,8 @@ services:
       DB_PASSWORD: ${ZSB_PASSWORD}
     depends_on:
       - psql
+    volumes:
+      - signatures_vol:/app/signatures
 
   frontend:
     container_name: zsb-frontend
@@ -42,3 +44,4 @@ volumes:
   psql_vol:
   nginx_cert_vol:
   nginx_config_vol:
+  signatures_vol:
