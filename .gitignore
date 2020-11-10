@@ -3,6 +3,7 @@
 /out
 /build
 /log
+*/assets
 *.iml
 *.ipr
 *.iws

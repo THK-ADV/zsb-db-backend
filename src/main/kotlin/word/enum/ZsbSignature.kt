@@ -5,9 +5,8 @@ import kotlinx.serialization.Serializable
 
 
 enum class ZsbSignatur(val id: Int, val desc: String, val text: String, val path: String) {
-    DEMO(1, "JFK-Demo", "Best regards\nJ. F. Kennedy\n---\n", RESOURCE_PATH + "demo-sign.jpeg");
-
-
+    NONE(0, "Keine", "",  ""),
+    DEMO(1, "JFK-Demo", "Best regards\nJ. F. Kennedy\n---\n", RESOURCE_PATH + "demo-sign.jpg");
 }
 
 @Serializable

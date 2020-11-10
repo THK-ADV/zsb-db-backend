@@ -10,10 +10,7 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import kotlinx.serialization.list
-import utilty.Serializer
-import utilty.logRequest
-import utilty.respond
-import utilty.respondJsonOk
+import utilty.*
 import word.enum.ZsbSignaturDto
 import java.io.File
 import java.util.*
@@ -24,7 +21,7 @@ fun Route.wordApi() {
             call.logRequest()
             val serialLetterDto = call.receive<SerialLetterDto>()
             val fileId = UUID.randomUUID()
-            val file = File("$fileId.docx")
+            val file = File("$fileId.doc")
             val generator = WordGenerator(file)
             val result = generator.generateLetter(serialLetterDto)
 
@@ -32,19 +29,18 @@ fun Route.wordApi() {
                 val error = HttpServerResponse.map(
                     Result.failure(CouldNotGenerateSerialLetterException("Word generation currently not working."))
                 )
+                ColoredLogging.LOG.error("Could not generate letter.")
                 call.respond(error)
                 return@post
             }
 
-            // respond file
             call.respondFile(file)
 
-            // delete file
             file.delete()
         }
     }
 
-    get("signatures") {
+    get("assets") {
         call.logRequest()
         val json = Serializer.stable.toJson(ZsbSignaturDto.serializer().list, ZsbSignaturDto.generate())
         call.respondJsonOk(json)

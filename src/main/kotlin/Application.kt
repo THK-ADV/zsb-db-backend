@@ -4,11 +4,14 @@ import database.recreateDatabase
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.routing.Routing
+import io.ktor.serialization.DefaultJsonConfiguration
+import io.ktor.serialization.serialization
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 import kotlinx.serialization.json.Json
 import legacy_import.CsvImport
 import model.adresse.adressenApi
@@ -26,7 +29,7 @@ import word.wordApi
 import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
-const val RESOURCE_PATH = "src\\main\\resources\\signatures\\"
+const val RESOURCE_PATH = "src/main/resources/assets/"
 
 fun Application.main() {
     // connect to db

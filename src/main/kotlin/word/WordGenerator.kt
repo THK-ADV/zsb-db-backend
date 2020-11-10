@@ -3,8 +3,10 @@ package word
 import model.adresse.AdresseDto
 import model.schule.SchuleDto
 import mu.KotlinLogging
+import org.apache.poi.util.Units
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment
 import org.apache.poi.xwpf.usermodel.XWPFDocument
+import org.apache.poi.xwpf.usermodel.XWPFRun
 import utilty.ColoredLogging
 import utilty.anyOrNull
 import word.enum.ZsbSignatur
@@ -39,13 +41,15 @@ class WordGenerator(private val file: File) {
         }
 
         // check for errors
-        if (!header || !body || !footer) return false
+        if (!header || !body || !footer) {
+            log.error("Error while writing. (Header: $header | Body: $body | Footer: $footer)")
+            return false
+        }
 
         // write to file
         doc.write(outputStream)
         outputStream.close()
 
-        log.info(">> serienbrief.docx - created <<")
         return true
     }
 
@@ -73,21 +77,28 @@ class WordGenerator(private val file: File) {
     private fun writeBody(text: String): Boolean = writeTextWithLineBreaks(text)
 
     private fun writeFooter(signatureId: Int): Boolean {
-        val signatur = anyOrNull { ZsbSignatur.values()[signatureId - 1] } ?: return false
+        val signatur = anyOrNull { ZsbSignatur.values()[signatureId] } ?: return false
+
+        if (signatur === ZsbSignatur.NONE) return true
+
         val paragraph = doc.createParagraph()
         val run = paragraph.createRun()
 
         writeTextWithLineBreaks(signatur.text)
-        val pic = File(signatur.path)
-        val inputStream = FileInputStream(pic)
-
-        log.warn(pic.absolutePath)
-        // TODO fix picture insert
-//        run.addPicture(inputStream, Document.PICTURE_TYPE_JPEG, pic.absolutePath, 20, 20)
-
-        doc.createParagraph().createRun().setText("PICTURE TEST")
+        appendSignatureAsPicture(signatur, run)
 
         return true
+    }
+
+    private fun appendSignatureAsPicture(signatur: ZsbSignatur, run: XWPFRun) {
+        val inputStream = FileInputStream(signatur.path)
+        run.addPicture(
+            inputStream,
+            XWPFDocument.PICTURE_TYPE_JPEG,
+            signatur.path,
+            Units.toEMU(50.0),
+            Units.toEMU(50.0)
+        )
     }
 
     private fun writeTextWithLineBreaks(text: String): Boolean {
@@ -110,7 +121,6 @@ class WordGenerator(private val file: File) {
 
         return true
     }
-
 
     private fun generateNewPage() {
         doc.createParagraph().isPageBreak = true
