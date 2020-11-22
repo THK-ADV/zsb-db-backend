@@ -1,5 +1,6 @@
 package legacy_import
 
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import model.adresse.Adresse
 import model.adresse.AdresseDto
 import model.kontakt.Kontakt
@@ -16,115 +17,99 @@ import java.io.File
 
 data class KontaktLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion?)
 
-class CsvImport(file: File) {
-    private val lines = mutableListOf<List<String>>()
-
+object CsvImport {
 
     init {
         ImportLog.clear()
-        val rawLines = file.readLines()
-        rawLines.forEach { rawLine ->
-            lines.add(rawLine.split(";"))
-        }
     }
 
-    fun parseSchule() {
-        // Schulname ; Name StuBO ; Mail Kontaktperson ; Schulform ; Kooperationsvertrag ; Nummer, Straße ; PLZ, Ort ;
-        // Regierungsbezirk ; Kreis ; Kontaktperson ; Mail Kontaktperson ;
-        // Name StuBO ; Mail StuBO ; Anzahl SuS ; KAoA ; Talentscout
+    fun parseSchule(file: File) {
+        // Schulname;Schulform;Schwerpunkt;Kooperationsvertrag;Nummer, Straße;PLZ;Ort;Regierungsbezirk;Kreis;
+        // Kontaktperson;Mail Kontaktperson;Name StuBO;Mail StuBO;Anzahl SuS;KAoA;Talentscout
+        val rows = csvReader{
+            charset = "windows-1252"
+            delimiter = ';'
+        }.readAllWithHeader(file)
 
-        lines.forEach { line ->
-            // skip first line
-            if (line.last() == "Talentscout") return@forEach
-
-            val plzOrt = line[SchuleIndices.plz_ort].split(",")
-            val ortDto = OrtDto(
-                plz = plzOrt.first().trim().toInt(),
-                bezeichnung = plzOrt.last().trim(),
-                kreis = line[SchuleIndices.kreis],
-                regierungsbezirk = line[SchuleIndices.regierungsbezirk]
-            )
-
-
-            val ort = Ort.save(ortDto).getOrNull()
-            if (ort == null) {
-                ImportLog.error("Could not read ORT in line: $line")
-                return@forEach
-            }
-
-            val nummerStrasse = line[SchuleIndices.nummer_strasse].split(',', limit = 2)
-            val adresseDto = AdresseDto(
-                strasse = nummerStrasse.last(),
-                hausnummer = nummerStrasse.first(),
-                ort_id = ort.id.value.toString()
-            )
-
-            val adresse = Adresse.save(adresseDto).getOrNull()
-            if (adresse == null) {
-                ImportLog.error("Could not read ADRESSE in line: $line")
-                return@forEach
-            }
-
-
-            val kontakteIds = mutableListOf<String>()
-            val kontakteADto = parseKontakte(
-                line[SchuleIndices.nameStuBo],
-                line[SchuleIndices.mailKontaktPerson],
-                KontaktFunktion.STUBO.id
-            )
-            kontakteADto.forEach { kontaktDto ->
-                Kontakt.save(kontaktDto).getOrNull()?.let {
-                    kontakteIds.add(it.id.value.toString())
-                }
-            }
-
-            val kontakteBDto = parseKontakte(
-                line[SchuleIndices.kontaktPerson2],
-                line[SchuleIndices.mailKontaktPerson2]
-            )
-
-            kontakteBDto.forEach { kontaktDto ->
-                Kontakt.save(kontaktDto).getOrNull()?.let {
-                    kontakteIds.add(it.id.value.toString())
-                }
-            }
-
-            val stuboDtos = parseKontakte(
-                line[SchuleIndices.nameStuBO2],
-                line[SchuleIndices.mailStuBO],
-                KontaktFunktion.STUBO.id
-            )
-            stuboDtos.forEach { kontaktDto ->
-                Kontakt.save(kontaktDto).getOrNull()?.let {
-                    kontakteIds.add(it.id.value.toString())
-                }
-            }
-
-            val anzahlSus = AnzahlSus.getObjectByString(line[SchuleIndices.anzahlSuS])
-            val schulform = Schulform.getSchulformByDesc(line[SchuleIndices.Schulform])
-            val schulname = line[SchuleIndices.schulname]
-            val kooperationsvertrag = parseToBoolean(line[SchuleIndices.Kooperationsvertrag])
-            val kAoa = parseToBoolean(line[SchuleIndices.kAoA])
-            val talent = parseToBoolean(line[SchuleIndices.talentscout])
-
+        rows.forEach { row ->
+            val ort = parseOrt(row["PLZ, Ort"], row["Regierungsbezirk"], row["Kreis"])
+                .also { logError(row.toList(), it, "ort") }
+                ?: return@forEach
+            val adresse = parseAdresse(row["Nummer, Straße"], ort)
+                .also{ logError(row.toList(), it, "adresse") }
+                ?: return@forEach
+            val kontaktpersonen = parseKontakte(row["Kontaktperson"], row["Mail Kontaktperson"])
+            val stuboKontakte = parseKontakte(row["Name StuBO"], row["Mail StuBO"], KontaktFunktion.STUBO.id)
+            val kontakte = saveKontakte(kontaktpersonen, stuboKontakte)
+            val kontaktIds = kontakte.map { it.id.value.toString() }
+            val schwerpunkt = row["Schwerpunkt"]
+                .also{ logError(row.toList(), it, "Schwerpunkt") }
+                ?: return@forEach
+            val schulname = row["Schulname"]
+                .also{ logError(row.toList(), it, "Schulname") }
+                ?: return@forEach
+            val anzahlSus = AnzahlSus.getObjectByString(row["Anzahl SuS"] ?: "")
+            val schulform = Schulform.getSchulformByDesc(row["Schulform"] ?: "")
+            val kooperationsvertrag = parseToBoolean(row["Kooperationsvertrag"] ?: "")
+            val kAoa = parseToBoolean(row["KAoA"] ?: "")
+            val talent = parseToBoolean(row["Talentscout"] ?: "")
 
             val schuleDto = SchuleDto(
                 null,
                 schulname,
                 schulform.id,
-                null,
+                schwerpunkt,
                 anzahlSus.id,
                 kooperationsvertrag,
                 adresse.id.value.toString(),
-                kontakteIds,
+                kontaktIds,
                 kAoa,
                 if (kAoa) 0 else -1,
                 talent,
                 if (talent) 0 else -1
             )
 
-            Schule.save(schuleDto).getOrNull() ?: ImportLog.error("Could not read SCHULE in line: $line")
+            Schule.save(schuleDto).getOrNull()
+                .also { logError(row, it, "LINE") }
         }
+    }
+
+    private fun saveKontakte(kontaktpersonen: List<KontaktDto>, stuboKontakte: List<KontaktDto>): List<Kontakt> {
+        val kontakte = mutableListOf<Kontakt>()
+        (kontaktpersonen + stuboKontakte).forEach { kontaktDto ->
+            Kontakt.save(kontaktDto).getOrNull()?.let { kontakt ->
+                kontakte.add(kontakt)
+            }
+        }
+        return kontakte
+    }
+
+    private fun parseAdresse(adresseString: String?, ort: Ort): Adresse? {
+        val nummerStrasse = adresseString?.split(',', limit = 2) ?: return null
+        if (nummerStrasse.size < 2) return null
+        val adresseDto = AdresseDto(
+            strasse = nummerStrasse.last(),
+            hausnummer = nummerStrasse.first(),
+            ort_id = ort.id.value.toString()
+        )
+
+        return Adresse.save(adresseDto).getOrNull()
+    }
+
+    private fun parseOrt(plzOrtString: String?, kreis: String?, regierungsbezirk: String?): Ort? {
+        val plzOrt = plzOrtString?.split(",") ?: return null
+        if (plzOrt.size < 2) return null
+        val ortDto = OrtDto(
+            plz = plzOrt.first().trim().toInt(),
+            bezeichnung = plzOrt.last().trim(),
+            kreis = kreis?.trim() ?: "",
+            regierungsbezirk = regierungsbezirk?.trim() ?: ""
+        )
+        return Ort.save(ortDto).getOrNull()
+    }
+
+    private fun logError(line: Any, nullable: Any?, hint: String) {
+        if (nullable == null) ImportLog.error("Could not read '$hint' in line: $line")
     }
 
     /**
@@ -132,12 +117,12 @@ class CsvImport(file: File) {
      */
     private fun parseToBoolean(text: String): Boolean = text.toLowerCase().trim() == "ja"
 
-    private fun parseKontakte(names: String, emails: String, function: Int? = null): List<KontaktDto> {
+    private fun parseKontakte(names: String?, emails: String?, function: Int? = null): List<KontaktDto> {
         val kontakte = mutableListOf<KontaktDto>()
 
         // split multiple kontakte by "und"
-        val splitNames = names.split("und")
-        val splitEmails = emails.split("und")
+        val splitNames = names?.split("und") ?: listOf()
+        val splitEmails = emails?.split("und") ?: listOf()
 
         // count of available model.kontakt data
         val count = if (splitEmails.size > splitNames.size) splitEmails.size else splitNames.size
@@ -149,8 +134,8 @@ class CsvImport(file: File) {
 
             val kontaktDto = KontaktDto(
                 null,
-                kontaktLight?.name ?: "",
-                kontaktLight?.vorname ?: "",
+                kontaktLight?.name?.trim() ?: "",
+                kontaktLight?.vorname?.trim() ?: "",
                 kontaktLight?.anrede?.id ?: Anrede.UNKNOWN.id,
                 email?.trim() ?: "",
                 kontaktLight?.funktion?.id ?: function ?: KontaktFunktion.UNKNOWN.id

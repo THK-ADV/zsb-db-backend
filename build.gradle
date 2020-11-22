@@ -56,6 +56,9 @@ dependencies {
     implementation "io.ktor:ktor-serialization:$ktor_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
 
+    // csv-import
+    implementation "com.github.doyaaaaaken:kotlin-csv-jvm:0.11.1"
+
     // logging
     implementation 'io.github.microutils:kotlin-logging:1.7.7'
 

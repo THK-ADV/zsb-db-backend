@@ -4,6 +4,7 @@
 /build
 /log
 */assets
+signatures/*
 *.iml
 *.ipr
 *.iws

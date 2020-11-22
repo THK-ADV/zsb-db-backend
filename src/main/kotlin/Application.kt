@@ -29,19 +29,10 @@ import word.wordApi
 import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
-const val RESOURCE_PATH = "src/main/resources/assets/"
+const val RESOURCE_PATH = "signatures/"
 
 fun Application.main() {
-    // connect to db
     DbSettings.connect(environment)
-
-    // load csv file or dummy data
-    anyOrNull {
-        val file = "schule_demo_file.csv"
-        CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
-        log.info("loaded data from '$file'")
-    } ?: log.warn("Couldn't import CSV-File!")
-
     configureServer(this)
 }
 
@@ -51,14 +42,13 @@ fun main() {
 
     recreateDatabase()
 
-    // load csv file
     anyOrNull {
-        val file = "schule_demo_file.csv"
-        CsvImport(File("src\\main\\resources\\legacy_import\\$file")).parseSchule()
-        log.info("loaded data from '$file'")
+        val fileName = "data-import.csv"
+        val file = File("src/main/resources/legacy_import/$fileName")
+        CsvImport.parseSchule(file)
+        log.info("loaded data from '$fileName'")
     } ?: log.warn("Couldn't import CSV-File!")
 
-    // fill some dummy data for new tables
     generateDummyData()
 
     val server = embeddedServer(Netty, port = 9000) {

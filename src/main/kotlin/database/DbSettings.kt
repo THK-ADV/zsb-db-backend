@@ -8,9 +8,9 @@ class CouldNotLoadDbCredentialsException(override val message: String) : Excepti
 object DbSettings {
     val db by lazy {
         Database.connect(
-            "jdbc:postgresql://localhost:5432/zsb",
+            "jdbc:postgresql://localhost:5432/postgres",
             driver = "org.postgresql.Driver",
-            user = "ktor", password = "0N61PNVEB}(^"
+            user = "postgres", password = "postgres"
         )
     }
 
