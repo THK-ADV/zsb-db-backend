@@ -13,7 +13,7 @@ import model.kontakt.enum.KontaktFunktionDto
 import utilty.*
 
 fun Route.kontakteApi() {
-    route("kontakte") {
+    route("contacts") {
         get {
             call.logRequest()
             val result = KontaktDao.getAll()
@@ -21,13 +21,13 @@ fun Route.kontakteApi() {
             call.respondJsonOk(json)
         }
 
-        get("/funktion") {
+        get("/function") {
             call.logRequest()
             val json = Serializer.stable.toJson(KontaktFunktionDto.serializer().list, KontaktFunktionDto.generate())
             call.respondJsonOk(json)
         }
 
-        get("/anreden") {
+        get("/salutations") {
             call.logRequest()
             val json = Serializer.stable.toJson(AnredeDto.serializer().list, AnredeDto.generate())
             call.respondJsonOk(json)
