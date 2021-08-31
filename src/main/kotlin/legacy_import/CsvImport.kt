@@ -1,8 +1,8 @@
 package legacy_import
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import model.adresse.Adresse
-import model.adresse.AdresseDto
+import model.address.Adresse
+import model.address.AdresseDto
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDto
 import model.kontakt.enum.Anrede
@@ -15,7 +15,7 @@ import model.schule.enum.AnzahlSus
 import model.schule.enum.Schulform
 import java.io.File
 
-data class KontaktLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion?)
+data class ContactLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion?)
 
 object CsvImport {
 
@@ -148,14 +148,14 @@ object CsvImport {
     }
 
     /**
-     * parse a [KontaktLight] (Name, Vorname, [Anrede] and [KontaktFunktion]) from given [text],
+     * parse a [ContactLight] (Name, Vorname, [Anrede] and [KontaktFunktion]) from given [text],
      * by extracting the first matching description; matching descriptions must be in brackets ()
      *
      * @param [text] Name of a Person with Anrede and Funktion e.g. "Frau Schulz, Kate (Schulleitung)"
      *
      * @return a [Pair] of the [text] without the cut function description and the found [KontaktFunktion]
      */
-    private fun parseKontaktLight(text: String): KontaktLight {
+    private fun parseKontaktLight(text: String): ContactLight {
         // Example fullName: Frau Schulz, Kate
         // (vorname can be missing)
         var (fullName, funktion) = parseKontaktFunktion(text)
@@ -172,7 +172,7 @@ object CsvImport {
         val name = anredeNameSplit.last().trim()
         val anrede = Anrede.getObjectByString(anredeNameSplit.first().trim())
 
-        return KontaktLight(name, vorname, anrede, funktion)
+        return ContactLight(name, vorname, anrede, funktion)
     }
 
     private fun parseKontaktFunktion(text: String): Pair<String, KontaktFunktion?> {

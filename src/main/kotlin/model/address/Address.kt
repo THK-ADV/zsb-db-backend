@@ -1,6 +1,6 @@
-package model.adresse
+package model.address
 
-import error_handling.OrtIdNotFoundException
+import error_handling.CityIdNotFoundException
 import kotlinx.serialization.Serializable
 import model.ort.Ort
 import model.ort.OrtDto
@@ -33,7 +33,7 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val ortUUID = UUID.fromString(dto.ort_id)
 
             val ort = anyOrNull { Ort[ortUUID] }
-                ?: return@transaction Result.failure<Adresse>(OrtIdNotFoundException("Couldn't update Adresse due to wrong Ort (ID: ${dto.ort_id})"))
+                ?: return@transaction Result.failure<Adresse>(CityIdNotFoundException("Couldn't update Adresse due to wrong Ort (ID: ${dto.ort_id})"))
 
             val matchedAdressen = Adresse.find {
                 (Adressen.ort eq ortUUID)

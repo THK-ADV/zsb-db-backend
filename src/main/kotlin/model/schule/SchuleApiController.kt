@@ -11,7 +11,7 @@ import model.schule.enum.KooperationspartnerDto
 import model.schule.enum.SchulformDto
 import utilty.*
 
-fun Route.schulenApi() = route("schulen") {
+fun Route.schoolsApi() = route("schools") {
 
     get {
         call.logRequest()
@@ -20,19 +20,19 @@ fun Route.schulenApi() = route("schulen") {
         call.respondJsonOk(json)
     }
 
-    get("/kooperationspartner") {
+    get("/cooperationpartners") {
         call.logRequest()
         val json = Serializer.stable.toJson(KooperationspartnerDto.serializer().list, KooperationspartnerDto.generate())
         call.respondJsonOk(json)
     }
 
-    get("/schulformen") {
+    get("/schooltypes") {
         call.logRequest()
         val json = Serializer.stable.toJson(SchulformDto.serializer().list, SchulformDto.generate())
         call.respondJsonOk(json)
     }
 
-    get("/anzahl_sus") {
+    get("/amount_students") {
         call.logRequest()
         val json = Serializer.stable.toJson(AnzahlSusDto.serializer().list, AnzahlSusDto.generate())
         call.respondJsonOk(json)

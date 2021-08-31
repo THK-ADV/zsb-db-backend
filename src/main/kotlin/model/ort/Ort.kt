@@ -1,7 +1,7 @@
 package model.ort
 
 import error_handling.CouldNotParseUuidException
-import error_handling.SchuleIdNotFoundException
+import error_handling.SchoolIdNotFoundException
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
@@ -46,7 +46,7 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
                     // fetch current Ort
                     val currentOrt = anyOrNull { Ort[uuid] }
-                        ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Ort with ID: $uuid"))
+                        ?: return@transaction Result.failure(SchoolIdNotFoundException("Could not find Ort with ID: $uuid"))
 
                     // update Ort
                     currentOrt.update(dto)

@@ -2,9 +2,9 @@ package model.schule
 
 import error_handling.*
 import kotlinx.serialization.Serializable
-import model.adresse.Adresse
-import model.adresse.AdresseDto
-import model.adresse.Adressen
+import model.address.Adresse
+import model.address.AdresseDto
+import model.address.Adressen
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDao
 import model.kontakt.KontaktDto
@@ -67,7 +67,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             return transaction {
                 // fetch Adresse
                 val adresse = anyOrNull { Adresse[UUID.fromString(dto.adress_id)] }
-                    ?: return@transaction Result.failure(AdressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
+                    ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
 
                 // create or update Schule
                 val schule: Schule = if (dto.schule_id == null) new(UUID.randomUUID()) {
@@ -80,7 +80,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
                     // fetch current Schule
                     val currentSchule = anyOrNull { Schule[uuid] }
-                        ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Schule with ID: $uuid"))
+                        ?: return@transaction Result.failure(SchoolIdNotFoundException("Could not find Schule with ID: $uuid"))
 
                     // update Schule
                     currentSchule.update(dto, adresse)
@@ -116,16 +116,16 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             // valid id for AnzahlSus?
             if (!(0 until AnzahlSus.values().count()).contains(dto.anzahl_sus)) {
-                return AnzahlSusNotValidException("This is not a valid index for AnzahlSus.")
+                return AmountStudentsNotValidException("This is not a valid index for AnzahlSus.")
             }
 
             // validate kontaktUUIDs?
             anyOrNull { KontaktDao.getAllById(dto.kontakte_ids) }
-                ?: return KontaktIdNotValidException("kontakte_ids contains non existing kontakt_ids")
+                ?: return ContactIdNotValidException("kontakte_ids contains non existing kontakt_ids")
 
             // valid id for schulform?
             if (Schulform.getDescById(dto.schulform) == null)
-                return SchulformNotValidException("This is not a valid index for Schulform.")
+                return SchoolTypeNotValidException("This is not a valid index for Schulform.")
 
             return null
         }

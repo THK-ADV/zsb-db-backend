@@ -1,6 +1,6 @@
 package word
 
-import model.adresse.AdresseDto
+import model.address.AdresseDto
 import model.schule.SchuleDto
 import mu.KotlinLogging
 import org.apache.poi.util.Units

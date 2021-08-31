@@ -1,7 +1,7 @@
 package database
 
-import model.adresse.AdresseDao
-import model.adresse.Adressen
+import model.address.AdresseDao
+import model.address.Adressen
 import model.bericht.Bericht
 import model.bericht.BerichtDto
 import model.bericht.Berichte

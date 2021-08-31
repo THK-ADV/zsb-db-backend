@@ -1,6 +1,6 @@
 package model.kontakt
 
-import error_handling.AnredeNotValidException
+import error_handling.SalutationNotValidException
 import error_handling.MailNotValidException
 import error_handling.ZsbException
 import kotlinx.serialization.Serializable
@@ -60,7 +60,7 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
         private fun validateDto(dto: KontaktDto): ZsbException? {
             if (!Anrede.values().indices.contains(dto.anrede))
-                return AnredeNotValidException("Anrede for ${dto.name} is not valid.")
+                return SalutationNotValidException("Anrede for ${dto.name} is not valid.")
 
             if (!validateMail(dto.email))
                 return MailNotValidException("mail for ${dto.name} is not a valid email.")

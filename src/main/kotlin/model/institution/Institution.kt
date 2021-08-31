@@ -1,12 +1,12 @@
 package model.institution
 
-import error_handling.AdressIdNotFoundException
+import error_handling.AddressIdNotFoundException
 import error_handling.CouldNotParseUuidException
 import error_handling.InstitutionIdNotValidException
 import kotlinx.serialization.Serializable
-import model.adresse.Adresse
-import model.adresse.AdresseDto
-import model.adresse.Adressen
+import model.address.Adresse
+import model.address.AdresseDto
+import model.address.Adressen
 import model.bericht.Bericht
 import model.bericht.Berichte
 import model.veranstalter.Veranstalter
@@ -44,7 +44,7 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             // get kontakt/adresse from db
             val adresse = anyOrNull { Adresse[adresseId] }
-                ?: return@transaction Result.failure(AdressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
+                ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
 
             // matched institution
             val matchedInstitution = Institution.find {

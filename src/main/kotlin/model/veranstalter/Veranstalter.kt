@@ -2,8 +2,8 @@ package model.veranstalter
 
 import error_handling.CouldNotParseUuidException
 import error_handling.InstitutionIdNotValidException
-import error_handling.ToManyVeranstalterException
-import error_handling.VeranstalterIdNotValidException
+import error_handling.TooManyHostsException
+import error_handling.HostIdNotValidException
 import kotlinx.serialization.Serializable
 import model.institution.Institution
 import model.institution.InstitutionDto
@@ -49,7 +49,7 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             )
 
             if (hochschule != null && institution != null) return@transaction Result.failure(
-                ToManyVeranstalterException("There should only be one uuid for either hochschule or institution")
+                TooManyHostsException("There should only be one uuid for either hochschule or institution")
             )
 
             // find matched veranstalter
@@ -63,7 +63,7 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     val uuid = anyOrNull { UUID.fromString(dto.uuid) }
                         ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Veranstalter is not a valid uuid."))
                     val old = anyOrNull { Veranstalter[uuid] }
-                        ?: return@transaction Result.failure(VeranstalterIdNotValidException("UUID ($uuid) is not a valid ID for Veranstalter"))
+                        ?: return@transaction Result.failure(HostIdNotValidException("UUID ($uuid) is not a valid ID for Veranstalter"))
                     old.update(hochschule, institution)
 
                     Veranstalter[uuid]

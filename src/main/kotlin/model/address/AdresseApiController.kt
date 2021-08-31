@@ -1,4 +1,4 @@
-package model.adresse
+package model.address
 
 import error_handling.HttpServerResponse
 import io.ktor.application.call
