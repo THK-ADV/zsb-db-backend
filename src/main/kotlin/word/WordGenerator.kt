@@ -56,12 +56,12 @@ class WordGenerator(private val file: File) {
     private fun writeHeader(schule: SchuleDto, adresse: AdresseDto): Boolean {
         val paragraph = doc.createParagraph()
         val run = paragraph.createRun()
-        val ort = adresse.ort ?: return false
+        val ort = adresse.city ?: return false
 
         repeat(3) { run.addBreak() }
         run.setText(schule.name.trim())
         run.addBreak()
-        run.setText("${adresse.strasse.trim()} ${adresse.hausnummer.trim()}\n")
+        run.setText("${adresse.street.trim()} ${adresse.houseNumber.trim()}\n")
         run.addBreak()
         run.setText("${ort.plz} ${ort.bezeichnung.trim()}\n")
         repeat(2) { run.addBreak() }

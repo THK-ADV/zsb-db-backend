@@ -32,7 +32,7 @@ fun Route.schulenApi() = route("schools") {
         call.respondJsonOk(json)
     }
 
-    get("/amount_students") {
+    get("/amountstudents") {
         call.logRequest()
         val json = Serializer.stable.toJson(AnzahlSusDto.serializer().list, AnzahlSusDto.generate())
         call.respondJsonOk(json)

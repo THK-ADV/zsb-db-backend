@@ -1,19 +1,12 @@
 import database.DbSettings
-import database.generateDummyData
-import database.recreateDatabase
-import io.ktor.application.Application
-import io.ktor.application.install
+import io.ktor.application.*
 import io.ktor.features.*
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.routing.Routing
-import io.ktor.serialization.DefaultJsonConfiguration
-import io.ktor.serialization.serialization
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.http.*
+import io.ktor.routing.*
+import io.ktor.serialization.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import kotlinx.serialization.json.Json
-import legacy_import.CsvImport
 import model.adresse.adressenApi
 import model.bericht.berichteApi
 import model.institution.institutionenApi
@@ -24,9 +17,7 @@ import model.veranstalter.veranstalterApi
 import model.veranstaltung.veranstaltungenApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
-import utilty.anyOrNull
 import word.wordApi
-import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
 const val RESOURCE_PATH = "signatures/"
@@ -40,7 +31,7 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    recreateDatabase()
+    /*recreateDatabase()
 
     anyOrNull {
         val fileName = "data-import.csv"
@@ -49,7 +40,7 @@ fun main() {
         log.info("loaded data from '$fileName'")
     } ?: log.warn("Couldn't import CSV-File!")
 
-    generateDummyData()
+    generateDummyData()*/
 
     val server = embeddedServer(Netty, port = 9000) {
         configureServer(this)
