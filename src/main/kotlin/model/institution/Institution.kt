@@ -82,7 +82,7 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
                     val berichte = mutableListOf<Bericht>()
                     veranstaltungen.forEach {
-                        berichte.addAll(Bericht.find { Berichte.veranstaltung_id eq it.id})
+                        berichte.addAll(Bericht.find { Berichte.event_id eq it.id})
                     }
 
                     berichte.forEach { it.delete() }

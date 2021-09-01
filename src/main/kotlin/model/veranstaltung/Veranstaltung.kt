@@ -79,7 +79,7 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         fun delete(veranstaltungId: UUID): Boolean {
             val result = anyOrNull {
                 transaction {
-                    Berichte.deleteWhere { Berichte.veranstaltung_id eq veranstaltungId }
+                    Berichte.deleteWhere { Berichte.event_id eq veranstaltungId }
                     Veranstaltungen.deleteWhere { Veranstaltungen.id eq veranstaltungId }
                 }
             }
