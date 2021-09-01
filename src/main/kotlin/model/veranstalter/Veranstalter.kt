@@ -22,18 +22,18 @@ import utilty.anyOrNull
 import java.util.*
 
 object VeranstalterTable : UUIDTable() {
-    val hochschul_id = reference("hochschul_id", Schulen).nullable()
+    val university_id = reference("hochschul_id", Schulen).nullable()
     val institution_id = reference("institution_id", Institutionen).nullable()
 }
 
 class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var hochschule by Schule optionalReferencedOn VeranstalterTable.hochschul_id
+    private var university by Schule optionalReferencedOn VeranstalterTable.university_id
     private var institution by Institution optionalReferencedOn VeranstalterTable.institution_id
 
     companion object : UUIDEntityClass<Veranstalter>(VeranstalterTable) {
         fun save(dto: VeranstalterDto): Result<Veranstalter> = transaction {
             // get validate ids
-            val hochschulId = anyOrNull { UUID.fromString(dto.hochschul_id) }
+            val hochschulId = anyOrNull { UUID.fromString(dto.university_id) }
             val institutionId = anyOrNull { UUID.fromString(dto.institution_id) }
 
             if (hochschulId == null && institutionId == null) return@transaction Result.failure(
@@ -54,7 +54,7 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             // find matched veranstalter
             val matchedVeranstalter = Veranstalter.find {
-                (VeranstalterTable.hochschul_id eq hochschulId) or (VeranstalterTable.institution_id eq institutionId)
+                (VeranstalterTable.university_id eq hochschulId) or (VeranstalterTable.institution_id eq institutionId)
             }.firstOrNull()
 
             // update/create
@@ -87,21 +87,21 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     private fun update(hochschule: Schule?, institution: Institution?) {
-        this.hochschule = hochschule
+        this.university = hochschule
         this.institution = institution
     }
 
     fun toDto() = VeranstalterDto(
         id.value.toString(),
-        hochschule?.id?.value?.toString(),
+        university?.id?.value?.toString(),
         institution?.id?.value?.toString()
     )
 
     fun toAtomicDto() = VeranstalterDto(
         id.value.toString(),
-        hochschule?.id?.value?.toString(),
+        university?.id?.value?.toString(),
         institution?.id?.value?.toString(),
-        hochschule?.toDto(),
+        university?.toDto(),
         institution?.toDto()
     )
 }
@@ -109,8 +109,8 @@ class Veranstalter(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 @Serializable
 data class VeranstalterDto(
     val uuid: String?,
-    val hochschul_id: String? = null,
+    val university_id: String? = null,
     val institution_id: String? = null,
-    val hochschule: SchuleDto? = null,
+    val university: SchuleDto? = null,
     val institution: InstitutionDto? = null
 )
