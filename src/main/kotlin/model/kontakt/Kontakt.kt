@@ -16,19 +16,19 @@ import utilty.validateMail
 import java.util.*
 
 object Kontakte : UUIDTable() {
-    val name = text("name")
-    val vorname = text("vorname")
-    val anrede = integer("anrede")
+    val surname = text("name")
+    val firstname = text("vorname")
+    val salutation = integer("anrede")
     val email = text("email")
-    val funktion = integer("funktion")
+    val feature = integer("funktion")
 }
 
 class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var name by Kontakte.name
-    private var vorname by Kontakte.vorname
-    private var anrede by Kontakte.anrede
+    private var surname by Kontakte.surname
+    private var firstname by Kontakte.firstname
+    private var salutation by Kontakte.salutation
     private var email by Kontakte.email
-    private var funktion by Kontakte.funktion
+    private var feature by Kontakte.feature
 
     companion object : UUIDEntityClass<Kontakt>(Kontakte) {
         fun save(dto: KontaktDto): Result<Kontakt> = transaction {
@@ -52,42 +52,42 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         // search for existing model.kontakt
         private fun findMatchedKontakt(dto: KontaktDto): Kontakt? {
             val matchedKontakte = Kontakt.find {
-                (Kontakte.name eq dto.name)
+                (Kontakte.surname eq dto.surname)
                     .and(Kontakte.email eq dto.email)
             }
             return if (matchedKontakte.empty()) null else matchedKontakte.first()
         }
 
         private fun validateDto(dto: KontaktDto): ZsbException? {
-            if (!Anrede.values().indices.contains(dto.anrede))
-                return AnredeNotValidException("Anrede for ${dto.name} is not valid.")
+            if (!Anrede.values().indices.contains(dto.salutation))
+                return AnredeNotValidException("Anrede for ${dto.surname} is not valid.")
 
             if (!validateMail(dto.email))
-                return MailNotValidException("mail for ${dto.name} is not a valid email.")
+                return MailNotValidException("mail for ${dto.surname} is not a valid email.")
 
             return null
         }
     }
 
     private fun update(dto: KontaktDto) {
-        this.name = dto.name
-        this.vorname = dto.vorname
-        this.anrede = dto.anrede ?: Anrede.UNKNOWN.ordinal
+        this.surname = dto.surname
+        this.firstname = dto.firstname
+        this.salutation = dto.salutation ?: Anrede.UNKNOWN.ordinal
         this.email = dto.email
-        this.funktion = dto.funktion ?: KontaktFunktion.OTHER.ordinal
+        this.feature = dto.feature ?: KontaktFunktion.OTHER.ordinal
     }
 
-    fun toDto() = KontaktDto(id.value.toString(), name, vorname, anrede, email, funktion)
+    fun toDto() = KontaktDto(id.value.toString(), surname, firstname, salutation, email, feature)
 }
 
 @Serializable
 data class KontaktDto(
     val uuid: String?,
-    val name: String,
-    val vorname: String = "",
-    val anrede: Int? = null,
+    val surname: String,
+    val firstname: String = "",
+    val salutation: Int? = null,
     val email: String,
-    val funktion: Int? = null
+    val feature: Int? = null
 ) {
-    fun isValid() = !name.isBlank() || !email.isBlank()
+    fun isValid() = !surname.isBlank() || !email.isBlank()
 }

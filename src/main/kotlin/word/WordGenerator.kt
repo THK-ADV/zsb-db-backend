@@ -30,12 +30,12 @@ class WordGenerator(private val file: File) {
 
         letter.addressees.forEachIndexed { i, it ->
             // check if adresse is valid
-            if (it.adresse == null) return@forEachIndexed
+            if (it.address == null) return@forEachIndexed
 
             // create new page for every page except the first
             if (i != 0) generateNewPage()
 
-            header = writeHeader(it, it.adresse)
+            header = writeHeader(it, it.address)
             body = writeBody(letter.msg)
             footer = writeFooter(letter.signature_id)
         }
