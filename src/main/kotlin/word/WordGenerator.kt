@@ -63,7 +63,7 @@ class WordGenerator(private val file: File) {
         run.addBreak()
         run.setText("${adresse.street.trim()} ${adresse.houseNumber.trim()}\n")
         run.addBreak()
-        run.setText("${ort.plz} ${ort.bezeichnung.trim()}\n")
+        run.setText("${ort.postcode} ${ort.designation.trim()}\n")
         repeat(2) { run.addBreak() }
 
         val formatter = DateTimeFormatter.ofPattern("d. MMMM yyyy")

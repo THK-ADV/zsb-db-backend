@@ -100,10 +100,10 @@ object CsvImport {
         val plzOrt = plzOrtString?.split(",") ?: return null
         if (plzOrt.size < 2) return null
         val ortDto = OrtDto(
-            plz = plzOrt.first().trim().toInt(),
-            bezeichnung = plzOrt.last().trim(),
-            kreis = kreis?.trim() ?: "",
-            regierungsbezirk = regierungsbezirk?.trim() ?: ""
+            postcode = plzOrt.first().trim().toInt(),
+            designation = plzOrt.last().trim(),
+            constituency = kreis?.trim() ?: "",
+            governmentDistrict = regierungsbezirk?.trim() ?: ""
         )
         return Ort.save(ortDto).getOrNull()
     }
