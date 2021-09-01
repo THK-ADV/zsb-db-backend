@@ -49,7 +49,7 @@ fun Route.schulenApi() = route("schools") {
     post {
         call.logRequest()
         val schuleDto = call.receive<SchuleDto>()
-        if (call.checkIdAndRespondUsePutIfNotNull(schuleDto.schule_id)) return@post
+        if (call.checkIdAndRespondUsePutIfNotNull(schuleDto.school_id)) return@post
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
     }
@@ -57,7 +57,7 @@ fun Route.schulenApi() = route("schools") {
     put {
         call.logRequest()
         val schuleDto = call.receive<SchuleDto>()
-        if (call.checkIdAndRespondUsePostIfNull(schuleDto.schule_id)) return@put
+        if (call.checkIdAndRespondUsePostIfNull(schuleDto.school_id)) return@put
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result))
     }
