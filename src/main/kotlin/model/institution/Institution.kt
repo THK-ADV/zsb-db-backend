@@ -77,7 +77,7 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
                     val veranstaltungen = mutableListOf<Veranstaltung>()
                     veranstalterList.forEach {
-                        veranstaltungen.addAll(Veranstaltung.find { Veranstaltungen.veranstalter_id eq it.id })
+                        veranstaltungen.addAll(Veranstaltung.find { Veranstaltungen.host_id eq it.id })
                     }
 
                     val berichte = mutableListOf<Bericht>()

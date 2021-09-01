@@ -17,34 +17,34 @@ import utilty.anyOrNull
 import java.util.*
 
 object Veranstaltungen : UUIDTable() {
-    val bezeichnung = text("bezeichnung")
-    val veranstalter_id = reference("veranstalter_id", VeranstalterTable)
-    val kategorie = text("kategorie")
-    val thema = text("thema")
-    val datum = text("datum")
-    val anzahlSus = text("anzahl_sus")
-    val stufe = text("stufe")
-    val ablauf = text("ablauf_und_bewertung")
-    val durchlaeufe = text("anzahl_der_durchlaeufe")
-    val ansprechpartner = text("ansprechpartner")
+    val designation = text("bezeichnung")
+    val host_id = reference("veranstalter_id", VeranstalterTable)
+    val category = text("kategorie")
+    val topic = text("thema")
+    val date = text("datum")
+    val amountStudents = text("anzahl_sus")
+    val level = text("stufe")
+    val sequence = text("ablauf_und_bewertung")
+    val runs = text("anzahl_der_durchlaeufe")
+    val contactPerson = text("ansprechpartner")
 }
 
 class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var bezeichnung by Veranstaltungen.bezeichnung
-    private var veranstalter by Veranstalter referencedOn Veranstaltungen.veranstalter_id
-    private var kategorie by Veranstaltungen.kategorie
-    private var thema by Veranstaltungen.thema
-    private var datum by Veranstaltungen.datum
-    private var anzahlSus by Veranstaltungen.anzahlSus
-    private var stufe by Veranstaltungen.stufe
-    private var ablauf by Veranstaltungen.ablauf
-    private var durchlaeufe by Veranstaltungen.durchlaeufe
-    private var ansprechpartner by Veranstaltungen.ansprechpartner
+    private var designation by Veranstaltungen.designation
+    private var host by Veranstalter referencedOn Veranstaltungen.host_id
+    private var category by Veranstaltungen.category
+    private var topic by Veranstaltungen.topic
+    private var date by Veranstaltungen.date
+    private var amountStudents by Veranstaltungen.amountStudents
+    private var level by Veranstaltungen.level
+    private var sequence by Veranstaltungen.sequence
+    private var runs by Veranstaltungen.runs
+    private var contactPerson by Veranstaltungen.contactPerson
 
     companion object : UUIDEntityClass<Veranstaltung>(Veranstaltungen) {
         fun save(dto: VeranstaltungDto): Result<Veranstaltung> = transaction {
             // validate ids
-            val veranstalterId = anyOrNull { UUID.fromString(dto.veranstalter_id) }
+            val veranstalterId = anyOrNull { UUID.fromString(dto.host_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("veranstalter_id for Veranstaltung is not valid.")
                 )
@@ -89,45 +89,45 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     private fun update(dto: VeranstaltungDto, veranstalter: Veranstalter) {
-        this.bezeichnung = dto.bezeichnung
-        this.veranstalter = veranstalter
-        this.kategorie = transformMultiSelect(dto.kategorie)
-        this.thema = dto.thema
-        this.datum = dto.datum
-        this.anzahlSus = dto.anzahlSus
-        this.stufe = transformMultiSelect(dto.stufe)
-        this.ablauf = dto.ablauf
-        this.durchlaeufe = dto.durchlaeufe
-        this.ansprechpartner = dto.ansprechpartner
+        this.designation = dto.designation
+        this.host = veranstalter
+        this.category = transformMultiSelect(dto.category)
+        this.topic = dto.topic
+        this.date = dto.date
+        this.amountStudents = dto.amountStudents
+        this.level = transformMultiSelect(dto.level)
+        this.sequence = dto.sequence
+        this.runs = dto.runs
+        this.contactPerson = dto.contactPerson
     }
 
     fun toDto() = VeranstaltungDto(
         id.value.toString(),
-        bezeichnung,
-        veranstalter.id.value.toString(),
-        transformMultiSelect(kategorie),
-        thema,
-        datum,
-        anzahlSus,
-        transformMultiSelect(stufe),
-        ablauf,
-        durchlaeufe,
-        ansprechpartner
+        designation,
+        host.id.value.toString(),
+        transformMultiSelect(category),
+        topic,
+        date,
+        amountStudents,
+        transformMultiSelect(level),
+        sequence,
+        runs,
+        contactPerson
     )
 
     fun toAtomicDto() = VeranstaltungDto(
         id.value.toString(),
-        bezeichnung,
-        veranstalter.id.value.toString(),
-        transformMultiSelect(kategorie),
-        thema,
-        datum,
-        anzahlSus,
-        transformMultiSelect(stufe),
-        ablauf,
-        durchlaeufe,
-        ansprechpartner,
-        veranstalter.toDto()
+        designation,
+        host.id.value.toString(),
+        transformMultiSelect(category),
+        topic,
+        date,
+        amountStudents,
+        transformMultiSelect(level),
+        sequence,
+        runs,
+        contactPerson,
+        host.toDto()
     )
 
     private val separator = ":"
@@ -143,15 +143,15 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 @Serializable
 data class VeranstaltungDto(
     val uuid: String?,
-    val bezeichnung: String,
-    val veranstalter_id: String,
-    val kategorie: List<Int>,
-    val thema: String,
-    val datum: String,
-    val anzahlSus: String,
-    val stufe: List<Int>,
-    val ablauf: String,
-    val durchlaeufe: String,
-    val ansprechpartner: String,
-    val veranstalter: VeranstalterDto? = null
+    val designation: String,
+    val host_id: String,
+    val category: List<Int>,
+    val topic: String,
+    val date: String,
+    val amountStudents: String,
+    val level: List<Int>,
+    val sequence: String,
+    val runs: String,
+    val contactPerson: String,
+    val host: VeranstalterDto? = null
 )
