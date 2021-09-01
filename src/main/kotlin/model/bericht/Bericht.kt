@@ -18,19 +18,19 @@ import java.util.*
 object Berichte : UUIDTable() {
     val title = text("titel")
     val text = text("text")
-    val veranstaltung_id = reference("veranstaltung_id", Veranstaltungen)
+    val event_id = reference("veranstaltung_id", Veranstaltungen)
 }
 
 class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var title by Berichte.title
     private var text by Berichte.text
-    private var veranstaltung by Veranstaltung referencedOn Berichte.veranstaltung_id
+    private var veranstaltung by Veranstaltung referencedOn Berichte.event_id
 
     companion object : UUIDEntityClass<Bericht>(Berichte) {
 
         fun save(dto: BerichtDto): Result<Bericht> = transaction {
             // validate ids
-            val veranstaltungId = anyOrNull { UUID.fromString(dto.veranstaltung_id) }
+            val veranstaltungId = anyOrNull { UUID.fromString(dto.event_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("veranstaltungId for Bericht isn't valid.")
                 )
@@ -66,7 +66,7 @@ class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
     private fun update(dto: BerichtDto, veranstaltung: Veranstaltung) {
         this.text = dto.text
-        this.title = dto.titel
+        this.title = dto.title
         this.veranstaltung = veranstaltung
     }
 
@@ -78,8 +78,8 @@ class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 @Serializable
 data class BerichtDto(
     val uuid: String?,
-    val titel: String,
+    val title: String,
     val text: String,
-    val veranstaltung_id: String,
-    val veranstaltung: VeranstaltungDto? = null
+    val event_id: String,
+    val event: VeranstaltungDto? = null
 )
