@@ -56,6 +56,7 @@ fun configureServer(server: Application) {
     server.install(CallLogging)
     server.install(CORS) {
         anyHost()
+        allowSameOrigin = true
         method(HttpMethod.Put)
         method(HttpMethod.Post)
         method(HttpMethod.Get)

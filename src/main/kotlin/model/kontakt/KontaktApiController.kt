@@ -21,7 +21,7 @@ fun Route.kontakteApi() {
             call.respondJsonOk(json)
         }
 
-        get("/function") {
+        get("/feature") {
             call.logRequest()
             val json = Serializer.stable.toJson(KontaktFunktionDto.serializer().list, KontaktFunktionDto.generate())
             call.respondJsonOk(json)
