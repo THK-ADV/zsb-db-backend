@@ -23,21 +23,21 @@ import utilty.anyOrNull
 import java.util.*
 
 object Institutionen : UUIDTable() {
-    val bezeichnung = text("bezeichnung")
-    val adress_id = reference("adress_id", Adressen)
+    val designation = text("bezeichnung")
+    val address_id = reference("adress_id", Adressen)
     val email = text("email")
 }
 
 class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var bezeichnung by Institutionen.bezeichnung
-    private var adresse by Adresse referencedOn Institutionen.adress_id
+    private var designation by Institutionen.designation
+    private var address by Adresse referencedOn Institutionen.address_id
     private var email by Institutionen.email
 
     companion object : UUIDEntityClass<Institution>(Institutionen) {
 
         fun save(dto: InstitutionDto): Result<Institution> = transaction {
             // validate ids
-            val adresseId = anyOrNull { UUID.fromString(dto.adress_id) }
+            val adresseId = anyOrNull { UUID.fromString(dto.address_id) }
                 ?: return@transaction Result.failure(
                     CouldNotParseUuidException("adress_id for Institution not valid.")
                 )
@@ -48,7 +48,7 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             // matched institution
             val matchedInstitution = Institution.find {
-                (Institutionen.bezeichnung eq dto.bezeichnung) and (Institutionen.adress_id eq adresseId) and (Institutionen.email eq dto.email)
+                (Institutionen.designation eq dto.designation) and (Institutionen.address_id eq adresseId) and (Institutionen.email eq dto.email)
             }.firstOrNull()
 
             val institution = when {
@@ -77,12 +77,12 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
                     val veranstaltungen = mutableListOf<Veranstaltung>()
                     veranstalterList.forEach {
-                        veranstaltungen.addAll(Veranstaltung.find { Veranstaltungen.veranstalter_id eq it.id })
+                        veranstaltungen.addAll(Veranstaltung.find { Veranstaltungen.host_id eq it.id })
                     }
 
                     val berichte = mutableListOf<Bericht>()
                     veranstaltungen.forEach {
-                        berichte.addAll(Bericht.find { Berichte.veranstaltung_id eq it.id})
+                        berichte.addAll(Bericht.find { Berichte.event_id eq it.id})
                     }
 
                     berichte.forEach { it.delete() }
@@ -97,32 +97,32 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     private fun update(dto: InstitutionDto, adresse: Adresse) {
-        this.bezeichnung = dto.bezeichnung
-        this.adresse = adresse
+        this.designation = dto.designation
+        this.address = adresse
         this.email = dto.email
     }
 
     fun toDto() = InstitutionDto(
         id.value.toString(),
-        bezeichnung,
-        adresse.id.value.toString(),
+        designation,
+        address.id.value.toString(),
         email
     )
 
     fun toAtomicDto() = InstitutionDto(
         id.value.toString(),
-        bezeichnung,
-        adresse.id.value.toString(),
+        designation,
+        address.id.value.toString(),
         email,
-        adresse.toAtomicDto()
+        address.toAtomicDto()
     )
 }
 
 @Serializable
 data class InstitutionDto(
     val uuid: String?,
-    val bezeichnung: String,
-    val adress_id: String,
+    val designation: String,
+    val address_id: String,
     val email: String,
-    val adresse: AdresseDto? = null
+    val address: AdresseDto? = null
 )

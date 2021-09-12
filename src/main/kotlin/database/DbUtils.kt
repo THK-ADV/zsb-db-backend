@@ -55,7 +55,7 @@ fun recreateDatabase() {
 /**
  * Generates dummy data for, Berichte, Veranstaltungen, Veranstalter und Institutionen
  */
-fun generateDummyData() {
+/*fun generateDummyData() {
     val adressen = AdresseDao.getAll(true)
 
     val institutionResult = Institution.save(
@@ -119,4 +119,4 @@ fun generateDummyData() {
     if (bericht == null) {
         ColoredLogging.LOG.warn("Could not load dummy data.")
     }
-}
+}*/

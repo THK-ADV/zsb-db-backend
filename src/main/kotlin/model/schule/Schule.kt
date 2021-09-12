@@ -24,13 +24,13 @@ import utilty.anyOrNull
 import java.util.*
 
 object Schulen : UUIDTable() {
-    val schulname = text("schulname")
-    val schulform = integer("schulform")
-    val schwerpunkt = text("schwerpunkt")
-    val anzahlSus = integer("anzahl_sus")
-    val kooperationsvertrag = bool("kooperationsvertrag")
-    val adress_id = reference("adress_id", Adressen)
-    val kaoa_hochschule = bool("kaoa_hochschule")
+    val schoolname = text("schulname")
+    val schooltype = integer("schulform")
+    val focus = text("schwerpunkt")
+    val amountStudents = integer("anzahl_sus")
+    val cooperationcontract = bool("kooperationsvertrag")
+    val address_id = reference("adress_id", Adressen)
+    val kaoa_university = bool("kaoa_hochschule")
     val kaoa_partner = integer("kaoa_partner")
     val talentscouting = bool("talentscouting")
     val talentscouting_partner = integer("talentscouting_partner")
@@ -44,14 +44,14 @@ object SchulKontakte : Table() {
 }
 
 class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var schulname by Schulen.schulname
-    private var schulform by Schulen.schulform
-    private var schwerpunkt by Schulen.schwerpunkt
-    private var anzahlSus by Schulen.anzahlSus
-    private var kooperationsvertrag by Schulen.kooperationsvertrag
-    private var adresse by Adresse referencedOn Schulen.adress_id
-    private var kontakte by Kontakt via SchulKontakte
-    private var kaoaHochschule by Schulen.kaoa_hochschule
+    private var schoolname by Schulen.schoolname
+    private var schooltype by Schulen.schooltype
+    private var focus by Schulen.focus
+    private var amountStudents by Schulen.amountStudents
+    private var cooperationcontract by Schulen.cooperationcontract
+    private var address by Adresse referencedOn Schulen.address_id
+    private var contacts by Kontakt via SchulKontakte
+    private var kaoaUniversity by Schulen.kaoa_university
     private var kaoaPartner by Schulen.kaoa_partner
     private var talentscouting by Schulen.talentscouting
     private var talentscoutingPartner by Schulen.talentscouting_partner
@@ -70,13 +70,13 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
 
                 // create or update Schule
-                val schule: Schule = if (dto.schule_id == null) new(UUID.randomUUID()) {
+                val schule: Schule = if (dto.school_id == null) new(UUID.randomUUID()) {
                     // note: manual creation of the uuid is needed to save the intermediate table in one transaction
                     update(dto, adresse)
                 } else {
                     // parse UUID
-                    val uuid = anyOrNull { UUID.fromString(dto.schule_id) }
-                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.schule_id}"))
+                    val uuid = anyOrNull { UUID.fromString(dto.school_id) }
+                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.school_id}"))
 
                     // fetch current Schule
                     val currentSchule = anyOrNull { Schule[uuid] }
@@ -132,29 +132,29 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     private fun update(dto: SchuleDto, adresse: Adresse) {
-        this.schulname = dto.name
-        this.schulform = dto.schulform
-        this.schwerpunkt = dto.schwerpunkt.toString()
-        this.anzahlSus = dto.anzahl_sus
-        this.kooperationsvertrag = dto.kooperationsvertrag
-        this.adresse = adresse
-        this.kaoaHochschule = dto.kaoa_hochschule
+        this.schoolname = dto.name
+        this.schooltype = dto.schooltype
+        this.focus = dto.focus.toString()
+        this.amountStudents = dto.amount_students
+        this.cooperationcontract = dto.cooperationcontract
+        this.address = adresse
+        this.kaoaUniversity = dto.kaoa_university
         this.kaoaPartner = dto.kaoa_partner
         this.talentscouting = dto.talentscouting
         this.talentscoutingPartner = dto.talentscouting_partner
-        this.kontakte = SizedCollection(KontaktDao.getAllById(dto.kontakte_ids))
+        this.contacts = SizedCollection(KontaktDao.getAllById(dto.contacts_ids))
     }
 
     fun toDto() = SchuleDto(
         id.value.toString(),
-        schulname,
-        schulform,
-        schwerpunkt,
-        anzahlSus,
-        kooperationsvertrag,
-        adresse.id.value.toString(),
-        kontakte.map { it.id.value.toString() },
-        kaoaHochschule,
+        schoolname,
+        schooltype,
+        focus,
+        amountStudents,
+        cooperationcontract,
+        address.id.value.toString(),
+        contacts.map { it.id.value.toString() },
+        kaoaUniversity,
         kaoaPartner,
         talentscouting,
         talentscoutingPartner
@@ -162,36 +162,36 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
     fun toAtomicDto() = SchuleDto(
         id.value.toString(),
-        schulname,
-        schulform,
-        schwerpunkt,
-        anzahlSus,
-        kooperationsvertrag,
-        adresse.id.value.toString(),
-        kontakte.map { it.id.value.toString() },
-        kaoaHochschule,
+        schoolname,
+        schooltype,
+        focus,
+        amountStudents,
+        cooperationcontract,
+        address.id.value.toString(),
+        contacts.map { it.id.value.toString() },
+        kaoaUniversity,
         kaoaPartner,
         talentscouting,
         talentscoutingPartner,
-        kontakte.map { it.toDto() },
-        adresse.toAtomicDto()
+        contacts.map { it.toDto() },
+        address.toAtomicDto()
     )
 }
 
 @Serializable
 data class SchuleDto(
-    val schule_id: String? = null,
+    val school_id: String? = null,
     val name: String,
-    val schulform: Int,
-    val schwerpunkt: String?,
-    val anzahl_sus: Int,
-    val kooperationsvertrag: Boolean,
-    val adress_id: String,
-    val kontakte_ids: List<String> = listOf(),
-    val kaoa_hochschule: Boolean,
+    val schooltype: Int,
+    val focus: String?,
+    val amount_students: Int,
+    val cooperationcontract: Boolean,
+    val address_id: String,
+    val contacts_ids: List<String> = listOf(),
+    val kaoa_university: Boolean,
     val kaoa_partner: Int,
     val talentscouting: Boolean,
     val talentscouting_partner: Int,
-    val kontakte: List<KontaktDto> = listOf(),
-    val adresse: AdresseDto? = null
+    val contacts: List<KontaktDto> = listOf(),
+    val address: AdresseDto? = null
 )

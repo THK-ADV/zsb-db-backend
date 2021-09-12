@@ -20,7 +20,7 @@ fun Route.schoolsApi() = route("schools") {
         call.respondJsonOk(json)
     }
 
-    get("/cooperationpartners") {
+    get("/cooperationpartner") {
         call.logRequest()
         val json = Serializer.stable.toJson(KooperationspartnerDto.serializer().list, KooperationspartnerDto.generate())
         call.respondJsonOk(json)
@@ -32,7 +32,7 @@ fun Route.schoolsApi() = route("schools") {
         call.respondJsonOk(json)
     }
 
-    get("/amount_students") {
+    get("/amountstudents") {
         call.logRequest()
         val json = Serializer.stable.toJson(AnzahlSusDto.serializer().list, AnzahlSusDto.generate())
         call.respondJsonOk(json)
@@ -49,7 +49,7 @@ fun Route.schoolsApi() = route("schools") {
     post {
         call.logRequest()
         val schuleDto = call.receive<SchuleDto>()
-        if (call.checkIdAndRespondUsePutIfNotNull(schuleDto.schule_id)) return@post
+        if (call.checkIdAndRespondUsePutIfNotNull(schuleDto.school_id)) return@post
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
     }
@@ -57,7 +57,7 @@ fun Route.schoolsApi() = route("schools") {
     put {
         call.logRequest()
         val schuleDto = call.receive<SchuleDto>()
-        if (call.checkIdAndRespondUsePostIfNull(schuleDto.schule_id)) return@put
+        if (call.checkIdAndRespondUsePostIfNull(schuleDto.school_id)) return@put
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result))
     }

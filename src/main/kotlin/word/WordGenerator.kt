@@ -30,12 +30,12 @@ class WordGenerator(private val file: File) {
 
         letter.addressees.forEachIndexed { i, it ->
             // check if adresse is valid
-            if (it.adresse == null) return@forEachIndexed
+            if (it.address == null) return@forEachIndexed
 
             // create new page for every page except the first
             if (i != 0) generateNewPage()
 
-            header = writeHeader(it, it.adresse)
+            header = writeHeader(it, it.address)
             body = writeBody(letter.msg)
             footer = writeFooter(letter.signature_id)
         }
@@ -56,14 +56,14 @@ class WordGenerator(private val file: File) {
     private fun writeHeader(schule: SchuleDto, adresse: AdresseDto): Boolean {
         val paragraph = doc.createParagraph()
         val run = paragraph.createRun()
-        val ort = adresse.ort ?: return false
+        val ort = adresse.city ?: return false
 
         repeat(3) { run.addBreak() }
         run.setText(schule.name.trim())
         run.addBreak()
-        run.setText("${adresse.strasse.trim()} ${adresse.hausnummer.trim()}\n")
+        run.setText("${adresse.street.trim()} ${adresse.houseNumber.trim()}\n")
         run.addBreak()
-        run.setText("${ort.plz} ${ort.bezeichnung.trim()}\n")
+        run.setText("${ort.postcode} ${ort.designation.trim()}\n")
         repeat(2) { run.addBreak() }
 
         val formatter = DateTimeFormatter.ofPattern("d. MMMM yyyy")

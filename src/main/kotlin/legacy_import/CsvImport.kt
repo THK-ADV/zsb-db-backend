@@ -88,9 +88,9 @@ object CsvImport {
         val nummerStrasse = adresseString?.split(',', limit = 2) ?: return null
         if (nummerStrasse.size < 2) return null
         val adresseDto = AdresseDto(
-            strasse = nummerStrasse.last(),
-            hausnummer = nummerStrasse.first(),
-            ort_id = ort.id.value.toString()
+            street = nummerStrasse.last(),
+            houseNumber = nummerStrasse.first(),
+            city_id = ort.id.value.toString()
         )
 
         return Adresse.save(adresseDto).getOrNull()
@@ -100,10 +100,10 @@ object CsvImport {
         val plzOrt = plzOrtString?.split(",") ?: return null
         if (plzOrt.size < 2) return null
         val ortDto = OrtDto(
-            plz = plzOrt.first().trim().toInt(),
-            bezeichnung = plzOrt.last().trim(),
-            kreis = kreis?.trim() ?: "",
-            regierungsbezirk = regierungsbezirk?.trim() ?: ""
+            postcode = plzOrt.first().trim().toInt(),
+            designation = plzOrt.last().trim(),
+            constituency = kreis?.trim() ?: "",
+            governmentDistrict = regierungsbezirk?.trim() ?: ""
         )
         return Ort.save(ortDto).getOrNull()
     }
