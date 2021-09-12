@@ -11,7 +11,7 @@ import kotlinx.serialization.list
 import utilty.*
 
 fun Route.orteApi() {
-   route("orte") {
+   route("cities") {
         get {
             call.logRequest()
             val result = OrtDao.getAll()

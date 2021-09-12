@@ -9,7 +9,7 @@ import io.ktor.routing.*
 import utilty.*
 
 fun Route.institutionenApi() {
-    route("institutionen") {
+    route("institutions") {
 
         // get all
         get {
