@@ -33,7 +33,7 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val ortUUID = UUID.fromString(dto.city_id)
 
             val ort = anyOrNull { Ort[ortUUID] }
-                ?: return@transaction Result.failure<Adresse>(CityIdNotFoundException("Couldn't update Adresse due to wrong Ort (ID: ${dto.ort_id})"))
+                ?: return@transaction Result.failure<Adresse>(CityIdNotFoundException("Couldn't update Adresse due to wrong Ort (ID: ${dto.city_id})"))
 
             val matchedAdressen = Adresse.find {
                 (Adressen.city eq ortUUID)

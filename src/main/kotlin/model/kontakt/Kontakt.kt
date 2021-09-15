@@ -59,8 +59,8 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         private fun validateDto(dto: KontaktDto): ZsbException? {
-            if (!Anrede.values().indices.contains(dto.anrede))
-                return SalutationNotValidException("Anrede for ${dto.name} is not valid.")
+            if (!Anrede.values().indices.contains(dto.salutation))
+                return SalutationNotValidException("Anrede for ${dto.firstname} is not valid.")
 
             if (!validateMail(dto.email))
                 return MailNotValidException("mail for ${dto.surname} is not a valid email.")

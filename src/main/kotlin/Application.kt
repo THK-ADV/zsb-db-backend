@@ -7,7 +7,7 @@ import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.serialization.json.Json
-import model.adresse.adressenApi
+import model.address.adressenApi
 import model.bericht.berichteApi
 import model.institution.institutionenApi
 import model.kontakt.kontakteApi

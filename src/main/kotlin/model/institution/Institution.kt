@@ -44,7 +44,7 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             // get kontakt/adresse from db
             val adresse = anyOrNull { Adresse[adresseId] }
-                ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
+                ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.address_id}"))
 
             // matched institution
             val matchedInstitution = Institution.find {

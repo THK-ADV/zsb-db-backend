@@ -66,8 +66,8 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
             return transaction {
                 // fetch Adresse
-                val adresse = anyOrNull { Adresse[UUID.fromString(dto.adress_id)] }
-                    ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.adress_id}"))
+                val adresse = anyOrNull { Adresse[UUID.fromString(dto.address_id)] }
+                    ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.address_id}"))
 
                 // create or update Schule
                 val schule: Schule = if (dto.school_id == null) new(UUID.randomUUID()) {
@@ -115,16 +115,16 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             }
 
             // valid id for AnzahlSus?
-            if (!(0 until AnzahlSus.values().count()).contains(dto.anzahl_sus)) {
+            if (!(0 until AnzahlSus.values().count()).contains(dto.amount_students)) {
                 return AmountStudentsNotValidException("This is not a valid index for AnzahlSus.")
             }
 
             // validate kontaktUUIDs?
-            anyOrNull { KontaktDao.getAllById(dto.kontakte_ids) }
+            anyOrNull { KontaktDao.getAllById(dto.contacts_ids) }
                 ?: return ContactIdNotValidException("kontakte_ids contains non existing kontakt_ids")
 
             // valid id for schulform?
-            if (Schulform.getDescById(dto.schulform) == null)
+            if (Schulform.getDescById(dto.schooltype) == null)
                 return SchoolTypeNotValidException("This is not a valid index for Schulform.")
 
             return null
