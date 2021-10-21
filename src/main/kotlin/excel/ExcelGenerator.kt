@@ -11,7 +11,7 @@ import java.util.*
 class ExcelGenerator(private val file: File) {
     private val workBook = XSSFWorkbook()
 
-    fun generateSheet(school: SchuleDto){
+    fun generateSheet(school: SchuleDto): Boolean {
         val outputStream = FileOutputStream(file)
         val sheet = workBook.createSheet("Adressen")
         val header = createHeader(sheet)
@@ -20,9 +20,10 @@ class ExcelGenerator(private val file: File) {
         workBook.write(outputStream)
         outputStream.close()
 
+        return true
     }
 
-    fun createHeader(sheet: XSSFSheet) {
+    private fun createHeader(sheet: XSSFSheet) {
 
         // Schulname, Vorname, Nachname, Straße, Hausnummer, PLZ, Ort
         val properties = arrayOf("Schulname", "Vorname", "Nachname", "Straße", "Hausnummer", "PLZ", "Ort")

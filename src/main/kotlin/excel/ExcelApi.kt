@@ -1,5 +1,6 @@
 package excel
 
+import error_handling.CouldNotGenerateExcelFileException
 import error_handling.CouldNotGenerateSerialLetterException
 import error_handling.HttpServerResponse
 import io.ktor.application.*
@@ -20,6 +21,15 @@ fun Route.excelApi() {
             val file = File("$fileId.xls")
             val generator = ExcelGenerator(file)
             val result = generator.generateSheet(schoolDto)
+
+            if(!result) {
+                val error = HttpServerResponse.map(
+                    Result.failure(CouldNotGenerateExcelFileException("Excel generation currently not working."))
+                )
+                ColoredLogging.LOG.error("Could not generate file.")
+                call.respond(error)
+                return@post
+            }
 
             call.respondFile(file)
 
