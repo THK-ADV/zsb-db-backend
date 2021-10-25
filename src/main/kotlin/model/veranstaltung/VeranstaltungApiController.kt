@@ -13,24 +13,24 @@ import model.veranstaltung.enum.VortragsartDto
 import utilty.*
 
 fun Route.veranstaltungenApi() {
-    route("veranstaltungen") {
+    route("events") {
 
         // get Kategorie options
-        get("/kategorien") {
+        get("/categories") {
             call.logRequest()
             val json = Serializer.stable.toJson(KategorieDto.serializer().list, KategorieDto.generate())
             call.respondJsonOk(json)
         }
 
         // get stufe options
-        get("/stufen") {
+        get("/levels") {
             call.logRequest()
             val json = Serializer.stable.toJson(StufeDto.serializer().list, StufeDto.generate())
             call.respondJsonOk(json)
         }
 
         // get vortragsart options
-        get("/vortragsarten") {
+        get("/presentationtypes") {
             call.logRequest()
             val json = Serializer.stable.toJson(VortragsartDto.serializer().list, VortragsartDto.generate())
             call.respondJsonOk(json)

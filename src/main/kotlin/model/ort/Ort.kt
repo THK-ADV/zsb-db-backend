@@ -1,7 +1,7 @@
 package model.ort
 
 import error_handling.CouldNotParseUuidException
-import error_handling.SchuleIdNotFoundException
+import error_handling.SchoolIdNotFoundException
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
@@ -13,17 +13,17 @@ import utilty.anyOrNull
 import java.util.*
 
 object Orte : UUIDTable() {
-    val regierungsbezirk = text("regierungsbezirk")
-    val kreis = text("kreis")
-    val plz = integer("plz")
-    val bezeichnung = text("bezeichnung")
+    val governmentDistrict = text("regierungsbezirk")
+    val constituency = text("kreis")
+    val postcode = integer("plz")
+    val designation = text("bezeichnung")
 }
 
 class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var plz by Orte.plz
-    private var bezeichnung by Orte.bezeichnung
-    private var kreis by Orte.kreis
-    private var regierungsbezirk by Orte.regierungsbezirk
+    private var postcode by Orte.postcode
+    private var designation by Orte.designation
+    private var constituency by Orte.constituency
+    private var governmentDistrict by Orte.governmentDistrict
 
     companion object : UUIDEntityClass<Ort>(Orte) {
         /**
@@ -31,22 +31,22 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
          */
         fun save(dto: OrtDto): Result<Ort> = transaction {
             val matchedOrte = Ort.find {
-                (Orte.bezeichnung eq dto.bezeichnung)
-                    .and(Orte.plz eq dto.plz)
-                    .and(Orte.kreis eq dto.kreis)
-                    .and(Orte.regierungsbezirk eq dto.regierungsbezirk)
+                (Orte.designation eq dto.designation)
+                    .and(Orte.postcode eq dto.postcode)
+                    .and(Orte.constituency eq dto.constituency)
+                    .and(Orte.governmentDistrict eq dto.governmentDistrict)
             }
             val matchedOrt = if (matchedOrte.empty()) null else matchedOrte.first()
 
             val ort: Ort = when {
-                dto.ort_id != null -> {
+                dto.city_id != null -> {
                     // parse UUID
-                    val uuid = anyOrNull { UUID.fromString(dto.ort_id) }
-                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.ort_id}"))
+                    val uuid = anyOrNull { UUID.fromString(dto.city_id) }
+                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.city_id}"))
 
                     // fetch current Ort
                     val currentOrt = anyOrNull { Ort[uuid] }
-                        ?: return@transaction Result.failure(SchuleIdNotFoundException("Could not find Ort with ID: $uuid"))
+                        ?: return@transaction Result.failure(SchoolIdNotFoundException("Could not find Ort with ID: $uuid"))
 
                     // update Ort
                     currentOrt.update(dto)
@@ -63,20 +63,20 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     private fun update(dto: OrtDto) {
-        this.plz = dto.plz
-        this.bezeichnung = dto.bezeichnung
-        this.kreis = dto.kreis
-        this.regierungsbezirk = dto.regierungsbezirk
+        this.postcode = dto.postcode
+        this.designation = dto.designation
+        this.constituency = dto.constituency
+        this.governmentDistrict = dto.governmentDistrict
     }
 
-    fun toDto() = OrtDto(id.value.toString(), plz, bezeichnung, kreis, regierungsbezirk)
+    fun toDto() = OrtDto(id.value.toString(), postcode, designation, constituency, governmentDistrict)
 }
 
 @Serializable
 data class OrtDto(
-    val ort_id: String? = null,
-    val plz: Int,
-    val bezeichnung: String,
-    val kreis: String,
-    val regierungsbezirk: String
+    val city_id: String? = null,
+    val postcode: Int,
+    val designation: String,
+    val constituency: String,
+    val governmentDistrict: String
 )

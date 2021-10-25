@@ -19,19 +19,19 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
             val (failureMsg, statusCode) = when(exception) {
                 is NotAuthorizedException -> exception.message to HttpStatusCode.Forbidden
                 is MailNotValidException -> exception.message to HttpStatusCode.BadRequest
-                is SchulformNotValidException -> exception.message to HttpStatusCode.BadRequest
-                is OrtIdNotFoundException -> exception.message to HttpStatusCode.BadRequest
-                is AdressIdNotFoundException -> exception.message to HttpStatusCode.NotFound
-                is SchuleIdNotFoundException -> exception.message to HttpStatusCode.NotFound
+                is SchoolTypeNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is CityIdNotFoundException -> exception.message to HttpStatusCode.BadRequest
+                is AddressIdNotFoundException -> exception.message to HttpStatusCode.NotFound
+                is SchoolIdNotFoundException -> exception.message to HttpStatusCode.NotFound
                 is CouldNotParseUuidException -> exception.message to HttpStatusCode.BadRequest
-                is AnzahlSusNotValidException -> exception.message to HttpStatusCode.BadRequest
-                is KontaktIdNotValidException -> exception.message to HttpStatusCode.BadRequest
-                is AnredeNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is AmountStudentsNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is ContactIdNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is SalutationNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is InstitutionIdNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is InternalDbException -> exception.message to HttpStatusCode.InternalServerError
-                is VeranstalterIdNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is HostIdNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is UuidNotFound -> exception.message to HttpStatusCode.NotFound
-                is ToManyVeranstalterException -> exception.message to HttpStatusCode.BadRequest
+                is TooManyHostsException -> exception.message to HttpStatusCode.BadRequest
                 is CouldNotGenerateSerialLetterException -> exception.message to HttpStatusCode.InternalServerError
                 is KooperationspartnerNotValidException -> exception.message to HttpStatusCode.BadRequest
             }

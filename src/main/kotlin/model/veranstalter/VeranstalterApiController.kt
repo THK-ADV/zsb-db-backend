@@ -9,7 +9,7 @@ import io.ktor.routing.*
 import utilty.*
 
 fun Route.veranstalterApi() {
-    route("veranstalter") {
+    route("hosts") {
         // get all
         get {
             call.logRequest()

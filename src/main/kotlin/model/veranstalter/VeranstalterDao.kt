@@ -1,7 +1,7 @@
 package model.veranstalter
 
 import error_handling.InternalDbException
-import error_handling.VeranstalterIdNotValidException
+import error_handling.HostIdNotValidException
 import kotlinx.serialization.list
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.Serializer
@@ -28,7 +28,7 @@ object VeranstalterDao {
         }
 
         if (result == null)
-            Result.failure(VeranstalterIdNotValidException("ID ($id) is not a valid uuid for Veranstalter."))
+            Result.failure(HostIdNotValidException("ID ($id) is not a valid uuid for Veranstalter."))
         else
             Result.success(mapJsonResult(result))
     }

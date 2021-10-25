@@ -1,7 +1,7 @@
 package database
 
-import model.adresse.AdresseDao
-import model.adresse.Adressen
+import model.address.AdresseDao
+import model.address.Adressen
 import model.bericht.Bericht
 import model.bericht.BerichtDto
 import model.bericht.Berichte
@@ -55,7 +55,7 @@ fun recreateDatabase() {
 /**
  * Generates dummy data for, Berichte, Veranstaltungen, Veranstalter und Institutionen
  */
-fun generateDummyData() {
+/*fun generateDummyData() {
     val adressen = AdresseDao.getAll(true)
 
     val institutionResult = Institution.save(
@@ -119,4 +119,4 @@ fun generateDummyData() {
     if (bericht == null) {
         ColoredLogging.LOG.warn("Could not load dummy data.")
     }
-}
+}*/

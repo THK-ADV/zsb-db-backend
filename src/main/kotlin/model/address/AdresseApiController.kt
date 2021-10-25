@@ -1,4 +1,4 @@
-package model.adresse
+package model.address
 
 import error_handling.HttpServerResponse
 import io.ktor.application.call
@@ -11,7 +11,7 @@ import kotlinx.serialization.list
 import utilty.*
 
 fun Route.adressenApi() {
-    route("adressen") {
+    route("addresses") {
         get {
             call.logRequest()
             val result = AdresseDao.getAll(call.parameters["resolve_ids"] == "true")
