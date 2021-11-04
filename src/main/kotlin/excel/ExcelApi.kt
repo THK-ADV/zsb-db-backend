@@ -13,14 +13,14 @@ import java.io.File
 import java.util.*
 
 fun Route.excelApi() {
-    route("downloadschools") {
+    route("downloadsheet") {
         post {
             call.logRequest()
-            val schoolDto = call.receive<SchuleDto>()
+            val schoolDtos = call.receive<List<SchuleDto>>()
             val fileId = UUID.randomUUID()
             val file = File("$fileId.xls")
             val generator = ExcelGenerator(file)
-            val result = generator.generateSheet(schoolDto)
+            val result = generator.generateSheet(schoolDtos)
 
             if(!result) {
                 val error = HttpServerResponse.map(

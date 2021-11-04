@@ -11,11 +11,11 @@ import java.util.*
 class ExcelGenerator(private val file: File) {
     private val workBook = XSSFWorkbook()
 
-    fun generateSheet(school: SchuleDto): Boolean {
+    fun generateSheet(schools: List<SchuleDto>): Boolean {
         val outputStream = FileOutputStream(file)
         val sheet = workBook.createSheet("Adressen")
         val header = createHeader(sheet)
-        val body = createContent(school)
+        val body = createContent(schools, sheet)
 
         workBook.write(outputStream)
         outputStream.close()
@@ -36,8 +36,27 @@ class ExcelGenerator(private val file: File) {
         }
     }
 
-    fun createContent(school: SchuleDto) {
-
+    private fun createContent(schools: List<SchuleDto>, sheet: XSSFSheet) {
+        var rowNum = 1;
+        schools.forEach {
+            for(i in 0..it.contacts.size) {
+                val row = sheet.createRow(rowNum++)
+                row.createCell(0)
+                    .setCellValue(it.name)
+                row.createCell(1)
+                    .setCellValue(it.contacts[i].firstname)
+                row.createCell(2)
+                    .setCellValue(it.contacts[i].surname)
+                row.createCell(3)
+                    .setCellValue(it.address?.street)
+                row.createCell(4)
+                    .setCellValue(it.address?.houseNumber)
+                row.createCell(5)
+                    .setCellValue(it.address?.city?.postcode.toString())
+                row.createCell(6)
+                    .setCellValue(it.address?.city?.designation)
+            }
+        }
     }
 
 }
