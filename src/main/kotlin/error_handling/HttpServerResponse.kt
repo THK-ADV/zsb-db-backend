@@ -34,6 +34,7 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 is TooManyHostsException -> exception.message to HttpStatusCode.BadRequest
                 is CouldNotGenerateSerialLetterException -> exception.message to HttpStatusCode.InternalServerError
                 is KooperationspartnerNotValidException -> exception.message to HttpStatusCode.BadRequest
+                else -> return HttpServerResponse("Unknown error.", ContentType.Text.Plain, HttpStatusCode.InternalServerError)
             }
 
             return HttpServerResponse(failureMsg, ContentType.Text.Plain, statusCode)
