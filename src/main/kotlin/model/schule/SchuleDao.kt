@@ -13,6 +13,10 @@ object SchuleDao {
         if (atomic) Schule[id].toAtomicDto() else Schule[id].toDto()
     }
 
+    fun getMultipleById(ids: List<UUID>, atomic: Boolean = false): SchuleDto = transaction {
+        if (atomic) Schule[id].toAtomicDto() else Schule[id].toDto()
+    }
+
     fun createOrUpdate(schuleDto: SchuleDto): Result<String> = transaction {
         Schule.save(schuleDto).map {
             val dto = it.toDto()

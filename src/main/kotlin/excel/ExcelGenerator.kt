@@ -2,30 +2,29 @@ package excel
 
 import model.schule.Schule
 import model.schule.SchuleDto
+import model.schule.Schulen
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.jetbrains.exposed.sql.select
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-class ExcelGenerator(private val file: File) {
-    private val workBook = XSSFWorkbook()
+class ExcelGenerator() {
 
-    fun generateSheet(schools: List<SchuleDto>): Boolean {
-        val outputStream = FileOutputStream(file)
+    fun generateSheet(schools: List<SchuleDto>): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        val workBook = XSSFWorkbook()
         val sheet = workBook.createSheet("Adressen")
-        val header = createHeader(sheet)
-        val body = createContent(schools, sheet)
+        createHeader(sheet)
+        createContent(schools, sheet)
 
         workBook.write(outputStream)
-        outputStream.close()
-
-        return true
+        return outputStream.toByteArray()
     }
 
     private fun createHeader(sheet: XSSFSheet) {
-
-        // Schulname, Vorname, Nachname, Straße, Hausnummer, PLZ, Ort
         val properties = arrayOf("Schulname", "Vorname", "Nachname", "Straße", "Hausnummer", "PLZ", "Ort")
 
         val headerRow = sheet.createRow(0)
@@ -39,14 +38,14 @@ class ExcelGenerator(private val file: File) {
     private fun createContent(schools: List<SchuleDto>, sheet: XSSFSheet) {
         var rowNum = 1;
         schools.forEach {
-            for(i in 0..it.contacts.size) {
+            it.contacts.forEach { c ->
                 val row = sheet.createRow(rowNum++)
                 row.createCell(0)
                     .setCellValue(it.name)
                 row.createCell(1)
-                    .setCellValue(it.contacts[i].firstname)
+                    .setCellValue(c.firstname)
                 row.createCell(2)
-                    .setCellValue(it.contacts[i].surname)
+                    .setCellValue(c.surname)
                 row.createCell(3)
                     .setCellValue(it.address?.street)
                 row.createCell(4)
