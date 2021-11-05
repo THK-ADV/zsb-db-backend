@@ -1,15 +1,10 @@
 package excel
 
-import model.schule.Schule
 import model.schule.SchuleDto
-import model.schule.Schulen
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.jetbrains.exposed.sql.select
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.util.*
+
 
 class ExcelGenerator() {
 
@@ -17,45 +12,55 @@ class ExcelGenerator() {
         val outputStream = ByteArrayOutputStream()
         val workBook = XSSFWorkbook()
         val sheet = workBook.createSheet("Adressen")
-        createHeader(sheet)
+        createHeader(sheet, workBook)
         createContent(schools, sheet)
-
         workBook.write(outputStream)
         return outputStream.toByteArray()
     }
 
-    private fun createHeader(sheet: XSSFSheet) {
-        val properties = arrayOf("Schulname", "Vorname", "Nachname", "Straße", "Hausnummer", "PLZ", "Ort")
+    private fun createHeader(sheet: XSSFSheet, workbook: XSSFWorkbook) {
 
+        val properties = arrayOf("Schulname", "Vorname", "Nachname", "Straße", "Hausnummer", "PLZ", "Ort")
         val headerRow = sheet.createRow(0)
+
+        val font = workbook.createFont()
+        font.bold = true
+        val style = workbook.createCellStyle()
+        style.setFont(font)
 
         for (i in properties.indices) {
             val cell = headerRow.createCell(i)
             cell.setCellValue(properties[i])
+            cell.cellStyle = style
         }
+
     }
 
     private fun createContent(schools: List<SchuleDto>, sheet: XSSFSheet) {
-        var rowNum = 1;
+        var rowNum = 1
+        var columnIndex = 0
         schools.forEach {
             it.contacts.forEach { c ->
+                columnIndex = 0
                 val row = sheet.createRow(rowNum++)
-                row.createCell(0)
+                row.createCell(columnIndex)
                     .setCellValue(it.name)
-                row.createCell(1)
+                row.createCell(++columnIndex)
                     .setCellValue(c.firstname)
-                row.createCell(2)
+                row.createCell(++columnIndex)
                     .setCellValue(c.surname)
-                row.createCell(3)
+                row.createCell(++columnIndex)
                     .setCellValue(it.address?.street)
-                row.createCell(4)
+                row.createCell(++columnIndex)
                     .setCellValue(it.address?.houseNumber)
-                row.createCell(5)
+                row.createCell(++columnIndex)
                     .setCellValue(it.address?.city?.postcode.toString())
-                row.createCell(6)
+                row.createCell(++columnIndex)
                     .setCellValue(it.address?.city?.designation)
             }
         }
+        for(i in 0..columnIndex)
+            sheet.autoSizeColumn(i)
     }
 
 }
