@@ -1,4 +1,5 @@
 import database.DbSettings
+import excel.excelApi
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
@@ -73,6 +74,7 @@ fun configureServer(server: Application) {
         veranstaltungenApi()
         berichteApi()
         wordApi()
+        excelApi()
     }
     server.install(ContentNegotiation) {
         serialization(
