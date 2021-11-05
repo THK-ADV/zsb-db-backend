@@ -52,6 +52,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
     implementation "org.apache.poi:poi-ooxml:4.1.2"
 
+    // excel export
+    compile "org.apache.poi:poi:3.17"	     // For `.xls` files
+
     // kotlinx-serialization (json support)
     implementation "io.ktor:ktor-serialization:$ktor_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"

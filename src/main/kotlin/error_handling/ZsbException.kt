@@ -20,6 +20,7 @@ class UuidNotFound(msg: String): ZsbException(msg)
 
 // other
 class CouldNotGenerateSerialLetterException(msg: String) : ZsbException(msg)
+class CouldNotGenerateExcelFileException(msg: String) : ZsbException(msg)
 class MailNotValidException(msg: String) : ZsbException(msg)
 class TooManyHostsException(msg: String) : ZsbException(msg)
 class NotAuthorizedException(msg: String) : ZsbException(msg)
