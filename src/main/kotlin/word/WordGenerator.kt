@@ -85,20 +85,8 @@ class WordGenerator(private val file: File) {
         val run = paragraph.createRun()
 
         writeTextWithLineBreaks(signatur.text)
-        appendSignatureAsPicture(signatur, run)
 
         return true
-    }
-
-    private fun appendSignatureAsPicture(signatur: ZsbSignatur, run: XWPFRun) {
-        val inputStream = FileInputStream(signatur.path)
-        run.addPicture(
-            inputStream,
-            XWPFDocument.PICTURE_TYPE_JPEG,
-            signatur.path,
-            Units.toEMU(50.0),
-            Units.toEMU(50.0)
-        )
     }
 
     private fun writeTextWithLineBreaks(text: String): Boolean {
