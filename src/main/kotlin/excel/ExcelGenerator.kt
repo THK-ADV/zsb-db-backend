@@ -6,7 +6,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.ByteArrayOutputStream
 
 
-class ExcelGenerator() {
+class ExcelGenerator {
 
     fun generateSheet(schools: List<SchuleDto>): ByteArray {
         val outputStream = ByteArrayOutputStream()
@@ -15,11 +15,12 @@ class ExcelGenerator() {
         createHeader(sheet, workBook)
         createContent(schools, sheet)
         workBook.write(outputStream)
+        outputStream.close()
+        workBook.close()
         return outputStream.toByteArray()
     }
 
     private fun createHeader(sheet: XSSFSheet, workbook: XSSFWorkbook) {
-
         val properties = arrayOf("Schulname", "Vorname", "Nachname", "Straße", "Hausnummer", "PLZ", "Ort")
         val headerRow = sheet.createRow(0)
 
@@ -33,7 +34,6 @@ class ExcelGenerator() {
             cell.setCellValue(properties[i])
             cell.cellStyle = style
         }
-
     }
 
     private fun createContent(schools: List<SchuleDto>, sheet: XSSFSheet) {
@@ -59,8 +59,12 @@ class ExcelGenerator() {
                     .setCellValue(it.address?.city?.designation)
             }
         }
-        for(i in 0..columnIndex)
-            sheet.autoSizeColumn(i)
+        for (i in 0..columnIndex) {
+            try {
+                sheet.autoSizeColumn(i)
+            } catch (e: Exception) {
+                println("could not auto size column $i")
+            }
+        }
     }
-
 }
