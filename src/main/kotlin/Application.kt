@@ -10,6 +10,7 @@ import io.ktor.server.netty.*
 import kotlinx.serialization.json.Json
 import model.address.adressenApi
 import model.bericht.berichteApi
+import model.communication.mailApi
 import model.institution.institutionenApi
 import model.kontakt.kontakteApi
 import model.ort.orteApi
@@ -74,6 +75,7 @@ fun configureServer(server: Application) {
         berichteApi()
         wordApi()
         excelApi()
+        mailApi()
     }
     server.install(ContentNegotiation) {
         serialization(
