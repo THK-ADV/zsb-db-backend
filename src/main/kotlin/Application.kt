@@ -10,6 +10,7 @@ import io.ktor.server.netty.*
 import kotlinx.serialization.json.Json
 import model.address.adressenApi
 import model.bericht.berichteApi
+import model.communication.mailApi
 import model.institution.institutionenApi
 import model.kontakt.kontakteApi
 import model.ort.orteApi
@@ -24,7 +25,7 @@ val log = ColoredLogging(KotlinLogging.logger {})
 
 fun Application.main() {
     DbSettings.connect(environment)
-    configureServer(this)
+    configureServer(this, environment)
 }
 
 fun main() {
@@ -43,14 +44,14 @@ fun main() {
     generateDummyData()*/
 
     val server = embeddedServer(Netty, port = 9000) {
-        configureServer(this)
+        configureServer(this, null)
     }
 
     log.info("## Start Server ##")
     server.start(wait = true)
 }
 
-fun configureServer(server: Application) {
+fun configureServer(server: Application, env: ApplicationEnvironment?) {
     server.install(DefaultHeaders)
     server.install(Compression)
     server.install(CallLogging)
@@ -74,6 +75,7 @@ fun configureServer(server: Application) {
         berichteApi()
         wordApi()
         excelApi()
+        env?.let { mailApi(loadMailSettings(it)) }
     }
     server.install(ContentNegotiation) {
         serialization(
@@ -85,4 +87,29 @@ fun configureServer(server: Application) {
             )
         )
     }
+}
+
+data class MailSettings(val sender: String, val host: String, val timeout: Int, val chunkSize: Int)
+
+private fun loadMailSettings(env: ApplicationEnvironment): MailSettings {
+    val sender = env.config.propertyOrNull("mail.sender")
+        ?.getString()
+        ?.takeIf { it.isNotEmpty() }
+        ?: throw Throwable("missing mail setting")
+    val host = env.config.propertyOrNull("mail.host")
+        ?.getString()
+        ?.takeIf { it.isNotEmpty() }
+        ?: throw Throwable("missing mail setting")
+    val timeout = env.config.propertyOrNull("mail.timeout")
+        ?.getString()
+        ?.toIntOrNull()
+        ?.takeIf { it > 0 }
+        ?: throw Throwable("missing mail setting")
+    val chunkSize = env.config.propertyOrNull("mail.chunkSize")
+        ?.getString()
+        ?.toIntOrNull()
+        ?.takeIf { it > 0 }
+        ?: throw Throwable("missing mail setting")
+
+    return MailSettings(sender, host, timeout, chunkSize)
 }
