@@ -7,9 +7,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.ByteArrayOutputStream
 
-
-class ExcelGenerator() {
-
+class ExcelGenerator {
+  
     fun generateSheet(schools: List<SchuleDto>): ByteArray {
         val outputStream = ByteArrayOutputStream()
         val workBook = XSSFWorkbook()
@@ -21,7 +20,6 @@ class ExcelGenerator() {
     }
 
     private fun createHeader(sheet: XSSFSheet, workbook: XSSFWorkbook) {
-
         val properties = arrayOf("Schulname", "Vorname", "Nachname", "Straße", "Hausnummer", "PLZ", "Ort")
         val headerRow = sheet.createRow(0)
 
@@ -35,7 +33,6 @@ class ExcelGenerator() {
             cell.setCellValue(properties[i])
             cell.cellStyle = style
         }
-
     }
 
     infix fun <A> List<A>.or(that: List<A>): List<A> =

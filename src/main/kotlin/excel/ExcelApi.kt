@@ -12,6 +12,7 @@ import model.schule.SchuleDto
 import utilty.*
 import java.io.File
 import java.util.*
+import utilty.logRequest
 
 fun Route.excelApi() {
     route("downloadsheet") {
@@ -23,7 +24,6 @@ fun Route.excelApi() {
 
             call.response.headers.append("Content-Disposition", "attachment")
             call.respondBytes(result, ContentType("application","vnd.ms-excel"), HttpStatusCode.OK)
-
         }
     }
 }

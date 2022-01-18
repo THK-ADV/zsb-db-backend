@@ -21,7 +21,6 @@ import utilty.ColoredLogging
 import word.wordApi
 
 val log = ColoredLogging(KotlinLogging.logger {})
-const val RESOURCE_PATH = "signatures/"
 
 fun Application.main() {
     DbSettings.connect(environment)
