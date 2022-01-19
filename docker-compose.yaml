@@ -24,6 +24,8 @@ services:
       DB_URL: jdbc:postgresql://psql:5432/${ZSB_USER}
       DB_USER: ${ZSB_USER}
       DB_PASSWORD: ${ZSB_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_SENDER: ${MAIL_SENDER}
     depends_on:
       - psql
     volumes:
