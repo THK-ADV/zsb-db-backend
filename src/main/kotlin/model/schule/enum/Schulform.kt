@@ -3,6 +3,7 @@ package model.schule.enum
 import kotlinx.serialization.Serializable
 
 enum class Schulform(val id: Int, val desc: String) {
+    KEINE(0, "Keine"),
     GRUNDSCHULE(1, "Grundschule"),
     HAUPTSCHULE(2, "Hauptschule"),
     REALSCHULE(3, "Realschule"),
@@ -14,7 +15,8 @@ enum class Schulform(val id: Int, val desc: String) {
     companion object {
         fun getDescById(id: Int): String? = values().find { it.id == id }?.desc
 
-        fun getSchulformByDesc(desc: String): Schulform = when (desc) {
+        fun fromDesc(desc: String): Schulform = when (desc) {
+                "Keine" -> KEINE
                 "Grundschule" -> GRUNDSCHULE
                 "Hauptschule" -> HAUPTSCHULE
                 "Realschule" -> REALSCHULE

@@ -1,4 +1,5 @@
 import database.DbSettings
+import database.recreateDatabase
 import excel.excelApi
 import io.ktor.application.*
 import io.ktor.features.*
@@ -8,6 +9,8 @@ import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.serialization.json.Json
+import legacy_import.CsvImport
+import legacy_import.ImportLog
 import model.address.adressenApi
 import model.bericht.berichteApi
 import model.communication.mailApi
@@ -19,7 +22,9 @@ import model.veranstalter.veranstalterApi
 import model.veranstaltung.veranstaltungenApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
+import utilty.anyOrNull
 import word.wordApi
+import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
 
@@ -32,16 +37,17 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    /*recreateDatabase()
+    recreateDatabase()
 
-    anyOrNull {
+    try {
         val fileName = "data-import.csv"
         val file = File("src/main/resources/legacy_import/$fileName")
-        CsvImport.parseSchule(file)
+        ImportLog.error(file.absolutePath)
+        CsvImport.parseSchool(file)
         log.info("loaded data from '$fileName'")
-    } ?: log.warn("Couldn't import CSV-File!")
-
-    generateDummyData()*/
+    } catch(e: Exception) {
+        log.error(e.message ?: "DSADSDASDSAS")
+    }
 
     val server = embeddedServer(Netty, port = 9000) {
         configureServer(this, null)

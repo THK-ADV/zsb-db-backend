@@ -3,19 +3,26 @@ package legacy_import
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import model.address.Adresse
 import model.address.AdresseDto
+import model.kaoaarbeit.KAoAArbeit
+import model.kaoaarbeit.KAoAArbeitDto
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDto
 import model.kontakt.enum.Anrede
 import model.kontakt.enum.KontaktFunktion
+import model.kontakt.enum.KAoABetreuung
+import model.kontakt.enum.Talentscout
 import model.ort.Ort
 import model.ort.OrtDto
-import model.schule.Schule
-import model.schule.SchuleDto
-import model.schule.enum.AnzahlSus
+import model.schule.enum.Kooperationspartner
 import model.schule.enum.Schulform
+import model.schule.SchuleDto
+import model.schule.Schule
 import java.io.File
 
-data class ContactLight(val name: String, val vorname: String, val anrede: Anrede, val funktion: KontaktFunktion?)
+private fun String?.ensureNonEmpty() : String =
+    if(this != null && (this.isBlank() || this.isEmpty()))
+        throw Exception("String is empty")
+    else this!!
 
 object CsvImport {
 
@@ -23,172 +30,137 @@ object CsvImport {
         ImportLog.clear()
     }
 
-    fun parseSchule(file: File) {
-        // Schulname;Schulform;Schwerpunkt;Kooperationsvertrag;Nummer, Straße;PLZ;Ort;Regierungsbezirk;Kreis;
-        // Kontaktperson;Mail Kontaktperson;Name StuBO;Mail StuBO;Anzahl SuS;KAoA;Talentscout
+    fun toSchooltype(s: String?) : Schulform =
+        s?.let { Schulform.fromDesc(it.trim()) } ?: Schulform.KEINE
+
+    fun toCooperationpartner(s: String?) : Kooperationspartner =
+        s?.let { Kooperationspartner.fromDesc(it.trim()) } ?: Kooperationspartner.KEINE
+
+    fun toSalutation(s: String?) : Anrede =
+        s?.let { Anrede.fromDesc(it.trim()) } ?: Anrede.KEINE
+
+    fun toContactFeature(s: String?) : KontaktFunktion =
+        s?.let { KontaktFunktion.fromDesc(it.trim()) } ?: KontaktFunktion.KEINE
+
+    fun toAddress(street: String?, houseNumber: String?, city: Ort) : Adresse {
+        val adresseDto = AdresseDto(
+            street = street.ensureNonEmpty().trim(),
+            houseNumber = houseNumber.ensureNonEmpty().trim(),
+            city_id = city.id.value.toString()
+        )
+        return Adresse.save(adresseDto).getOrThrow()
+    }
+
+    fun toCity(postcode: String?, designation: String?, constituency: String?, governmentDistrict: String?) : Ort {
+        val ortDto = OrtDto(
+            postcode = postcode.ensureNonEmpty().trim().toInt(),
+            designation = designation.ensureNonEmpty().trim(),
+            constituency = constituency.ensureNonEmpty().trim(),
+            governmentDistrict = governmentDistrict.ensureNonEmpty().trim()
+        )
+        return Ort.save(ortDto).getOrThrow()
+    }
+
+    fun toContact(names: String?, salutations: String?, features: String?, emails: String?): List<Kontakt> {
+        if (names == null || salutations == null || features == null || emails == null)
+            return emptyList()
+
+        val nameList = names.split(";")
+        val salutationList = salutations.split(";")
+        val featureList = features.split(";")
+        val emailList = emails.split(";")
+
+        if (nameList.size != salutationList.size || nameList.size != featureList.size || nameList.size != emailList.size)
+            return emptyList()
+
+        fun createContact(res: Pair<Pair<Pair<String, String>, String>, String>): Kontakt {
+            val name = res.first.first.first.split(",")
+            val surname = name[0]
+            val firstname = name[1]
+            val salutation = res.first.first.second
+            val feature = res.first.second
+            val email = res.second
+
+            val contactDto = KontaktDto(
+                surname = surname.trim(),
+                firstname = firstname.trim(),
+                salutation = this.toSalutation(salutation).id,
+                feature = this.toContactFeature(feature).id,
+                email = email.trim()
+            )
+            return Kontakt.save(contactDto).getOrThrow()
+        }
+
+        return nameList.zip(salutationList).zip(featureList).zip(emailList)
+            .map(::createContact)
+    }
+
+    fun toKAoASupervisor(s: String?) : KAoABetreuung =
+        s?.let { KAoABetreuung.fromDesc(it.trim()) } ?: KAoABetreuung.KEINE
+
+    fun toTalentscout(s: String?) : Talentscout =
+        s?.let { Talentscout.fromDesc(it.trim()) } ?: Talentscout.KEINE
+
+    fun toKAoAWork(name: String, content: String, school: Schule) : KAoAArbeit {
+        val kaoaWorkDto = KAoAArbeitDto(
+            name = name,
+            content = content,
+            school_id = school.id.value.toString()
+        )
+        return KAoAArbeit.save(kaoaWorkDto).getOrThrow()
+    }
+
+    fun parseSchool(file: File) {
         val rows = csvReader{
             charset = "windows-1252"
             delimiter = ';'
         }.readAllWithHeader(file)
 
         rows.forEach { row ->
-            val ort = parseOrt(row["PLZ, Ort"], row["Regierungsbezirk"], row["Kreis"])
-                .also { logError(row.toList(), it, "ort") }
-                ?: return@forEach
-            val adresse = parseAdresse(row["Nummer, Straße"], ort)
-                .also{ logError(row.toList(), it, "adresse") }
-                ?: return@forEach
-            val kontaktpersonen = parseKontakte(row["Kontaktperson"], row["Mail Kontaktperson"])
-            val stuboKontakte = parseKontakte(row["Name StuBO"], row["Mail StuBO"], KontaktFunktion.STUBO.id)
-            val kontakte = saveKontakte(kontaktpersonen, stuboKontakte)
-            val kontaktIds = kontakte.map { it.id.value.toString() }
-            val schwerpunkt = row["Schwerpunkt"]
-                .also{ logError(row.toList(), it, "Schwerpunkt") }
-                ?: return@forEach
-            val schulname = row["Schulname"]
-                .also{ logError(row.toList(), it, "Schulname") }
-                ?: return@forEach
-            val anzahlSus = AnzahlSus.getObjectByString(row["Anzahl SuS"] ?: "")
-            val schulform = Schulform.getSchulformByDesc(row["Schulform"] ?: "")
-            val kooperationsvertrag = parseToBoolean(row["Kooperationsvertrag"] ?: "")
-            val kAoa = parseToBoolean(row["KAoA"] ?: "")
-            val talent = parseToBoolean(row["Talentscout"] ?: "")
+            ImportLog.error(row.toString())
+            val name = row["Schulname"].ensureNonEmpty().trim()
+            val type = toSchooltype(row["Schulform"])
+            val comment = row["Kommentar"]?.trim() ?: ""
+            val amountStudents11 = row["Schülerzahl EF/11*"]?.toIntOrNull() ?: 0
+            val amountStudents12 = row["Schülerzahl Q1/12*"]?.toIntOrNull() ?: 0
+            val amountStudents13 = row["Schülerzahl Q2/13*"]?.toIntOrNull() ?: 0
+            val phonenumber = row["Telefon"] ?: ""
+            val email = row["Email Schule"] ?: ""
+            val website = row["Schulwebseite"] ?: ""
+            val cooperationpartner = toCooperationpartner(row["Betreuende Hochschule KAoA/Talentscouting"])
+            val cooperationcontract = parseToBoolean(row["Hochschulischen Kooperationsvertrag TH (Allgemeine und spezifische Zusammenarbeit)"] ?: "nein")
+            val city = toCity(row["PLZ"], row["Ort"], row["Regierungsbezirk"], row["Kreis"])
+            val address = toAddress(row["Straße"], row["Hausnummer"], city)
+            toContact(row["Name, Vorname Kontaktpersonen"], row["Anrede Kontaktpersonen"], row["Funktion Kontaktpersonen"], row["Mailadresse Kontaktpersonen"])
+            val kaoaSupervisor = toKAoASupervisor(row["Nachname, Vorname KAoA Betreuer*in"])
+            val talentscout = toTalentscout(row["Nachname, Vorname Talentscout"])
 
-            val schuleDto = SchuleDto(
+            val schoolDto = SchuleDto(
                 null,
-                schulname,
-                schulform.id,
-                schwerpunkt,
-                anzahlSus.id,
-                kooperationsvertrag,
-                adresse.id.value.toString(),
-                kontaktIds,
-                kAoa,
-                if (kAoa) 0 else -1,
-                talent,
-                if (talent) 0 else -1
+                name,
+                type.id,
+                comment,
+                amountStudents11,
+                amountStudents12,
+                amountStudents13,
+                phonenumber,
+                email,
+                website,
+                cooperationpartner.id,
+                kaoaSupervisor.id,
+                talentscout.id,
+                cooperationcontract,
+                address.id.value.toString()
             )
 
-            Schule.save(schuleDto).getOrNull()
-                .also { logError(row, it, "LINE") }
+            val school = Schule.save(schoolDto).getOrThrow()
+
+            toKAoAWork("KAoA-Arbeit* 2021/22", row["KAoA-Arbeit* 2021/22"]?.trim() ?: "", school)
+            toKAoAWork("KAoA-Arbeit* 2022/23", row["KAoA-Arbeit* 2022/23"]?.trim() ?: "", school)
+            toKAoAWork("KAoA-Arbeit* 2023/24", row["KAoA-Arbeit* 2023/24"]?.trim() ?: "", school)
+            toKAoAWork("KAoA-Arbeit* 2024/25", row["KAoA-Arbeit* 2024/25"]?.trim() ?: "", school)
         }
     }
 
-    private fun saveKontakte(kontaktpersonen: List<KontaktDto>, stuboKontakte: List<KontaktDto>): List<Kontakt> {
-        val kontakte = mutableListOf<Kontakt>()
-        (kontaktpersonen + stuboKontakte).forEach { kontaktDto ->
-            Kontakt.save(kontaktDto).getOrNull()?.let { kontakt ->
-                kontakte.add(kontakt)
-            }
-        }
-        return kontakte
-    }
-
-    private fun parseAdresse(adresseString: String?, ort: Ort): Adresse? {
-        val nummerStrasse = adresseString?.split(',', limit = 2) ?: return null
-        if (nummerStrasse.size < 2) return null
-        val adresseDto = AdresseDto(
-            street = nummerStrasse.last(),
-            houseNumber = nummerStrasse.first(),
-            city_id = ort.id.value.toString()
-        )
-
-        return Adresse.save(adresseDto).getOrNull()
-    }
-
-    private fun parseOrt(plzOrtString: String?, kreis: String?, regierungsbezirk: String?): Ort? {
-        val plzOrt = plzOrtString?.split(",") ?: return null
-        if (plzOrt.size < 2) return null
-        val ortDto = OrtDto(
-            postcode = plzOrt.first().trim().toInt(),
-            designation = plzOrt.last().trim(),
-            constituency = kreis?.trim() ?: "",
-            governmentDistrict = regierungsbezirk?.trim() ?: ""
-        )
-        return Ort.save(ortDto).getOrNull()
-    }
-
-    private fun logError(line: Any, nullable: Any?, hint: String) {
-        if (nullable == null) ImportLog.error("Could not read '$hint' in line: $line")
-    }
-
-    /**
-     * If [text] is equal to "ja" return true, else false
-     */
     private fun parseToBoolean(text: String): Boolean = text.toLowerCase().trim() == "ja"
-
-    private fun parseKontakte(names: String?, emails: String?, function: Int? = null): List<KontaktDto> {
-        val kontakte = mutableListOf<KontaktDto>()
-
-        // split multiple kontakte by "und"
-        val splitNames = names?.split("und") ?: listOf()
-        val splitEmails = emails?.split("und") ?: listOf()
-
-        // count of available model.kontakt data
-        val count = if (splitEmails.size > splitNames.size) splitEmails.size else splitNames.size
-        repeat(count) { i ->
-            val kontaktLightString = splitNames.getOrNull(i)
-            val email = splitEmails.getOrNull(i)
-
-            val kontaktLight = kontaktLightString?.let { parseKontaktLight(it) }
-
-            val kontaktDto = KontaktDto(
-                null,
-                kontaktLight?.name?.trim() ?: "",
-                kontaktLight?.vorname?.trim() ?: "",
-                kontaktLight?.anrede?.id ?: Anrede.UNKNOWN.id,
-                email?.trim() ?: "",
-                kontaktLight?.funktion?.id ?: function ?: KontaktFunktion.UNKNOWN.id
-            )
-            if (kontaktDto.isValid())
-                kontakte.add(kontaktDto)
-        }
-
-        return kontakte
-    }
-
-    /**
-     * parse a [ContactLight] (Name, Vorname, [Anrede] and [KontaktFunktion]) from given [text],
-     * by extracting the first matching description; matching descriptions must be in brackets ()
-     *
-     * @param [text] Name of a Person with Anrede and Funktion e.g. "Frau Schulz, Kate (Schulleitung)"
-     *
-     * @return a [Pair] of the [text] without the cut function description and the found [KontaktFunktion]
-     */
-    private fun parseKontaktLight(text: String): ContactLight {
-        // Example fullName: Frau Schulz, Kate
-        // (vorname can be missing)
-        var (fullName, funktion) = parseKontaktFunktion(text)
-
-        // parse vorname
-        val vorname = if (fullName.contains(",")) {
-            val nameSplit = fullName.split(",")
-            fullName = nameSplit.first().trim()
-            nameSplit.last().trim() // vorname
-        } else ""
-
-        // remaining full name example: Frau Schulz
-        val anredeNameSplit = fullName.trim().split(" ")
-        val name = anredeNameSplit.last().trim()
-        val anrede = Anrede.getObjectByString(anredeNameSplit.first().trim())
-
-        return ContactLight(name, vorname, anrede, funktion)
-    }
-
-    private fun parseKontaktFunktion(text: String): Pair<String, KontaktFunktion?> {
-        if (!text.contains('(') || !text.contains(')')) return Pair(text, null)
-
-        // Example split: Schulleitung)
-        val split = text.split('(', limit = 2)
-
-        // Example remainingText: Frau Schulz, Kate
-        val remainingText = split.first()
-
-        // Example functionDesc: Schulleitung
-        val functionDesc = split.last().trim(')', ' ')
-
-        val funktion = KontaktFunktion.getFunktionByDesc(functionDesc)
-
-        return Pair(remainingText, funktion)
-    }
 }

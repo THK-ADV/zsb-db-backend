@@ -6,7 +6,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.routing.*
 import kotlinx.serialization.list
-import model.schule.enum.AnzahlSusDto
 import model.schule.enum.KooperationspartnerDto
 import model.schule.enum.SchulformDto
 import utilty.*
@@ -32,12 +31,6 @@ fun Route.schoolsApi() = route("schools") {
         call.respondJsonOk(json)
     }
 
-    get("/amountstudents") {
-        call.logRequest()
-        val json = Serializer.stable.toJson(AnzahlSusDto.serializer().list, AnzahlSusDto.generate())
-        call.respondJsonOk(json)
-    }
-
     get("/{uuid}") {
         call.logRequest()
         val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
@@ -49,7 +42,7 @@ fun Route.schoolsApi() = route("schools") {
     post {
         call.logRequest()
         val schuleDto = call.receive<SchuleDto>()
-        if (call.checkIdAndRespondUsePutIfNotNull(schuleDto.school_id)) return@post
+        if (call.checkIdAndRespondUsePutIfNotNull(schuleDto.id)) return@post
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
     }
@@ -57,7 +50,7 @@ fun Route.schoolsApi() = route("schools") {
     put {
         call.logRequest()
         val schuleDto = call.receive<SchuleDto>()
-        if (call.checkIdAndRespondUsePostIfNull(schuleDto.school_id)) return@put
+        if (call.checkIdAndRespondUsePostIfNull(schuleDto.id)) return@put
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result))
     }

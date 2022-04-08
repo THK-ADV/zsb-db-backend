@@ -33,7 +33,7 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 is UuidNotFound -> exception.message to HttpStatusCode.NotFound
                 is TooManyHostsException -> exception.message to HttpStatusCode.BadRequest
                 is CouldNotGenerateSerialLetterException -> exception.message to HttpStatusCode.InternalServerError
-                is KooperationspartnerNotValidException -> exception.message to HttpStatusCode.BadRequest
+                is CooperationPartnerNotValidException -> exception.message to HttpStatusCode.BadRequest
                 else -> return HttpServerResponse("Unknown error.", ContentType.Text.Plain, HttpStatusCode.InternalServerError)
             }
 
