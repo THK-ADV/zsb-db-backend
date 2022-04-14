@@ -45,10 +45,7 @@ class ExcelGenerator {
         var rowNum = 1
         val columnIndex = 0
         schools.forEach { s ->
-            val contacts = findContacts(
-                s,
-                KontaktFunktion.STUDIEN_UND_BERUFSWAHLKOORDINATOR_IN
-            ) or // TODO: is this formerly known as STUBO?
+            val contacts = findContacts(s, KontaktFunktion.STUDIEN_UND_BERUFSWAHLKOORDINATOR_IN) or
                     findContacts(s, KontaktFunktion.SEKRETARIAT) or
                     findContacts(s, KontaktFunktion.SCHULLEITUNG) or
                     s.contacts
