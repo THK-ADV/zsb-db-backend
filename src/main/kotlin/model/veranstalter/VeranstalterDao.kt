@@ -1,10 +1,10 @@
 package model.veranstalter
 
-import error_handling.InternalDbException
 import error_handling.HostIdNotValidException
-import kotlinx.serialization.list
+import error_handling.InternalDbException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.Serializer
 import utilty.anyOrNull
 import java.util.*
 
@@ -19,7 +19,7 @@ object VeranstalterDao {
         if (result == null)
             Result.failure(InternalDbException("Error while trying to get all Veranstalter from db."))
         else
-            Result.success(Serializer.stable.toJson(VeranstalterDto.serializer().list, result).toString())
+            Result.success(Json.encodeToString(result))
     }
 
     fun getById(id: UUID, atomic: Boolean = false) = transaction {
@@ -40,5 +40,5 @@ object VeranstalterDao {
     fun delete(veranstalterId: UUID): Boolean = Veranstalter.delete(veranstalterId)
 
     private fun mapJsonResult(result: VeranstalterDto) =
-        Serializer.stable.toJson(VeranstalterDto.serializer(), result).toString()
+        Json.encodeToString(result)
 }

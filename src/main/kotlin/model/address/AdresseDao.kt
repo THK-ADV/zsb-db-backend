@@ -1,11 +1,12 @@
 package model.address
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.Serializer
 import java.util.*
 
 object AdresseDao {
-    fun getAll(atomic: Boolean = false): List<AdresseDto> = transaction{
+    fun getAll(atomic: Boolean = false): List<AdresseDto> = transaction {
         Adresse.all().map { if (atomic) it.toAtomicDto() else it.toDto() }
     }
 
@@ -14,6 +15,6 @@ object AdresseDao {
     }
 
     fun createOrUpdate(adresseDto: AdresseDto): Result<String> = transaction {
-        Adresse.save(adresseDto).map { Serializer.stable.toJson(AdresseDto.serializer(), it.toDto()).toString() }
+        Adresse.save(adresseDto).map { Json.encodeToString(it.toDto()) }
     }
 }

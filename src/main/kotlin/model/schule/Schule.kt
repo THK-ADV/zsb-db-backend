@@ -9,7 +9,6 @@ import model.kontakt.Kontakt
 import model.kontakt.KontaktDao
 import model.kontakt.KontaktDto
 import model.kontakt.Kontakte
-import model.schule.enum.AnzahlSus
 import model.schule.enum.Kooperationspartner
 import model.schule.enum.Schulform
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -24,37 +23,46 @@ import utilty.anyOrNull
 import java.util.*
 
 object Schulen : UUIDTable() {
-    val schoolname = text("schulname")
-    val schooltype = integer("schulform")
-    val focus = text("schwerpunkt")
-    val amountStudents = integer("anzahl_sus")
+    val name = text("name")
+    val type = integer("form")
+    val comment = text("kommentar")
+    val amountStudents11 = integer("schuelerzahl_11")
+    val amountStudents12 = integer("schuelerzahl_12")
+    val amountStudents13 = integer("schuelerzahl_13")
+    val address = reference("adress_id", Adressen)
+    val phonenumber = text("telefon")
+    val email = text("email")
+    val website = text("website")
+    val cooperationpartner = integer("kooperationspartner")
+    val kaoaSupervisor = integer("kaoa_supervisor")
+    val talentscout = integer("talentscout")
     val cooperationcontract = bool("kooperationsvertrag")
-    val address_id = reference("adress_id", Adressen)
-    val kaoa_university = bool("kaoa_hochschule")
-    val kaoa_partner = integer("kaoa_partner")
-    val talentscouting = bool("talentscouting")
-    val talentscouting_partner = integer("talentscouting_partner")
 }
 
 // many to many reference
 object SchulKontakte : Table() {
-    val schule = reference("model/schule", Schulen)
-    val kontakt = reference("model/kontakt", Kontakte)
-    override val primaryKey = PrimaryKey(schule, kontakt, name = "PK_SchulKontakte")
+    val school = reference("model/schule", Schulen)
+    val contact = reference("model/kontakt", Kontakte)
+    override val primaryKey = PrimaryKey(school, contact, name = "PK_SchulKontakte")
 }
 
 class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var schoolname by Schulen.schoolname
-    private var schooltype by Schulen.schooltype
-    private var focus by Schulen.focus
-    private var amountStudents by Schulen.amountStudents
+
+    private var name by Schulen.name
+    private var type by Schulen.type
+    private var comment by Schulen.comment
+    private var amountStudents11 by Schulen.amountStudents11
+    private var amountStudents12 by Schulen.amountStudents12
+    private var amountStudents13 by Schulen.amountStudents13
+    private var address by Adresse referencedOn Schulen.address
+    private var phonenumber by Schulen.phonenumber
+    private var email by Schulen.email
+    private var website by Schulen.website
+    private var cooperationpartner by Schulen.cooperationpartner
+    private var kaoaSupervisor by Schulen.kaoaSupervisor
+    private var talentscout by Schulen.talentscout
     private var cooperationcontract by Schulen.cooperationcontract
-    private var address by Adresse referencedOn Schulen.address_id
     private var contacts by Kontakt via SchulKontakte
-    private var kaoaUniversity by Schulen.kaoa_university
-    private var kaoaPartner by Schulen.kaoa_partner
-    private var talentscouting by Schulen.talentscouting
-    private var talentscoutingPartner by Schulen.talentscouting_partner
 
     companion object : UUIDEntityClass<Schule>(Schulen) {
         /**
@@ -70,20 +78,20 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     ?: return@transaction Result.failure(AddressIdNotFoundException("Could not find Adresse with ID: ${dto.address_id}"))
 
                 // create or update Schule
-                val schule: Schule = if (dto.school_id == null) new(UUID.randomUUID()) {
+                val schule: Schule = if (dto.id == null) new(UUID.randomUUID()) {
                     // note: manual creation of the uuid is needed to save the intermediate table in one transaction
                     update(dto, adresse)
                 } else {
                     // parse UUID
-                    val uuid = anyOrNull { UUID.fromString(dto.school_id) }
-                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.school_id}"))
+                    val uuid = anyOrNull { UUID.fromString(dto.id) }
+                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.id}"))
 
                     // fetch current Schule
-                    val currentSchule = anyOrNull { Schule[uuid] }
+                    val aktuelleSchule = anyOrNull { Schule[uuid] }
                         ?: return@transaction Result.failure(SchoolIdNotFoundException("Could not find Schule with ID: $uuid"))
 
                     // update Schule
-                    currentSchule.update(dto, adresse)
+                    aktuelleSchule.update(dto, adresse)
 
                     // fetch updated Schule
                     Schule[uuid]
@@ -98,7 +106,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val result = anyOrNull {
 
                 transaction {
-                    SchulKontakte.deleteWhere { SchulKontakte.schule eq schuleId }
+                    SchulKontakte.deleteWhere { SchulKontakte.school eq schuleId }
                     Schulen.deleteWhere { Schulen.id eq schuleId }
                 }
             }
@@ -107,24 +115,19 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         private fun validateDto(dto: SchuleDto): ZsbException? {
-            val kooperationspartnerRange = (-1 until Kooperationspartner.values().count())
-            if (!kooperationspartnerRange.contains(dto.kaoa_partner)
-                || !kooperationspartnerRange.contains(dto.talentscouting_partner)
-            ) {
-                return KooperationspartnerNotValidException("This is not a valid index for Kooperationspartner.")
-            }
+            if (!Kooperationspartner.values().any { it.id == dto.cooperationpartner })
+                return CooperationPartnerNotValidException("This is not a valid index for Kooperationspartner.")
 
             // valid id for AnzahlSus?
-            if (!(0 until AnzahlSus.values().count()).contains(dto.amount_students)) {
+            if (!(dto.amount_students11 in 0..150 &&
+                        dto.amount_students12 in 0..150 &&
+                        dto.amount_students13 in 0..150)
+            ) {
                 return AmountStudentsNotValidException("This is not a valid index for AnzahlSus.")
             }
 
-            // validate kontaktUUIDs?
-            anyOrNull { KontaktDao.getAllById(dto.contacts_ids) }
-                ?: return ContactIdNotValidException("kontakte_ids contains non existing kontakt_ids")
-
             // valid id for schulform?
-            if (Schulform.getDescById(dto.schooltype) == null)
+            if (Schulform.getDescById(dto.type) == null)
                 return SchoolTypeNotValidException("This is not a valid index for Schulform.")
 
             return null
@@ -132,66 +135,84 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     }
 
     private fun update(dto: SchuleDto, adresse: Adresse) {
-        this.schoolname = dto.name
-        this.schooltype = dto.schooltype
-        this.focus = dto.focus.toString()
-        this.amountStudents = dto.amount_students
-        this.cooperationcontract = dto.cooperationcontract
+        this.name = dto.name
+        this.type = dto.type
+        this.comment = dto.comment
+        this.amountStudents11 = dto.amount_students11
+        this.amountStudents12 = dto.amount_students12
+        this.amountStudents13 = dto.amount_students13
         this.address = adresse
-        this.kaoaUniversity = dto.kaoa_university
-        this.kaoaPartner = dto.kaoa_partner
-        this.talentscouting = dto.talentscouting
-        this.talentscoutingPartner = dto.talentscouting_partner
+        this.phonenumber = dto.phonenumber
+        this.email = dto.email
+        this.website = dto.website
+        this.cooperationpartner = dto.cooperationpartner
+        this.kaoaSupervisor = dto.kaoaSupervisor
+        this.talentscout = dto.talentscout
+        this.cooperationcontract = dto.cooperationcontract
         this.contacts = SizedCollection(KontaktDao.getAllById(dto.contacts_ids))
     }
 
     fun toDto() = SchuleDto(
         id.value.toString(),
-        schoolname,
-        schooltype,
-        focus,
-        amountStudents,
+        name,
+        type,
+        comment,
+        amountStudents11,
+        amountStudents12,
+        amountStudents13,
+        phonenumber,
+        email,
+        website,
+        cooperationpartner,
+        kaoaSupervisor,
+        talentscout,
         cooperationcontract,
         address.id.value.toString(),
+        null,
         contacts.map { it.id.value.toString() },
-        kaoaUniversity,
-        kaoaPartner,
-        talentscouting,
-        talentscoutingPartner
+        listOf()
     )
 
     fun toAtomicDto() = SchuleDto(
         id.value.toString(),
-        schoolname,
-        schooltype,
-        focus,
-        amountStudents,
+        name,
+        type,
+        comment,
+        amountStudents11,
+        amountStudents12,
+        amountStudents13,
+        phonenumber,
+        email,
+        website,
+        cooperationpartner,
+        kaoaSupervisor,
+        talentscout,
         cooperationcontract,
         address.id.value.toString(),
+        address.toAtomicDto(),
         contacts.map { it.id.value.toString() },
-        kaoaUniversity,
-        kaoaPartner,
-        talentscouting,
-        talentscoutingPartner,
-        contacts.map { it.toDto() },
-        address.toAtomicDto()
+        contacts.map { it.toDto() }
     )
 }
 
 @Serializable
 data class SchuleDto(
-    val school_id: String? = null,
+    val id: String? = null,
     val name: String,
-    val schooltype: Int,
-    val focus: String?,
-    val amount_students: Int,
+    val type: Int,
+    val comment: String,
+    val amount_students11: Int,
+    val amount_students12: Int,
+    val amount_students13: Int,
+    val phonenumber: String,
+    val email: String,
+    val website: String,
+    val cooperationpartner: Int,
+    val kaoaSupervisor: Int,
+    val talentscout: Int,
     val cooperationcontract: Boolean,
     val address_id: String,
+    val address: AdresseDto? = null,
     val contacts_ids: List<String> = listOf(),
-    val kaoa_university: Boolean,
-    val kaoa_partner: Int,
-    val talentscouting: Boolean,
-    val talentscouting_partner: Int,
-    val contacts: List<KontaktDto> = listOf(),
-    val address: AdresseDto? = null
+    val contacts: List<KontaktDto> = listOf()
 )

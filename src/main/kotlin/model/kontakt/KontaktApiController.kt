@@ -1,13 +1,11 @@
 package model.kontakt
 
 import error_handling.HttpServerResponse
-import io.ktor.application.call
-import io.ktor.request.receive
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.put
-import io.ktor.routing.route
-import kotlinx.serialization.list
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import model.kontakt.enum.AnredeDto
 import model.kontakt.enum.KontaktFunktionDto
 import utilty.*
@@ -17,19 +15,19 @@ fun Route.kontakteApi() {
         get {
             call.logRequest()
             val result = KontaktDao.getAll()
-            val json = Serializer.stable.toJson(KontaktDto.serializer().list, result)
+            val json = Json.encodeToJsonElement(result)
             call.respondJsonOk(json)
         }
 
         get("/feature") {
             call.logRequest()
-            val json = Serializer.stable.toJson(KontaktFunktionDto.serializer().list, KontaktFunktionDto.generate())
+            val json = Json.encodeToJsonElement(KontaktFunktionDto.generate())
             call.respondJsonOk(json)
         }
 
         get("/salutations") {
             call.logRequest()
-            val json = Serializer.stable.toJson(AnredeDto.serializer().list, AnredeDto.generate())
+            val json = Json.encodeToJsonElement(AnredeDto.generate())
             call.respondJsonOk(json)
         }
 
@@ -38,7 +36,7 @@ fun Route.kontakteApi() {
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
 
             val kontakt = KontaktDao.getById(uuid)
-            val json = Serializer.stable.toJson(KontaktDto.serializer(), kontakt)
+            val json = Json.encodeToJsonElement(kontakt)
             call.respondJsonOk(json)
         }
 

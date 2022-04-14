@@ -1,11 +1,10 @@
 package model.veranstalter
 
 import error_handling.HttpServerResponse
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.receive
-import io.ktor.routing.*
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
 import utilty.*
 
 fun Route.veranstalterApi() {

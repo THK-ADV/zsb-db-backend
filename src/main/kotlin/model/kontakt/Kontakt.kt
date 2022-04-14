@@ -37,8 +37,8 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             if (exception != null) return@transaction Result.failure(exception)
 
             // update given ID
-            if (dto.uuid != null) {
-                val uuid = UUID.fromString(dto.uuid)
+            if (dto.contact_id != null) {
+                val uuid = UUID.fromString(dto.contact_id)
                 val old = Kontakt[uuid]
                 old.update(dto)
                 return@transaction Result.Companion.success(Kontakt[uuid])
@@ -72,22 +72,20 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private fun update(dto: KontaktDto) {
         this.surname = dto.surname
         this.firstname = dto.firstname
-        this.salutation = dto.salutation ?: Anrede.UNKNOWN.ordinal
+        this.salutation = dto.salutation ?: Anrede.KEINE.ordinal
         this.email = dto.email
-        this.feature = dto.feature ?: KontaktFunktion.OTHER.ordinal
+        this.feature = dto.feature ?: KontaktFunktion.KEINE.ordinal
     }
 
-    fun toDto() = KontaktDto(id.value.toString(), surname, firstname, salutation, email, feature)
+    fun toDto() = KontaktDto(id.value.toString(), surname, firstname, salutation, feature, email)
 }
 
 @Serializable
 data class KontaktDto(
-    val uuid: String?,
+    val contact_id: String? = null,
     val surname: String,
-    val firstname: String = "",
+    val firstname: String,
     val salutation: Int? = null,
-    val email: String,
-    val feature: Int? = null
-) {
-    fun isValid() = !surname.isBlank() || !email.isBlank()
-}
+    val feature: Int? = null,
+    val email: String
+)

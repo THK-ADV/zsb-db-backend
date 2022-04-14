@@ -1,13 +1,11 @@
 package model.address
 
 import error_handling.HttpServerResponse
-import io.ktor.application.call
-import io.ktor.request.receive
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.put
-import io.ktor.routing.route
-import kotlinx.serialization.list
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import utilty.*
 
 fun Route.adressenApi() {
@@ -15,7 +13,7 @@ fun Route.adressenApi() {
         get {
             call.logRequest()
             val result = AdresseDao.getAll(call.parameters["resolve_ids"] == "true")
-            val json = Serializer.stable.toJson(AdresseDto.serializer().list, result)
+            val json = Json.encodeToJsonElement(result)
             call.respondJsonOk(json)
         }
 
@@ -23,7 +21,7 @@ fun Route.adressenApi() {
             call.logRequest()
             val adressId = call.getParameterAsUuidOrNullAndRespondError("id") ?: return@get
             val result = AdresseDao.getById(adressId, call.parameters["resolve_ids"] == "true")
-            val json = Serializer.stable.toJson(AdresseDto.serializer(), result)
+            val json = Json.encodeToJsonElement(result)
             call.respondJsonOk(json)
         }
 

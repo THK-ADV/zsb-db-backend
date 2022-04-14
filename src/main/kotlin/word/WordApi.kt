@@ -2,15 +2,16 @@ package word
 
 import error_handling.CouldNotGenerateSerialLetterException
 import error_handling.HttpServerResponse
-import io.ktor.application.call
-import io.ktor.request.receive
-import io.ktor.response.respondFile
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.route
-import kotlinx.serialization.list
-import utilty.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
+import utilty.ColoredLogging
+import utilty.logRequest
+import utilty.respond
+import utilty.respondJsonOk
 import word.enum.ZsbSignaturDto
 import java.io.File
 import java.util.*
@@ -42,7 +43,7 @@ fun Route.wordApi() {
 
     get("assets") {
         call.logRequest()
-        val json = Serializer.stable.toJson(ZsbSignaturDto.serializer().list, ZsbSignaturDto.generate())
+        val json = Json.encodeToJsonElement(ZsbSignaturDto.generate())
         call.respondJsonOk(json)
     }
 }

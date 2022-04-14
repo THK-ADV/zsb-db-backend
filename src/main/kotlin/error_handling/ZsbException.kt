@@ -6,7 +6,7 @@ sealed class ZsbException(override val message: String) : Exception(message)
 // invalid enum ids
 class SchoolTypeNotValidException(msg: String) : ZsbException(msg)
 class AmountStudentsNotValidException(msg: String) : ZsbException(msg)
-class KooperationspartnerNotValidException(msg: String) : ZsbException(msg)
+class CooperationPartnerNotValidException(msg: String) : ZsbException(msg)
 class SalutationNotValidException(msg: String) : ZsbException(msg)
 
 // invalid object ids

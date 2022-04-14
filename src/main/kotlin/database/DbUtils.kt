@@ -1,29 +1,17 @@
 package database
 
-import model.address.AdresseDao
 import model.address.Adressen
-import model.bericht.Bericht
-import model.bericht.BerichtDto
 import model.bericht.Berichte
-import model.institution.Institution
-import model.institution.InstitutionDto
 import model.institution.Institutionen
+import model.kaoaarbeit.KAoAArbeiten
 import model.kontakt.Kontakte
 import model.ort.Orte
 import model.schule.SchulKontakte
 import model.schule.Schulen
-import model.veranstalter.Veranstalter
-import model.veranstalter.VeranstalterDto
 import model.veranstalter.VeranstalterTable
-import model.veranstaltung.Veranstaltung
-import model.veranstaltung.VeranstaltungDto
 import model.veranstaltung.Veranstaltungen
-import model.veranstaltung.enum.Kategorie
-import model.veranstaltung.enum.Stufe
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.ColoredLogging
-import java.time.LocalDateTime
 
 fun recreateDatabase() {
     transaction {
@@ -33,6 +21,7 @@ fun recreateDatabase() {
         SchemaUtils.drop(VeranstalterTable)
         SchemaUtils.drop(Institutionen)
         SchemaUtils.drop(SchulKontakte)
+        SchemaUtils.drop(KAoAArbeiten)
         SchemaUtils.drop(Schulen)
         SchemaUtils.drop(Adressen)
         SchemaUtils.drop(Orte)
@@ -47,7 +36,8 @@ fun recreateDatabase() {
             Institutionen,
             VeranstalterTable,
             Veranstaltungen,
-            Berichte
+            Berichte,
+            KAoAArbeiten
         )
     }
 }
