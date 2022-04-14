@@ -1,7 +1,8 @@
 package model.ort
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.Serializer
 import java.util.*
 
 object OrtDao {
@@ -14,8 +15,6 @@ object OrtDao {
     }
 
     fun createOrUpdate(ortDto: OrtDto): Result<String> = transaction {
-        Ort.save(ortDto).map {
-            Serializer.stable.toJson(OrtDto.serializer(), it.toDto()).toString()
-        }
+        Ort.save(ortDto).map { Json.encodeToString(it.toDto()) }
     }
 }

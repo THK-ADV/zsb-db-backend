@@ -3,15 +3,12 @@ package word
 import model.address.AdresseDto
 import model.schule.SchuleDto
 import mu.KotlinLogging
-import org.apache.poi.util.Units
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment
 import org.apache.poi.xwpf.usermodel.XWPFDocument
-import org.apache.poi.xwpf.usermodel.XWPFRun
 import utilty.ColoredLogging
 import utilty.anyOrNull
 import word.enum.ZsbSignatur
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -82,7 +79,7 @@ class WordGenerator(private val file: File) {
         if (signatur === ZsbSignatur.NONE) return true
 
         val paragraph = doc.createParagraph()
-        val run = paragraph.createRun()
+        paragraph.createRun()
 
         writeTextWithLineBreaks(signatur.text)
 

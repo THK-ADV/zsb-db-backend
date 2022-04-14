@@ -1,11 +1,12 @@
 package model.schule
 
 import error_handling.HttpServerResponse
-import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.receive
-import io.ktor.routing.*
-import kotlinx.serialization.list
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import model.schule.enum.KooperationspartnerDto
 import model.schule.enum.SchulformDto
 import utilty.*
@@ -15,19 +16,19 @@ fun Route.schoolsApi() = route("schools") {
     get {
         call.logRequest()
         val result = SchuleDao.getAll(call.parameters["resolve_ids"] == "true")
-        val json = Serializer.stable.toJson(SchuleDto.serializer().list, result)
+        val json = Json.encodeToJsonElement(result)
         call.respondJsonOk(json)
     }
 
     get("/cooperationpartner") {
         call.logRequest()
-        val json = Serializer.stable.toJson(KooperationspartnerDto.serializer().list, KooperationspartnerDto.generate())
+        val json = Json.encodeToJsonElement(KooperationspartnerDto.generate())
         call.respondJsonOk(json)
     }
 
     get("/schooltypes") {
         call.logRequest()
-        val json = Serializer.stable.toJson(SchulformDto.serializer().list, SchulformDto.generate())
+        val json = Json.encodeToJsonElement(SchulformDto.generate())
         call.respondJsonOk(json)
     }
 
@@ -35,7 +36,7 @@ fun Route.schoolsApi() = route("schools") {
         call.logRequest()
         val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
         val schule = SchuleDao.getById(uuid, call.parameters["resolve_ids"] == "true")
-        val json = Serializer.stable.toJson(SchuleDto.serializer(), schule)
+        val json = Json.encodeToJsonElement(schule)
         call.respondJsonOk(json)
     }
 

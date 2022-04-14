@@ -1,9 +1,7 @@
 package model.kaoaarbeit
 
-import error_handling.AddressIdNotFoundException
 import error_handling.SchoolIdNotFoundException
 import kotlinx.serialization.Serializable
-import model.address.Adresse
 import model.schule.Schule
 import model.schule.SchuleDto
 import model.schule.Schulen

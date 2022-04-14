@@ -84,7 +84,7 @@ class Kontakt(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 data class KontaktDto(
     val contact_id: String? = null,
     val surname: String,
-    val firstname: String = "",
+    val firstname: String,
     val salutation: Int? = null,
     val feature: Int? = null,
     val email: String

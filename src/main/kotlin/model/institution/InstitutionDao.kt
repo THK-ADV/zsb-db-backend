@@ -2,9 +2,9 @@ package model.institution
 
 import error_handling.InternalDbException
 import error_handling.UuidNotFound
-import kotlinx.serialization.list
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.Serializer
 import utilty.anyOrNull
 import java.util.*
 
@@ -19,7 +19,7 @@ object InstitutionDao {
         if (result == null)
             Result.failure(InternalDbException("Error while trying to get all Institutionen from db."))
         else
-            Result.success(Serializer.stable.toJson(InstitutionDto.serializer().list, result).toString())
+            Result.success(Json.encodeToString(result))
     }
 
     fun getById(id: UUID, atomic: Boolean = false): Result<String> = transaction {
@@ -40,5 +40,5 @@ object InstitutionDao {
     fun delete(institutionsId: UUID): Boolean = Institution.delete(institutionsId)
 
     private fun mapJsonResult(result: InstitutionDto) =
-        Serializer.stable.toJson(InstitutionDto.serializer(), result).toString()
+        Json.encodeToString(result)
 }

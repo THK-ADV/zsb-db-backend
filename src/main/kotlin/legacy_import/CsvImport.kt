@@ -8,41 +8,39 @@ import model.kaoaarbeit.KAoAArbeitDto
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDto
 import model.kontakt.enum.Anrede
-import model.kontakt.enum.KontaktFunktion
 import model.kontakt.enum.KAoABetreuung
+import model.kontakt.enum.KontaktFunktion
 import model.kontakt.enum.Talentscout
 import model.ort.Ort
 import model.ort.OrtDto
+import model.schule.Schule
+import model.schule.SchuleDto
 import model.schule.enum.Kooperationspartner
 import model.schule.enum.Schulform
-import model.schule.SchuleDto
-import model.schule.Schule
 import java.io.File
 
-private fun String?.ensureNonEmpty() : String =
-    if(this != null && (this.isBlank() || this.isEmpty()))
+private fun String?.ensureNonEmpty(): String =
+    if (this == null)
         throw Exception("String is empty")
-    else this!!
+    else if (this.isBlank() || this.isEmpty())
+        throw Exception("String is empty")
+    else this
 
 object CsvImport {
 
-    init {
-        ImportLog.clear()
-    }
-
-    fun toSchooltype(s: String?) : Schulform =
+    fun toSchooltype(s: String?): Schulform =
         s?.let { Schulform.fromDesc(it.trim()) } ?: Schulform.KEINE
 
-    fun toCooperationpartner(s: String?) : Kooperationspartner =
+    fun toCooperationpartner(s: String?): Kooperationspartner =
         s?.let { Kooperationspartner.fromDesc(it.trim()) } ?: Kooperationspartner.KEINE
 
-    fun toSalutation(s: String?) : Anrede =
+    fun toSalutation(s: String?): Anrede =
         s?.let { Anrede.fromDesc(it.trim()) } ?: Anrede.KEINE
 
-    fun toContactFeature(s: String?) : KontaktFunktion =
+    fun toContactFeature(s: String?): KontaktFunktion =
         s?.let { KontaktFunktion.fromDesc(it.trim()) } ?: KontaktFunktion.KEINE
 
-    fun toAddress(street: String?, houseNumber: String?, city: Ort) : Adresse {
+    fun toAddress(street: String?, houseNumber: String?, city: Ort): Adresse {
         val adresseDto = AdresseDto(
             street = street.ensureNonEmpty().trim(),
             houseNumber = houseNumber.ensureNonEmpty().trim(),
@@ -51,7 +49,7 @@ object CsvImport {
         return Adresse.save(adresseDto).getOrThrow()
     }
 
-    fun toCity(postcode: String?, designation: String?, constituency: String?, governmentDistrict: String?) : Ort {
+    fun toCity(postcode: String?, designation: String?, constituency: String?, governmentDistrict: String?): Ort {
         val ortDto = OrtDto(
             postcode = postcode.ensureNonEmpty().trim().toInt(),
             designation = designation.ensureNonEmpty().trim(),
@@ -95,13 +93,13 @@ object CsvImport {
             .map(::createContact)
     }
 
-    fun toKAoASupervisor(s: String?) : KAoABetreuung =
+    fun toKAoASupervisor(s: String?): KAoABetreuung =
         s?.let { KAoABetreuung.fromDesc(it.trim()) } ?: KAoABetreuung.KEINE
 
-    fun toTalentscout(s: String?) : Talentscout =
+    fun toTalentscout(s: String?): Talentscout =
         s?.let { Talentscout.fromDesc(it.trim()) } ?: Talentscout.KEINE
 
-    fun toKAoAWork(name: String, content: String, school: Schule) : KAoAArbeit {
+    fun toKAoAWork(name: String, content: String, school: Schule): KAoAArbeit {
         val kaoaWorkDto = KAoAArbeitDto(
             name = name,
             content = content,
@@ -111,13 +109,12 @@ object CsvImport {
     }
 
     fun parseSchool(file: File) {
-        val rows = csvReader{
-            charset = "windows-1252"
+        val rows = csvReader {
             delimiter = ';'
         }.readAllWithHeader(file)
 
         rows.forEach { row ->
-            ImportLog.error(row.toString())
+            println(row["Schulname"])
             val name = row["Schulname"].ensureNonEmpty().trim()
             val type = toSchooltype(row["Schulform"])
             val comment = row["Kommentar"]?.trim() ?: ""
@@ -128,10 +125,17 @@ object CsvImport {
             val email = row["Email Schule"] ?: ""
             val website = row["Schulwebseite"] ?: ""
             val cooperationpartner = toCooperationpartner(row["Betreuende Hochschule KAoA/Talentscouting"])
-            val cooperationcontract = parseToBoolean(row["Hochschulischen Kooperationsvertrag TH (Allgemeine und spezifische Zusammenarbeit)"] ?: "nein")
+            val cooperationcontract = parseToBoolean(
+                row["Hochschulischen Kooperationsvertrag TH (Allgemeine und spezifische Zusammenarbeit)"] ?: "nein"
+            )
             val city = toCity(row["PLZ"], row["Ort"], row["Regierungsbezirk"], row["Kreis"])
             val address = toAddress(row["Straße"], row["Hausnummer"], city)
-            toContact(row["Name, Vorname Kontaktpersonen"], row["Anrede Kontaktpersonen"], row["Funktion Kontaktpersonen"], row["Mailadresse Kontaktpersonen"])
+            val contacts = toContact(
+                row["Name, Vorname Kontaktpersonen"],
+                row["Anrede Kontaktpersonen"],
+                row["Funktion Kontaktpersonen"],
+                row["Mailadresse Kontaktpersonen"]
+            )
             val kaoaSupervisor = toKAoASupervisor(row["Nachname, Vorname KAoA Betreuer*in"])
             val talentscout = toTalentscout(row["Nachname, Vorname Talentscout"])
 
@@ -150,7 +154,8 @@ object CsvImport {
                 kaoaSupervisor.id,
                 talentscout.id,
                 cooperationcontract,
-                address.id.value.toString()
+                address.id.value.toString(),
+                contacts_ids = contacts.map { it.id.value.toString() }
             )
 
             val school = Schule.save(schoolDto).getOrThrow()
@@ -162,5 +167,5 @@ object CsvImport {
         }
     }
 
-    private fun parseToBoolean(text: String): Boolean = text.toLowerCase().trim() == "ja"
+    private fun parseToBoolean(text: String): Boolean = text.lowercase().trim() == "ja"
 }

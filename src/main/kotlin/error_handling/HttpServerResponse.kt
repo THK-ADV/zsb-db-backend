@@ -1,8 +1,6 @@
 package error_handling
 
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-
+import io.ktor.http.*
 
 data class HttpServerResponse(val text: String, val type: ContentType, val status: HttpStatusCode) {
 
@@ -16,7 +14,7 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
             if (exception == null || exception !is ZsbException)
                 return HttpServerResponse("Unknown error.", ContentType.Text.Plain, HttpStatusCode.InternalServerError)
 
-            val (failureMsg, statusCode) = when(exception) {
+            val (failureMsg, statusCode) = when (exception) {
                 is NotAuthorizedException -> exception.message to HttpStatusCode.Forbidden
                 is MailNotValidException -> exception.message to HttpStatusCode.BadRequest
                 is SchoolTypeNotValidException -> exception.message to HttpStatusCode.BadRequest
@@ -34,7 +32,11 @@ data class HttpServerResponse(val text: String, val type: ContentType, val statu
                 is TooManyHostsException -> exception.message to HttpStatusCode.BadRequest
                 is CouldNotGenerateSerialLetterException -> exception.message to HttpStatusCode.InternalServerError
                 is CooperationPartnerNotValidException -> exception.message to HttpStatusCode.BadRequest
-                else -> return HttpServerResponse("Unknown error.", ContentType.Text.Plain, HttpStatusCode.InternalServerError)
+                else -> return HttpServerResponse(
+                    "Unknown error.",
+                    ContentType.Text.Plain,
+                    HttpStatusCode.InternalServerError
+                )
             }
 
             return HttpServerResponse(failureMsg, ContentType.Text.Plain, statusCode)

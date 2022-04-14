@@ -1,12 +1,12 @@
 package model.veranstaltung
 
 import error_handling.HttpServerResponse
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.receive
-import io.ktor.routing.*
-import kotlinx.serialization.list
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import model.veranstaltung.enum.KategorieDto
 import model.veranstaltung.enum.StufeDto
 import model.veranstaltung.enum.VortragsartDto
@@ -18,21 +18,21 @@ fun Route.veranstaltungenApi() {
         // get Kategorie options
         get("/categories") {
             call.logRequest()
-            val json = Serializer.stable.toJson(KategorieDto.serializer().list, KategorieDto.generate())
+            val json = Json.encodeToJsonElement(KategorieDto.generate())
             call.respondJsonOk(json)
         }
 
         // get stufe options
         get("/levels") {
             call.logRequest()
-            val json = Serializer.stable.toJson(StufeDto.serializer().list, StufeDto.generate())
+            val json = Json.encodeToJsonElement(StufeDto.generate())
             call.respondJsonOk(json)
         }
 
         // get vortragsart options
         get("/presentationtypes") {
             call.logRequest()
-            val json = Serializer.stable.toJson(VortragsartDto.serializer().list, VortragsartDto.generate())
+            val json = Json.encodeToJsonElement(VortragsartDto.generate())
             call.respondJsonOk(json)
         }
 
