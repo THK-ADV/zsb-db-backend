@@ -2,9 +2,9 @@ package model.bericht
 
 import error_handling.InternalDbException
 import error_handling.UuidNotFound
-import kotlinx.serialization.list
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.Serializer
 import utilty.anyOrNull
 import java.util.*
 
@@ -40,8 +40,8 @@ object BerichtDao {
     fun delete(berichtId: UUID): Boolean = Bericht.delete(berichtId)
 
     private fun mapJsonResult(result: BerichtDto) =
-        Serializer.stable.toJson(BerichtDto.serializer(), result).toString()
+        Json.encodeToString(result)
 
     private fun mapJsonResultList(result: List<BerichtDto>) =
-        Serializer.stable.toJson(BerichtDto.serializer().list, result).toString()
+        Json.encodeToString(result)
 }

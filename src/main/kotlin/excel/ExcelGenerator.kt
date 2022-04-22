@@ -8,7 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.ByteArrayOutputStream
 
 class ExcelGenerator {
-  
+
     fun generateSheet(schools: List<SchuleDto>): ByteArray {
         val outputStream = ByteArrayOutputStream()
         val workBook = XSSFWorkbook()
@@ -43,10 +43,10 @@ class ExcelGenerator {
             s.contacts.filter { it.feature == f.id }
 
         var rowNum = 1
-        var columnIndex = 0
+        val columnIndex = 0
         schools.forEach { s ->
-            val contacts = findContacts(s, KontaktFunktion.STUBO) or
-                    findContacts(s, KontaktFunktion.SECRETARIAT) or
+            val contacts = findContacts(s, KontaktFunktion.STUDIEN_UND_BERUFSWAHLKOORDINATOR_IN) or
+                    findContacts(s, KontaktFunktion.SEKRETARIAT) or
                     findContacts(s, KontaktFunktion.SCHULLEITUNG) or
                     s.contacts
             contacts.forEach {
@@ -62,9 +62,9 @@ class ExcelGenerator {
         }
     }
 
-    private fun printRows(sheet: XSSFSheet, s: SchuleDto, c: KontaktDto, row: Int): Int {
+    private fun printRows(sheet: XSSFSheet, s: SchuleDto, c: KontaktDto, rowIndex: Int): Int {
         var columnIndex = 0
-        val row = sheet.createRow(row)
+        val row = sheet.createRow(rowIndex)
         row.createCell(columnIndex)
             .setCellValue(s.name)
         row.createCell(++columnIndex)

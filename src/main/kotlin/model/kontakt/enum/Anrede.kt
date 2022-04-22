@@ -3,15 +3,15 @@ package model.kontakt.enum
 import kotlinx.serialization.Serializable
 
 enum class Anrede(val id: Int, val desc: String) {
-    UNKNOWN(0, ""),
+    KEINE(0, ""),
     HERR(1, "Herr"),
     FRAU(2, "Frau");
 
     companion object {
-        fun getObjectByString(string: String) = when (string) {
+        fun fromDesc(string: String) = when (string) {
             "Herr" -> HERR
             "Frau" -> FRAU
-            else -> UNKNOWN
+            else -> KEINE
         }
     }
 }

@@ -1,13 +1,11 @@
 package utilty
 
 import error_handling.HttpServerResponse
-import io.ktor.application.ApplicationCall
-import io.ktor.features.origin
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.httpMethod
-import io.ktor.request.path
-import io.ktor.response.respondText
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import kotlinx.serialization.json.JsonElement
 import mu.KotlinLogging
 import java.util.*
@@ -58,7 +56,11 @@ suspend fun ApplicationCall.checkIdAndRespondUsePostIfNull(id: String?): Boolean
  */
 suspend fun ApplicationCall.checkIdAndRespondUsePutIfNotNull(id: String?): Boolean {
     if (id != null) {
-        this.respondText("ID given. Use put to update existing data.", ContentType.Text.Plain, HttpStatusCode.BadRequest)
+        this.respondText(
+            "ID given. Use put to update existing data.",
+            ContentType.Text.Plain,
+            HttpStatusCode.BadRequest
+        )
         return true
     }
     return false

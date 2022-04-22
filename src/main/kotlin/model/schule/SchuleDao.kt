@@ -1,7 +1,8 @@
 package model.schule
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import org.jetbrains.exposed.sql.transactions.transaction
-import utilty.Serializer
 import java.util.*
 
 object SchuleDao {
@@ -16,7 +17,7 @@ object SchuleDao {
     fun createOrUpdate(schuleDto: SchuleDto): Result<String> = transaction {
         Schule.save(schuleDto).map {
             val dto = it.toDto()
-            val json = Serializer.stable.toJson(SchuleDto.serializer(), dto)
+            val json = Json.encodeToJsonElement(dto)
 
             json.toString()
         }
