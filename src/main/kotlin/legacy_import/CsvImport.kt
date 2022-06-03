@@ -37,6 +37,9 @@ object CsvImport {
     fun toSalutation(s: String?): Anrede =
         s?.let { Anrede.fromDesc(it.trim()) } ?: Anrede.KEINE
 
+    // TODO the data-import file contains abbreviations like 'StuBO' or 'ASP BA', but the actual
+    //  descriptions are spelled out, e.g. 'Studien- und Berufswahlkoordinator*in' or 'Ansprechpartner*innen...'.
+    //  thus, those contact features do not match and fall back to OTHER(25)
     fun toContactFeature(s: String?): KontaktFunktion =
         s?.let { KontaktFunktion.fromDesc(it.trim()) } ?: KontaktFunktion.KEINE
 

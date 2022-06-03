@@ -1,5 +1,7 @@
 package model.kontakt.enum
 
+import kotlinx.serialization.Serializable
+
 enum class Talentscout(val id: Int, val desc: String) {
     KEINE(0, "Keine"),
     AA(1, "Abdirahman, Amal"),
@@ -21,5 +23,13 @@ enum class Talentscout(val id: Int, val desc: String) {
             "Ruetz, Stefanie" -> SR
             else -> KEINE
         }
+    }
+}
+
+@Serializable
+data class TalentscoutDto(val id: Int, val desc: String) {
+    companion object {
+        fun generate(): List<TalentscoutDto> = Talentscout.values()
+            .map { TalentscoutDto(it.id, it.desc) }
     }
 }
