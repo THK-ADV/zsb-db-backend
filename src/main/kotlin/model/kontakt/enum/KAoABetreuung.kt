@@ -33,3 +33,11 @@ enum class KAoABetreuung(val id: Int, val desc: String) {
         }
     }
 }
+
+@Serializable
+data class KAoABetreuungDto(val id: Int, val desc: String) {
+    companion object {
+        fun generate(): List<KAoABetreuungDto> = KAoABetreuung.values()
+            .map { KAoABetreuungDto(it.id, it.desc) }
+    }
+}

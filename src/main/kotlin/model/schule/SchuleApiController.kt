@@ -7,6 +7,10 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import model.kaoaarbeit.KAoAArbeitDao
+import model.kontakt.enum.KAoABetreuung
+import model.kontakt.enum.KAoABetreuungDto
+import model.kontakt.enum.TalentscoutDto
 import model.schule.enum.KooperationspartnerDto
 import model.schule.enum.SchulformDto
 import utilty.*
@@ -20,15 +24,36 @@ fun Route.schoolsApi() = route("schools") {
         call.respondJsonOk(json)
     }
 
-    get("/cooperationpartner") {
+    get("/cooperationPartner") {
         call.logRequest()
         val json = Json.encodeToJsonElement(KooperationspartnerDto.generate())
+        call.respondJsonOk(json)
+    }
+
+    get("/kaoaSupervisors") {
+        call.logRequest()
+        val json = Json.encodeToJsonElement(KAoABetreuungDto.generate())
+        call.respondJsonOk(json)
+    }
+
+    get("/talentScouts") {
+        call.logRequest()
+        val json = Json.encodeToJsonElement(TalentscoutDto.generate())
         call.respondJsonOk(json)
     }
 
     get("/schooltypes") {
         call.logRequest()
         val json = Json.encodeToJsonElement(SchulformDto.generate())
+        call.respondJsonOk(json)
+    }
+
+    get("/{uuid}/kAoAWork") {
+        call.logRequest()
+        val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
+        val atomic = call.parameters["resolve_ids"]?.toBoolean() ?: false
+        val kAoAWork = KAoAArbeitDao.bySchoolId(uuid, atomic)
+        val json = Json.encodeToJsonElement(kAoAWork)
         call.respondJsonOk(json)
     }
 

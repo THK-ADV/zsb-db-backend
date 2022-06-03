@@ -11,10 +11,10 @@ enum class Kooperationspartner(val id: Int, val desc: String) {
     companion object {
 
         fun fromDesc(desc: String): Kooperationspartner = when (desc) {
-            "Keine" -> Kooperationspartner.KEINE
-            "TH Köln" -> Kooperationspartner.TH
-            "Uni Köln" -> Kooperationspartner.UNI
-            else -> Kooperationspartner.OTHER
+            "Keine" -> KEINE
+            "TH Köln" -> TH
+            "Uni Köln" -> UNI
+            else -> OTHER
         }
     }
 }
