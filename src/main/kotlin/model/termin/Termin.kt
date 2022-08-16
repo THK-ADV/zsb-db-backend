@@ -24,8 +24,7 @@ object Termine : UUIDTable() {
     val date = text("datum")
     val amountStudents = text("anzahl_sus")
     val level = text("stufe")
-    val sequence = text("ablauf_und_bewertung")
-    val runs = text("anzahl_der_durchlaeufe")
+    val annotations = text("anmerkungen")
     val contactPerson = text("ansprechpartner")
 }
 
@@ -37,8 +36,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var date by Termine.date
     private var amountStudents by Termine.amountStudents
     private var level by Termine.level
-    private var sequence by Termine.sequence
-    private var runs by Termine.runs
+    private var annotations by Termine.annotations
     private var contactPerson by Termine.contactPerson
 
     companion object : UUIDEntityClass<Termin>(Termine) {
@@ -96,8 +94,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         this.date = dto.date
         this.amountStudents = dto.amountStudents
         this.level = transformMultiSelect(dto.level)
-        this.sequence = dto.sequence
-        this.runs = dto.runs
+        this.annotations = dto.annotations
         this.contactPerson = dto.contactPerson
     }
 
@@ -110,8 +107,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         date,
         amountStudents,
         transformMultiSelect(level),
-        sequence,
-        runs,
+        annotations,
         contactPerson
     )
 
@@ -124,8 +120,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         date,
         amountStudents,
         transformMultiSelect(level),
-        sequence,
-        runs,
+        annotations,
         contactPerson,
         host.toDto()
     )
@@ -150,8 +145,7 @@ data class TerminDto(
     val date: String,
     val amountStudents: String,
     val level: List<Int>,
-    val sequence: String,
-    val runs: String,
+    val annotations: String,
     val contactPerson: String,
     val host: VeranstalterDto? = null
 )
