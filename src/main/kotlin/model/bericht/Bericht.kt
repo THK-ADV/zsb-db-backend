@@ -3,9 +3,9 @@ package model.bericht
 import error_handling.CouldNotParseUuidException
 import error_handling.UuidNotFound
 import kotlinx.serialization.Serializable
-import model.veranstaltung.Veranstaltung
-import model.veranstaltung.VeranstaltungDto
-import model.veranstaltung.Veranstaltungen
+import model.termin.Termin
+import model.termin.TerminDto
+import model.termin.Termine
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -18,26 +18,26 @@ import java.util.*
 object Berichte : UUIDTable() {
     val title = text("titel")
     val text = text("text")
-    val event_id = reference("veranstaltung_id", Veranstaltungen)
+    val event_id = reference("termin_id", Termine)
 }
 
 class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var title by Berichte.title
     private var text by Berichte.text
-    private var veranstaltung by Veranstaltung referencedOn Berichte.event_id
+    private var termin by Termin referencedOn Berichte.event_id
 
     companion object : UUIDEntityClass<Bericht>(Berichte) {
 
         fun save(dto: BerichtDto): Result<Bericht> = transaction {
             // validate ids
-            val veranstaltungId = anyOrNull { UUID.fromString(dto.event_id) }
+            val terminId = anyOrNull { UUID.fromString(dto.event_id) }
                 ?: return@transaction Result.failure(
-                    CouldNotParseUuidException("veranstaltungId for Bericht isn't valid.")
+                    CouldNotParseUuidException("terminId for Bericht isn't valid.")
                 )
 
-            // get veranstaltung by id
-            val veranstaltung = anyOrNull { Veranstaltung[veranstaltungId] }
-                ?: return@transaction Result.failure(UuidNotFound("Could not find Veranstaltung with ID: $veranstaltungId"))
+            // get termin by id
+            val termin = anyOrNull { Termin[terminId] }
+                ?: return@transaction Result.failure(UuidNotFound("Could not find Termin with ID: $terminId"))
 
             // update/create
             val bericht = if (dto.uuid != null) {
@@ -46,10 +46,10 @@ class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                 val old = anyOrNull { Bericht[uuid] }
                     ?: return@transaction Result.failure(UuidNotFound("Couldn't find Bericht with ID: $uuid"))
 
-                old.update(dto, veranstaltung)
+                old.update(dto, termin)
                 Bericht[uuid]
             } else {
-                new { update(dto, veranstaltung) }
+                new { update(dto, termin) }
             }
 
             Result.success(bericht)
@@ -64,15 +64,15 @@ class Bericht(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(dto: BerichtDto, veranstaltung: Veranstaltung) {
+    private fun update(dto: BerichtDto, termin: Termin) {
         this.text = dto.text
         this.title = dto.title
-        this.veranstaltung = veranstaltung
+        this.termin = termin
     }
 
-    fun toDto() = BerichtDto(id.value.toString(), title, text, veranstaltung.id.toString())
+    fun toDto() = BerichtDto(id.value.toString(), title, text, termin.id.toString())
 
-    fun toAtomicDto() = BerichtDto(id.value.toString(), title, text, veranstaltung.id.toString(), veranstaltung.toDto())
+    fun toAtomicDto() = BerichtDto(id.value.toString(), title, text, termin.id.toString(), termin.toDto())
 }
 
 @Serializable
@@ -81,5 +81,5 @@ data class BerichtDto(
     val title: String,
     val text: String,
     val event_id: String,
-    val event: VeranstaltungDto? = null
+    val event: TerminDto? = null
 )

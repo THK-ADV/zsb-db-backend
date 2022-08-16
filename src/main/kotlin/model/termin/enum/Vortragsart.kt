@@ -1,4 +1,4 @@
-package model.veranstaltung.enum
+package model.termin.enum
 
 import kotlinx.serialization.Serializable
 

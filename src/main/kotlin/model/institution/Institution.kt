@@ -11,8 +11,8 @@ import model.bericht.Bericht
 import model.bericht.Berichte
 import model.veranstalter.Veranstalter
 import model.veranstalter.VeranstalterTable
-import model.veranstaltung.Veranstaltung
-import model.veranstaltung.Veranstaltungen
+import model.termin.Termin
+import model.termin.Termine
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -75,18 +75,18 @@ class Institution(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     val institution = Institution.find { Institutionen.id eq institutionsId }.first()
                     val veranstalterList = Veranstalter.find { VeranstalterTable.institution_id eq institution.id }.toList()
 
-                    val veranstaltungen = mutableListOf<Veranstaltung>()
+                    val termine = mutableListOf<Termin>()
                     veranstalterList.forEach {
-                        veranstaltungen.addAll(Veranstaltung.find { Veranstaltungen.host_id eq it.id })
+                        termine.addAll(Termin.find { Termine.host_id eq it.id })
                     }
 
                     val berichte = mutableListOf<Bericht>()
-                    veranstaltungen.forEach {
+                    termine.forEach {
                         berichte.addAll(Bericht.find { Berichte.event_id eq it.id})
                     }
 
                     berichte.forEach { it.delete() }
-                    veranstaltungen.forEach { it.delete() }
+                    termine.forEach { it.delete() }
                     veranstalterList.forEach { it.delete() }
                     institution.delete()
                 }

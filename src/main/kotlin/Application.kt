@@ -1,5 +1,4 @@
 import database.DbSettings
-import database.recreateDatabase
 import excel.excelApi
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -12,7 +11,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.routing.*
-import legacy_import.CsvImport
 import model.address.adressenApi
 import model.bericht.berichteApi
 import model.communication.mailApi
@@ -21,11 +19,10 @@ import model.kontakt.kontakteApi
 import model.ort.orteApi
 import model.schule.schoolsApi
 import model.veranstalter.veranstalterApi
-import model.veranstaltung.veranstaltungenApi
+import model.termin.termineApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
 import word.wordApi
-import java.io.File
 
 val log = ColoredLogging(KotlinLogging.logger {})
 
@@ -38,12 +35,12 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    recreateDatabase()
+    //recreateDatabase()
 
-    val fileName = "data-import.csv"
-    val file = File("src/main/resources/legacy_import/$fileName")
-    CsvImport.parseSchool(file)
-    log.info("loaded data from '$fileName'")
+//    val fileName = "data-import.csv"
+//    val file = File("src/main/resources/legacy_import/$fileName")
+//    CsvImport.parseSchool(file)
+//    log.info("loaded data from '$fileName'")
 
     val server = embeddedServer(Netty, port = 9000) {
         configureServer(this, null)
@@ -73,7 +70,7 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         kontakteApi()
         institutionenApi()
         veranstalterApi()
-        veranstaltungenApi()
+        termineApi()
         berichteApi()
         wordApi()
         excelApi()
