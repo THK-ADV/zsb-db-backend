@@ -1,4 +1,4 @@
-package model.veranstaltung
+package model.termin
 
 import error_handling.InternalDbException
 import error_handling.UuidNotFound
@@ -8,42 +8,42 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.anyOrNull
 import java.util.*
 
-object VeranstaltungDao {
+object TerminDao {
     fun getAll(atomic: Boolean = false): Result<String> = transaction {
         val result = anyOrNull {
-            Veranstaltung.all().map {
+            Termin.all().map {
                 if (atomic) it.toAtomicDto() else it.toDto()
             }
         }
 
         if (result == null)
-            Result.failure(InternalDbException("Error while trying to get all Veranstaltungen from db."))
+            Result.failure(InternalDbException("Error while trying to get all Termine from db."))
         else
             Result.success(mapJsonResultList(result))
     }
 
     fun getById(id: UUID, atomic: Boolean = false): Result<String> = transaction {
         val result = anyOrNull {
-            if (atomic) Veranstaltung[id].toAtomicDto() else Veranstaltung[id].toDto()
+            if (atomic) Termin[id].toAtomicDto() else Termin[id].toDto()
         }
 
         if (result == null)
-            Result.failure(UuidNotFound("Couldn't find Veranstaltung with UUID: $id"))
+            Result.failure(UuidNotFound("Couldn't find Termin with UUID: $id"))
         else
             Result.success(mapJsonResult(result))
 
     }
 
-    fun createOrUpdate(veranstaltungDto: VeranstaltungDto): Result<String> = transaction {
-        Veranstaltung.save(veranstaltungDto).map { mapJsonResult(it.toDto()) }
+    fun createOrUpdate(terminDto: TerminDto): Result<String> = transaction {
+        Termin.save(terminDto).map { mapJsonResult(it.toDto()) }
     }
 
 
-    fun delete(uuid: UUID): Boolean = Veranstaltung.delete(uuid)
+    fun delete(uuid: UUID): Boolean = Termin.delete(uuid)
 
-    private fun mapJsonResult(result: VeranstaltungDto) =
+    private fun mapJsonResult(result: TerminDto) =
         Json.encodeToString(result)
 
-    private fun mapJsonResultList(result: List<VeranstaltungDto>) =
+    private fun mapJsonResultList(result: List<TerminDto>) =
         Json.encodeToString(result)
 }

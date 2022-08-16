@@ -1,4 +1,4 @@
-package model.veranstaltung
+package model.termin
 
 import error_handling.CouldNotParseUuidException
 import error_handling.UuidNotFound
@@ -16,7 +16,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.anyOrNull
 import java.util.*
 
-object Veranstaltungen : UUIDTable() {
+object Termine : UUIDTable() {
     val designation = text("bezeichnung")
     val host_id = reference("veranstalter_id", VeranstalterTable)
     val category = text("kategorie")
@@ -29,58 +29,58 @@ object Veranstaltungen : UUIDTable() {
     val contactPerson = text("ansprechpartner")
 }
 
-class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
-    private var designation by Veranstaltungen.designation
-    private var host by Veranstalter referencedOn Veranstaltungen.host_id
-    private var category by Veranstaltungen.category
-    private var topic by Veranstaltungen.topic
-    private var date by Veranstaltungen.date
-    private var amountStudents by Veranstaltungen.amountStudents
-    private var level by Veranstaltungen.level
-    private var sequence by Veranstaltungen.sequence
-    private var runs by Veranstaltungen.runs
-    private var contactPerson by Veranstaltungen.contactPerson
+class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
+    private var designation by Termine.designation
+    private var host by Veranstalter referencedOn Termine.host_id
+    private var category by Termine.category
+    private var topic by Termine.topic
+    private var date by Termine.date
+    private var amountStudents by Termine.amountStudents
+    private var level by Termine.level
+    private var sequence by Termine.sequence
+    private var runs by Termine.runs
+    private var contactPerson by Termine.contactPerson
 
-    companion object : UUIDEntityClass<Veranstaltung>(Veranstaltungen) {
-        fun save(dto: VeranstaltungDto): Result<Veranstaltung> = transaction {
+    companion object : UUIDEntityClass<Termin>(Termine) {
+        fun save(dto: TerminDto): Result<Termin> = transaction {
             // validate ids
             val veranstalterId = anyOrNull { UUID.fromString(dto.host_id) }
                 ?: return@transaction Result.failure(
-                    CouldNotParseUuidException("veranstalter_id for Veranstaltung is not valid.")
+                    CouldNotParseUuidException("veranstalter_id for Termin is not valid.")
                 )
 
             // get related objects from db
             val veranstalter = anyOrNull { Veranstalter[veranstalterId] }
                 ?: return@transaction Result.failure(UuidNotFound("Could not find Veranstalter with ID: $veranstalterId"))
 
-            // finding a matched Veranstaltung is skipped here due to the unique
+            // finding a matched Termin is skipped here due to the unique
 
-            // update/create Veranstaltung
-            val veranstaltung = if (dto.uuid != null) {
+            // update/create Termin
+            val termin = if (dto.uuid != null) {
                 val uuid = anyOrNull { UUID.fromString(dto.uuid) }
-                    ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Veranstaltung is not valid."))
-                val old = anyOrNull { Veranstaltung[uuid] }
-                    ?: return@transaction Result.failure(UuidNotFound("Couldn't find Veranstaltung with UUID: $uuid"))
+                    ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Termin is not valid."))
+                val old = anyOrNull { Termin[uuid] }
+                    ?: return@transaction Result.failure(UuidNotFound("Couldn't find Termin with UUID: $uuid"))
 
                 // update and safe
                 old.update(dto, veranstalter)
-                Veranstaltung[uuid]
+                Termin[uuid]
             } else {
                 new { update(dto, veranstalter) }
             }
 
             // return result
-            Result.success(veranstaltung)
+            Result.success(termin)
         }
 
         /**
-         * Delete veranstaltung with [veranstaltungId] and all attached [Berichte]
+         * Delete termin with [id] and all attached [Berichte]
          */
-        fun delete(veranstaltungId: UUID): Boolean {
+        fun delete(id: UUID): Boolean {
             val result = anyOrNull {
                 transaction {
-                    Berichte.deleteWhere { Berichte.event_id eq veranstaltungId }
-                    Veranstaltungen.deleteWhere { Veranstaltungen.id eq veranstaltungId }
+                    Berichte.deleteWhere { Berichte.event_id eq id }
+                    Termine.deleteWhere { Termine.id eq id }
                 }
             }
 
@@ -88,7 +88,7 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(dto: VeranstaltungDto, veranstalter: Veranstalter) {
+    private fun update(dto: TerminDto, veranstalter: Veranstalter) {
         this.designation = dto.designation
         this.host = veranstalter
         this.category = transformMultiSelect(dto.category)
@@ -101,7 +101,7 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         this.contactPerson = dto.contactPerson
     }
 
-    fun toDto() = VeranstaltungDto(
+    fun toDto() = TerminDto(
         id.value.toString(),
         designation,
         host.id.value.toString(),
@@ -115,7 +115,7 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         contactPerson
     )
 
-    fun toAtomicDto() = VeranstaltungDto(
+    fun toAtomicDto() = TerminDto(
         id.value.toString(),
         designation,
         host.id.value.toString(),
@@ -141,7 +141,7 @@ class Veranstaltung(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 }
 
 @Serializable
-data class VeranstaltungDto(
+data class TerminDto(
     val uuid: String?,
     val designation: String,
     val host_id: String,

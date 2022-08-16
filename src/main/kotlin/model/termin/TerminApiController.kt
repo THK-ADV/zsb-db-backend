@@ -1,4 +1,4 @@
-package model.veranstaltung
+package model.termin
 
 import error_handling.HttpServerResponse
 import io.ktor.http.*
@@ -7,12 +7,12 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
-import model.veranstaltung.enum.KategorieDto
-import model.veranstaltung.enum.StufeDto
-import model.veranstaltung.enum.VortragsartDto
+import model.termin.enum.KategorieDto
+import model.termin.enum.StufeDto
+import model.termin.enum.VortragsartDto
 import utilty.*
 
-fun Route.veranstaltungenApi() {
+fun Route.termineApi() {
     route("events") {
 
         // get Kategorie options
@@ -39,7 +39,7 @@ fun Route.veranstaltungenApi() {
         // get all
         get {
             call.logRequest()
-            val result = VeranstaltungDao.getAll(call.parameters["resolve_ids"] == "true")
+            val result = TerminDao.getAll(call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
 
@@ -47,7 +47,7 @@ fun Route.veranstaltungenApi() {
         get("/{uuid}") {
             call.logRequest()
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
-            val result = VeranstaltungDao.getById(uuid, call.parameters["resolve_ids"] == "true")
+            val result = TerminDao.getById(uuid, call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
 
@@ -61,24 +61,24 @@ fun Route.veranstaltungenApi() {
         delete("/{uuid}") {
             call.logRequest()
             val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
-            val isDeleted = VeranstaltungDao.delete(uuid)
+            val isDeleted = TerminDao.delete(uuid)
             if (isDeleted)
                 call.respondTextAsJson("Successfully deleted $uuid")
             else
-                call.respondTextAsJson("Couldn't find Veranstaltung with id: $uuid", status = HttpStatusCode.NotFound)
+                call.respondTextAsJson("Couldn't find Termin with id: $uuid", status = HttpStatusCode.NotFound)
         }
     }
 }
 
 private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     call.logRequest()
-    val veranstaltungDto = call.receive<VeranstaltungDto>()
+    val terminDto = call.receive<TerminDto>()
 
     if (isPost) {
-        if (call.checkIdAndRespondUsePutIfNotNull(veranstaltungDto.uuid)) return
+        if (call.checkIdAndRespondUsePutIfNotNull(terminDto.uuid)) return
     } else
-        if (call.checkIdAndRespondUsePostIfNull(veranstaltungDto.uuid)) return
+        if (call.checkIdAndRespondUsePostIfNull(terminDto.uuid)) return
 
-    val result = VeranstaltungDao.createOrUpdate(veranstaltungDto)
+    val result = TerminDao.createOrUpdate(terminDto)
     call.respond(HttpServerResponse.map(result))
 }

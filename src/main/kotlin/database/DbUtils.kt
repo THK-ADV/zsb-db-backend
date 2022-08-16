@@ -9,7 +9,7 @@ import model.ort.Orte
 import model.schule.SchulKontakte
 import model.schule.Schulen
 import model.veranstalter.VeranstalterTable
-import model.veranstaltung.Veranstaltungen
+import model.termin.Termine
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -17,7 +17,7 @@ fun recreateDatabase() {
     transaction {
         // recreate DB
         SchemaUtils.drop(Berichte)
-        SchemaUtils.drop(Veranstaltungen)
+        SchemaUtils.drop(Termine)
         SchemaUtils.drop(VeranstalterTable)
         SchemaUtils.drop(Institutionen)
         SchemaUtils.drop(SchulKontakte)
@@ -35,7 +35,7 @@ fun recreateDatabase() {
             SchulKontakte,
             Institutionen,
             VeranstalterTable,
-            Veranstaltungen,
+            Termine,
             Berichte,
             KAoAArbeiten
         )
@@ -43,7 +43,7 @@ fun recreateDatabase() {
 }
 
 /**
- * Generates dummy data for, Berichte, Veranstaltungen, Veranstalter und Institutionen
+ * Generates dummy data for, Berichte, Termine, Veranstalter und Institutionen
  */
 /*fun generateDummyData() {
     val adressen = AdresseDao.getAll(true)
@@ -65,8 +65,8 @@ fun recreateDatabase() {
         )
     )
 
-    val veranstaltungResult = Veranstaltung.save(
-        VeranstaltungDto(
+    val terminResult = Termin.save(
+        TerminDto(
             null,
             "Neue Felgen für Porsche",
             veranstalterResult.getOrNull()?.id?.value.toString(),
@@ -81,8 +81,8 @@ fun recreateDatabase() {
         )
     )
 
-    Veranstaltung.save(
-        VeranstaltungDto(
+    Termin.save(
+        TerminDto(
             null,
             "Studienberatung",
             veranstalterResult.getOrNull()?.id?.value.toString(),
@@ -102,7 +102,7 @@ fun recreateDatabase() {
             null,
             "Erste Eindrücke",
             "Der Vortrag war sehr interessant und könnte eine Möglichkeit bieten junge Menschen für den Ingenieursberuf zu begeistern.",
-            veranstaltungResult.getOrNull()?.id?.value.toString()
+            terminResult.getOrNull()?.id?.value.toString()
         )
     )
     val bericht = berichtResult.getOrNull()
