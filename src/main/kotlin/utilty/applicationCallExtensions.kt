@@ -22,7 +22,7 @@ suspend fun ApplicationCall.getParameterAsIntOrNullAndRespondError(param: String
     return id
 }
 
-suspend fun ApplicationCall.getParameterAsUuidOrNullAndRespondError(param: String = "uuid"): UUID? {
+suspend fun ApplicationCall.parseParamAsUUID(param: String = "uuid"): UUID? {
     val uuid = anyOrNull { UUID.fromString(parameters[param]) }
 
     if (uuid == null) respondText("given $param must be an uuid", ContentType.Text.Plain, HttpStatusCode.BadRequest)
@@ -54,7 +54,7 @@ suspend fun ApplicationCall.checkIdAndRespondUsePostIfNull(id: String?): Boolean
 /**
  * @return true if the id is given and a respond was send
  */
-suspend fun ApplicationCall.checkIdAndRespondUsePutIfNotNull(id: String?): Boolean {
+suspend fun ApplicationCall.checkId(id: String?): Boolean {
     if (id != null) {
         this.respondText(
             "ID given. Use put to update existing data.",

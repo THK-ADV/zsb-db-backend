@@ -20,7 +20,7 @@ fun Route.berichteApi() {
         // get on by id
         get("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError() ?: return@get
+            val uuid = call.parseParamAsUUID() ?: return@get
             val result = BerichtDao.getById(uuid, call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
@@ -34,7 +34,7 @@ fun Route.berichteApi() {
         // delete
         delete("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
+            val uuid = call.parseParamAsUUID("uuid") ?: return@delete
             val isDeleted = BerichtDao.delete(uuid)
             if (isDeleted)
                 call.respondTextAsJson("Successfully deleted $uuid")
@@ -49,7 +49,7 @@ private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     val berichtDto = call.receive<BerichtDto>()
 
     if (isPost) {
-        if (call.checkIdAndRespondUsePutIfNotNull(berichtDto.uuid)) return
+        if (call.checkId(berichtDto.uuid)) return
     } else
         if (call.checkIdAndRespondUsePostIfNull(berichtDto.uuid)) return
 

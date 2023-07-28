@@ -20,7 +20,7 @@ fun Route.institutionenApi() {
         // get one by id
         get("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
+            val uuid = call.parseParamAsUUID("uuid") ?: return@get
             val result = InstitutionDao.getById(uuid, call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
@@ -34,7 +34,7 @@ fun Route.institutionenApi() {
         // delete
         delete("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
+            val uuid = call.parseParamAsUUID("uuid") ?: return@delete
             val isDeleted = InstitutionDao.delete(uuid)
             if (isDeleted)
                 call.respondTextAsJson("Successfully deleted $uuid")
@@ -49,7 +49,7 @@ private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     val institutionDto = call.receive<InstitutionDto>()
 
     if (isPost) {
-        if (call.checkIdAndRespondUsePutIfNotNull(institutionDto.uuid)) return
+        if (call.checkId(institutionDto.uuid)) return
     } else
         if (call.checkIdAndRespondUsePostIfNull(institutionDto.uuid)) return
 

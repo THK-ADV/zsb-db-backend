@@ -6,7 +6,7 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
-import utilty.getParameterAsUuidOrNullAndRespondError
+import utilty.parseParamAsUUID
 import utilty.logRequest
 import utilty.respond
 import utilty.respondJsonOk
@@ -22,7 +22,7 @@ fun Route.orteApi() {
 
         get("/{id}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
+            val uuid = call.parseParamAsUUID("uuid") ?: return@get
             val ort = OrtDao.getById(uuid)
             val json = Json.encodeToJsonElement(ort)
             call.respondJsonOk(json)
