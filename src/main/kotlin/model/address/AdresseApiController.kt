@@ -19,7 +19,7 @@ fun Route.adressenApi() {
 
         get("/{id}") {
             call.logRequest()
-            val adressId = call.getParameterAsUuidOrNullAndRespondError("id") ?: return@get
+            val adressId = call.parseParamAsUUID("id") ?: return@get
             val result = AdresseDao.getById(adressId, call.parameters["resolve_ids"] == "true")
             val json = Json.encodeToJsonElement(result)
             call.respondJsonOk(json)

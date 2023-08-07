@@ -46,7 +46,7 @@ fun Route.termineApi() {
         // get one by id
         get("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
+            val uuid = call.parseParamAsUUID("uuid") ?: return@get
             val result = TerminDao.getById(uuid, call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
@@ -60,7 +60,7 @@ fun Route.termineApi() {
         // delete
         delete("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
+            val uuid = call.parseParamAsUUID("uuid") ?: return@delete
             val isDeleted = TerminDao.delete(uuid)
             if (isDeleted)
                 call.respondTextAsJson("Successfully deleted $uuid")
@@ -75,7 +75,7 @@ private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     val terminDto = call.receive<TerminDto>()
 
     if (isPost) {
-        if (call.checkIdAndRespondUsePutIfNotNull(terminDto.uuid)) return
+        if (call.checkId(terminDto.uuid)) return
     } else
         if (call.checkIdAndRespondUsePostIfNull(terminDto.uuid)) return
 

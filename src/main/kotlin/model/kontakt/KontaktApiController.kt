@@ -33,7 +33,7 @@ fun Route.kontakteApi() {
 
         get("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
+            val uuid = call.parseParamAsUUID("uuid") ?: return@get
 
             val kontakt = KontaktDao.getById(uuid)
             val json = Json.encodeToJsonElement(kontakt)

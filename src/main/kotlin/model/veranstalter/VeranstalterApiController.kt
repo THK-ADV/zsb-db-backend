@@ -19,7 +19,7 @@ fun Route.veranstalterApi() {
         // get one by id
         get("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@get
+            val uuid = call.parseParamAsUUID("uuid") ?: return@get
             val result = VeranstalterDao.getById(uuid, call.parameters["resolve_ids"] == "true")
             call.respond(HttpServerResponse.map(result))
         }
@@ -33,7 +33,7 @@ fun Route.veranstalterApi() {
         // delete
         delete("/{uuid}") {
             call.logRequest()
-            val uuid = call.getParameterAsUuidOrNullAndRespondError("uuid") ?: return@delete
+            val uuid = call.parseParamAsUUID("uuid") ?: return@delete
             val isDeleted = VeranstalterDao.delete(uuid)
             if (isDeleted)
                 call.respondTextAsJson("Successfully deleted Veranstalter: $uuid")
@@ -48,7 +48,7 @@ private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     val veranstalterDto = call.receive<VeranstalterDto>()
 
     if (isPost) {
-        if (call.checkIdAndRespondUsePutIfNotNull(veranstalterDto.uuid)) return
+        if (call.checkId(veranstalterDto.uuid)) return
     } else
         if (call.checkIdAndRespondUsePostIfNull(veranstalterDto.uuid)) return
 
