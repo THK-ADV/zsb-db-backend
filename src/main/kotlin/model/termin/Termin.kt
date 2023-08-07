@@ -1,12 +1,13 @@
 package model.termin
 
 import error_handling.CouldNotParseUuidException
+import error_handling.InstitutionIdNotValidException
 import error_handling.UuidNotFound
 import kotlinx.serialization.Serializable
 import model.bericht.Berichte
-import model.veranstalter.Veranstalter
-import model.veranstalter.VeranstalterDto
-import model.veranstalter.VeranstalterTable
+import model.schule.Schule
+import model.schule.SchuleDto
+import model.schule.Schulen
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -18,7 +19,7 @@ import java.util.*
 
 object Termine : UUIDTable() {
     val designation = text("bezeichnung")
-    val host_id = reference("veranstalter_id", VeranstalterTable)
+    val school_id = reference("hochschul_id", Schulen).nullable()
     val category = text("kategorie")
     val topic = text("thema")
     val date = text("datum")
@@ -30,7 +31,7 @@ object Termine : UUIDTable() {
 
 class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var designation by Termine.designation
-    private var host by Veranstalter referencedOn Termine.host_id
+    private var school by Schule referencedOn Termine.school_id
     private var category by Termine.category
     private var topic by Termine.topic
     private var date by Termine.date
@@ -42,14 +43,15 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     companion object : UUIDEntityClass<Termin>(Termine) {
         fun save(dto: TerminDto): Result<Termin> = transaction {
             // validate ids
-            val veranstalterId = anyOrNull { UUID.fromString(dto.host_id) }
+            val hochschulId = anyOrNull { UUID.fromString(dto.school_id) }
                 ?: return@transaction Result.failure(
-                    CouldNotParseUuidException("veranstalter_id for Termin is not valid.")
+                    CouldNotParseUuidException("hochschul_id for Termin not valid.")
                 )
-
             // get related objects from db
-            val veranstalter = anyOrNull { Veranstalter[veranstalterId] }
-                ?: return@transaction Result.failure(UuidNotFound("Could not find Veranstalter with ID: $veranstalterId"))
+            val hochschule = anyOrNull { Schule[hochschulId] }
+                ?: return@transaction Result.failure(
+                    InstitutionIdNotValidException("UUID for hochschule is not valid")
+                )
 
             // finding a matched Termin is skipped here due to the unique
 
@@ -61,10 +63,10 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                     ?: return@transaction Result.failure(UuidNotFound("Couldn't find Termin with UUID: $uuid"))
 
                 // update and safe
-                old.update(dto, veranstalter)
+                old.update(dto, hochschule)
                 Termin[uuid]
             } else {
-                new { update(dto, veranstalter) }
+                new { update(dto, hochschule) }
             }
 
             // return result
@@ -86,9 +88,9 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(dto: TerminDto, veranstalter: Veranstalter) {
+    private fun update(dto: TerminDto, hochschule: Schule) {
         this.designation = dto.designation
-        this.host = veranstalter
+        this.school = hochschule.id
         this.category = transformMultiSelect(dto.category)
         this.topic = dto.topic
         this.date = dto.date
@@ -101,7 +103,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     fun toDto() = TerminDto(
         id.value.toString(),
         designation,
-        host.id.value.toString(),
+        school,
         transformMultiSelect(category),
         topic,
         date,
@@ -114,7 +116,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     fun toAtomicDto() = TerminDto(
         id.value.toString(),
         designation,
-        host.id.value.toString(),
+        school,
         transformMultiSelect(category),
         topic,
         date,
@@ -122,7 +124,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         transformMultiSelect(level),
         annotations,
         contactPerson,
-        host.toDto()
+        school.toDto()
     )
 
     private val separator = ":"
@@ -139,7 +141,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 data class TerminDto(
     val uuid: String?,
     val designation: String,
-    val host_id: String,
+    val school_id: String,
     val category: List<Int>,
     val topic: String,
     val date: String,
@@ -147,5 +149,5 @@ data class TerminDto(
     val level: List<Int>,
     val annotations: String,
     val contactPerson: String,
-    val host: VeranstalterDto? = null
+    val school: SchuleDto? = null
 )
