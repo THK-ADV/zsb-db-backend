@@ -39,7 +39,7 @@ fun Route.termineApi() {
         // get all
         get {
             call.logRequest()
-            val result = TerminDao.getAll(call.parameters["resolve_ids"] == "true")
+            val result = TerminDao.getAll()
             call.respond(HttpServerResponse.map(result))
         }
 

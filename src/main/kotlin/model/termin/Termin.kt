@@ -26,7 +26,7 @@ object Termine : UUIDTable() {
     val other = text("freitextfeld")
     val school_id = reference("schule_id", Schulen)
     val category = integer("terminart")
-    val thirdCategory = integer("bei uns typ").nullable()
+    val internCategory = integer("bei uns typ").nullable()
     val schoolCategory = integer("an schule typ").nullable()
     val kAoACategory = integer("kaoa typ").nullable()
     val talentscoutCategory = integer("talentscout typ").nullable()
@@ -43,11 +43,11 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var other by Termine.other
     private var school by Schule referencedOn Termine.school_id
     private var category by Termine.category
-    private var thirdCategory by Termine.thirdCategory
+    private var internCategory by Termine.internCategory
     private var schoolCategory by Termine.schoolCategory
     private var kAoACategory by Termine.kAoACategory
     private var talentscoutCategory by Termine.talentscoutCategory
-    private var thSpezificCategory by Termine.thSpezificCategory
+    private var thSpecificCategory by Termine.thSpezificCategory
     private var isIndividualAppt by Termine.isIndividualAppt
     private var runs by Termine.runs
 
@@ -107,11 +107,11 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         this.other = dto.other
         this.school = schule
         this.category = dto.category.id
-        this.thirdCategory = dto.thirdCategory?.id
+        this.internCategory = dto.internCategory?.id
         this.schoolCategory = dto.schoolCategory?.id
         this.kAoACategory = dto.kAoACategory?.id
         this.talentscoutCategory = dto.talentscoutCategory?.id
-        this.thSpezificCategory = dto.thSpezificCategory?.id
+        this.thSpecificCategory = dto.thSpezificCategory?.id
         this.isIndividualAppt = dto.isIndividualAppt
         this.runs = dto.runs
     }
@@ -126,11 +126,11 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         school.id.value.toString(),
         null,
         Kategorie.getById(category),
-        thirdCategory?.let { BeiUnsTyp.getById(it) },
+        internCategory?.let { BeiUnsTyp.getById(it) },
         schoolCategory?.let { AnSchuleTyp.getById(it) },
         kAoACategory?.let { KAoATyp.getById(it) },
         talentscoutCategory?.let { TalentscoutTyp.getById(it) },
-        thSpezificCategory?.let { THSpezifischTyp.getById(it) },
+        thSpecificCategory?.let { THSpezifischTyp.getById(it) },
         isIndividualAppt,
         runs
     )
@@ -145,24 +145,52 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         school.id.value.toString(),
         school.toDto(),
         Kategorie.getById(category),
-        thirdCategory?.let { BeiUnsTyp.getById(it) },
+        internCategory?.let { BeiUnsTyp.getById(it) },
         schoolCategory?.let { AnSchuleTyp.getById(it) },
         kAoACategory?.let { KAoATyp.getById(it) },
         talentscoutCategory?.let { TalentscoutTyp.getById(it) },
-        thSpezificCategory?.let { THSpezifischTyp.getById(it) },
+        thSpecificCategory?.let { THSpezifischTyp.getById(it) },
         isIndividualAppt,
         runs
     )
 
+    fun toTermin() = when (category) {
+        1 -> AnSchuleTermin(
+            id.value.toString(),
+            schoolyear,
+            date,
+            contact_school,
+            contact_university,
+            other,
+            school.id.value.toString(),
+            school.toDto(),
+            schoolCategory?.let { AnSchuleTyp.getById(it) },
+            isIndividualAppt,
+            runs
+        )
 
-    private val separator = ":"
-
-    private fun transformMultiSelect(ids: List<Int>) = ids.fold("") {acc, it -> acc + separator + it}
-    private fun transformMultiSelect(ids: String): List<Int> {
-        val list = mutableListOf<Int?>()
-        ids.split(separator).forEach { list.add(it.toIntOrNull()) }
-        return list.filterNotNull()
+        2 -> BeiUnsTermin(
+            id.value.toString(),
+            schoolyear,
+            date,
+            contact_school,
+            contact_university,
+            other,
+            school.id.value.toString(),
+            school.toDto(),
+            internCategory?.let { BeiUnsTyp.getById(it) }
+        )
+        else -> throw Exception("Terminart nicht erkannt")
     }
+}
+
+private val separator = ":"
+
+private fun transformMultiSelect(ids: List<Int>) = ids.fold("") { acc, it -> acc + separator + it }
+private fun transformMultiSelect(ids: String): List<Int> {
+    val list = mutableListOf<Int?>()
+    ids.split(separator).forEach { list.add(it.toIntOrNull()) }
+    return list.filterNotNull()
 }
 
 @Serializable
@@ -178,7 +206,7 @@ data class TerminDto(
     val school: SchuleDto? = null,
     val category: Kategorie,
     // spezifische Eigenschaften
-    val thirdCategory: BeiUnsTyp?,
+    val internCategory: BeiUnsTyp?,
     val schoolCategory: AnSchuleTyp?,
     val kAoACategory: KAoATyp?,
     val talentscoutCategory: TalentscoutTyp?,
