@@ -47,7 +47,7 @@ fun Route.termineApi() {
         get("/{uuid}") {
             call.logRequest()
             val uuid = call.parseParamAsUUID("uuid") ?: return@get
-            val result = TerminDao.getById(uuid, call.parameters["resolve_ids"] == "true")
+            val result = TerminDao.getById(uuid)
             call.respond(HttpServerResponse.map(result))
         }
 

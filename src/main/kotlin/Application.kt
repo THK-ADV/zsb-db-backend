@@ -12,13 +12,10 @@ import io.ktor.server.plugins.cors.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.routing.*
 import model.address.adressenApi
-import model.bericht.berichteApi
 import model.communication.mailApi
-import model.institution.institutionenApi
 import model.kontakt.kontakteApi
 import model.ort.orteApi
 import model.schule.schoolsApi
-import model.veranstalter.veranstalterApi
 import model.termin.termineApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
@@ -68,10 +65,7 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         adressenApi()
         orteApi()
         kontakteApi()
-        institutionenApi()
-        veranstalterApi()
         termineApi()
-        berichteApi()
         wordApi()
         excelApi()
         env?.let { mailApi(MailSettings.fromEnvironment(it)) }

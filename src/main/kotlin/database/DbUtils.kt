@@ -1,14 +1,11 @@
 package database
 
 import model.address.Adressen
-import model.bericht.Berichte
-import model.institution.Institutionen
 import model.kaoaarbeit.KAoAArbeiten
 import model.kontakt.Kontakte
 import model.ort.Orte
 import model.schule.SchulKontakte
 import model.schule.Schulen
-import model.veranstalter.VeranstalterTable
 import model.termin.Termine
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -16,10 +13,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun recreateDatabase() {
     transaction {
         // recreate DB
-        SchemaUtils.drop(Berichte)
         SchemaUtils.drop(Termine)
-        SchemaUtils.drop(VeranstalterTable)
-        SchemaUtils.drop(Institutionen)
         SchemaUtils.drop(SchulKontakte)
         SchemaUtils.drop(KAoAArbeiten)
         SchemaUtils.drop(Schulen)
@@ -33,10 +27,7 @@ fun recreateDatabase() {
             Schulen,
             Kontakte,
             SchulKontakte,
-            Institutionen,
-            VeranstalterTable,
             Termine,
-            Berichte,
             KAoAArbeiten
         )
     }

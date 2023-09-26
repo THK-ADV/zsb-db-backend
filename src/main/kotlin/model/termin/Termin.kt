@@ -4,7 +4,6 @@ import error_handling.CouldNotParseUuidException
 import error_handling.InstitutionIdNotValidException
 import error_handling.UuidNotFound
 import kotlinx.serialization.Serializable
-import model.bericht.Berichte
 import model.schule.Schule
 import model.schule.SchuleDto
 import model.schule.Schulen
@@ -90,7 +89,6 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         fun delete(id: UUID): Boolean {
             val result = anyOrNull {
                 transaction {
-                    Berichte.deleteWhere { Berichte.event_id eq id }
                     Termine.deleteWhere { Termine.id eq id }
                 }
             }
