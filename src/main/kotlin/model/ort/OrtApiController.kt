@@ -1,15 +1,15 @@
 package model.ort
 
 import error_handling.HttpServerResponse
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
-import utilty.parseParamAsUUID
-import utilty.logRequest
-import utilty.respond
-import utilty.respondJsonOk
+import model.address.AdresseDao
+import model.address.AdresseDto
+import utilty.*
 
 fun Route.orteApi() {
     route("cities") {
@@ -33,6 +33,14 @@ fun Route.orteApi() {
             val ortDto = call.receive<OrtDto>()
             val result = OrtDao.createOrUpdate(ortDto)
             call.respond(HttpServerResponse.map(result))
+        }
+
+        post {
+            call.logRequest()
+            val ortDto = call.receive<OrtDto>()
+            if (call.checkId(ortDto.id)) return@post
+            val result = OrtDao.createOrUpdate(ortDto)
+            call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
         }
     }
 }

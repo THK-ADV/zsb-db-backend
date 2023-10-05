@@ -29,7 +29,7 @@ object Termine : UUIDTable() {
     val schoolCategory = integer("an schule typ").nullable()
     val kAoACategory = integer("kaoa typ").nullable()
     val talentscoutCategory = integer("talentscout typ").nullable()
-    val thSpezificCategory = integer("th spezifisch typ").nullable()
+    val thSpecificCategory = integer("th spezifisch typ").nullable()
     val isIndividualAppt = bool("ist einzeltermin").nullable()
     val runs = integer("durchläufe").nullable()
 }
@@ -46,7 +46,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var schoolCategory by Termine.schoolCategory
     private var kAoACategory by Termine.kAoACategory
     private var talentscoutCategory by Termine.talentscoutCategory
-    private var thSpecificCategory by Termine.thSpezificCategory
+    private var thSpecificCategory by Termine.thSpecificCategory
     private var isIndividualAppt by Termine.isIndividualAppt
     private var runs by Termine.runs
 
@@ -109,7 +109,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         this.schoolCategory = dto.schoolCategory?.id
         this.kAoACategory = dto.kAoACategory?.id
         this.talentscoutCategory = dto.talentscoutCategory?.id
-        this.thSpecificCategory = dto.thSpezificCategory?.id
+        this.thSpecificCategory = dto.thSpecificCategory?.id
         this.isIndividualAppt = dto.isIndividualAppt
         this.runs = dto.runs
     }
@@ -163,6 +163,9 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             school.id.value.toString(),
             school.toDto(),
             schoolCategory?.let { AnSchuleTyp.getById(it) },
+            kAoACategory?.let { KAoATyp.getById(it) },
+            talentscoutCategory?.let { TalentscoutTyp.getById(it) },
+            thSpecificCategory?.let { THSpezifischTyp.getById(it) },
             isIndividualAppt,
             runs
         )
@@ -208,7 +211,7 @@ data class TerminDto(
     val schoolCategory: AnSchuleTyp?,
     val kAoACategory: KAoATyp?,
     val talentscoutCategory: TalentscoutTyp?,
-    val thSpezificCategory: THSpezifischTyp?,
+    val thSpecificCategory: THSpezifischTyp?,
     val isIndividualAppt: Boolean?,
     val runs: Int?
 )

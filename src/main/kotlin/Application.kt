@@ -1,4 +1,5 @@
 import database.DbSettings
+import database.recreateDatabase
 import excel.excelApi
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -32,7 +33,7 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    //recreateDatabase()
+    recreateDatabase()
 
 //    val fileName = "data-import.csv"
 //    val file = File("src/main/resources/legacy_import/$fileName")

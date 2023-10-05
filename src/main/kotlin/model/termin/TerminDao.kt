@@ -34,8 +34,8 @@ object TerminDao {
 
     }
 
-    fun createOrUpdate(terminDto: TerminDto): Result<String> = transaction {
-        Termin.save(terminDto).map { mapJsonResult(it.toTermin()) }
+    fun createOrUpdate(dto: TerminDto): Result<String> = transaction {
+        Termin.save(dto).map { mapJsonResult(it.toTermin()) }
     }
 
 

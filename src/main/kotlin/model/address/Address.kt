@@ -43,8 +43,8 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val matchedAdresse = if (matchedAdressen.empty()) null else matchedAdressen.first()
 
             val adresse = when {
-                dto.address_id != null -> {
-                    val uuid = UUID.fromString(dto.address_id)
+                dto.id != null -> {
+                    val uuid = UUID.fromString(dto.id)
                     val old = Adresse[uuid]
                     old.update(dto, ort)
                     Adresse[uuid]
@@ -70,7 +70,7 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
 @Serializable
 data class AdresseDto(
-    val address_id: String? = null,
+    val id: String? = null,
     val street: String,
     val houseNumber: String,
     val city_id: String,
