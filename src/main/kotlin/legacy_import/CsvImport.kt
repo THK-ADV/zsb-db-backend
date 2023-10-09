@@ -46,7 +46,7 @@ object CsvImport {
     fun toAddress(street: String?, houseNumber: String?, city: Ort): Adresse {
         val adresseDto = AdresseDto(
             street = street.ensureNonEmpty().trim(),
-            houseNumber = houseNumber.ensureNonEmpty().trim(),
+            houseNumber = houseNumber?.trim() ?: "1",
             city_id = city.id.value.toString()
         )
         return Adresse.save(adresseDto).getOrThrow()
@@ -76,8 +76,8 @@ object CsvImport {
 
         fun createContact(res: Pair<Pair<Pair<String, String>, String>, String>): Kontakt {
             val name = res.first.first.first.split(",")
-            val surname = name[0]
-            val firstname = name[1]
+            val surname = name.getOrNull(0) ?: ""
+            val firstname = name.getOrNull(1) ?: ""
             val salutation = res.first.first.second
             val feature = res.first.second
             val email = res.second
@@ -117,30 +117,29 @@ object CsvImport {
         }.readAllWithHeader(file)
 
         rows.forEach { row ->
-            println(row["Schulname"])
             val name = row["Schulname"].ensureNonEmpty().trim()
             val type = toSchooltype(row["Schulform"])
-            val comment = row["Kommentar"]?.trim() ?: ""
-            val amountStudents11 = row["Schülerzahl EF/11*"]?.toIntOrNull() ?: 0
-            val amountStudents12 = row["Schülerzahl Q1/12*"]?.toIntOrNull() ?: 0
-            val amountStudents13 = row["Schülerzahl Q2/13*"]?.toIntOrNull() ?: 0
-            val phonenumber = row["Telefon"] ?: ""
-            val email = row["Email Schule"] ?: ""
-            val website = row["Schulwebseite"] ?: ""
-            val cooperationpartner = toCooperationpartner(row["Betreuende Hochschule KAoA/Talentscouting"])
-            val cooperationcontract = parseToBoolean(
-                row["Hochschulischen Kooperationsvertrag TH (Allgemeine und spezifische Zusammenarbeit)"] ?: "nein"
-            )
             val city = toCity(row["PLZ"], row["Ort"], row["Regierungsbezirk"], row["Kreis"])
             val address = toAddress(row["Straße"], row["Hausnummer"], city)
+            val phonenumber = row["Telefon Schule/Sekretariat"]?.trim() ?: ""
+            val email = row["Email Schule/Sekretariat"]?.trim() ?: ""
+            val website = row["Schulwebseite"]?.trim() ?: ""
+            val comment = row["Kommentar"]?.trim() ?: ""
+            val amountStudents11 = row["Schülerzahl EF/11*"]?.trim()?.toIntOrNull() ?: 0
+            val amountStudents12 = row["Schülerzahl Q1/12*"]?.trim()?.toIntOrNull() ?: 0
+            val amountStudents13 = row["Schülerzahl Q2/13*"]?.trim()?.toIntOrNull() ?: 0
             val contacts = toContact(
                 row["Name, Vorname Kontaktpersonen"],
                 row["Anrede Kontaktpersonen"],
                 row["Funktion Kontaktpersonen"],
                 row["Mailadresse Kontaktpersonen"]
             )
+            val cooperationpartner = toCooperationpartner(row["Betreuende Hochschule KAoA/Talentscouting"])
             val kaoaSupervisor = toKAoASupervisor(row["Nachname, Vorname KAoA Betreuer*in"])
             val talentscout = toTalentscout(row["Nachname, Vorname Talentscout"])
+            val cooperationcontract = parseToBoolean(
+                row["Hochschulischen Kooperationsvertrag TH (Allgemeine und spezifische Zusammenarbeit)"]?.trim() ?: "nein"
+            )
 
             val schoolDto = SchuleDto(
                 null,
@@ -161,12 +160,13 @@ object CsvImport {
                 contacts_ids = contacts.map { it.id.value.toString() }
             )
 
+            print(schoolDto)
             val school = Schule.save(schoolDto).getOrThrow()
 
-            toKAoAWork("KAoA-Arbeit* 2021/22", row["KAoA-Arbeit* 2021/22"]?.trim() ?: "", school)
+            /*toKAoAWork("KAoA-Arbeit* 2021/22", row["KAoA-Arbeit* 2021/22"]?.trim() ?: "", school)
             toKAoAWork("KAoA-Arbeit* 2022/23", row["KAoA-Arbeit* 2022/23"]?.trim() ?: "", school)
             toKAoAWork("KAoA-Arbeit* 2023/24", row["KAoA-Arbeit* 2023/24"]?.trim() ?: "", school)
-            toKAoAWork("KAoA-Arbeit* 2024/25", row["KAoA-Arbeit* 2024/25"]?.trim() ?: "", school)
+            toKAoAWork("KAoA-Arbeit* 2024/25", row["KAoA-Arbeit* 2024/25"]?.trim() ?: "", school)*/
         }
     }
 
