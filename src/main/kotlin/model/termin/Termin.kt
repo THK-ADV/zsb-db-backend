@@ -32,6 +32,7 @@ object Termine : UUIDTable() {
     val thSpecificCategory = integer("th spezifisch typ").nullable()
     val isIndividualAppt = bool("ist einzeltermin").nullable()
     val runs = integer("durchläufe").nullable()
+    val description = text("beschreibung").nullable()
 }
 
 class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
@@ -49,6 +50,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var thSpecificCategory by Termine.thSpecificCategory
     private var isIndividualAppt by Termine.isIndividualAppt
     private var runs by Termine.runs
+    private var description by Termine.description
 
     companion object : UUIDEntityClass<Termin>(Termine) {
         fun save(dto: TerminDto): Result<Termin> = transaction {
@@ -112,6 +114,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         this.thSpecificCategory = dto.thSpecificCategory?.id
         this.isIndividualAppt = dto.isIndividualAppt
         this.runs = dto.runs
+        this.description = dto.description
     }
 
     fun toDto() = TerminDto(
@@ -130,7 +133,8 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         talentscoutCategory?.let { TalentscoutTyp.getById(it) },
         thSpecificCategory?.let { THSpezifischTyp.getById(it) },
         isIndividualAppt,
-        runs
+        runs,
+        description
     )
 
     fun toAtomicDto() = TerminDto(
@@ -149,7 +153,8 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         talentscoutCategory?.let { TalentscoutTyp.getById(it) },
         thSpecificCategory?.let { THSpezifischTyp.getById(it) },
         isIndividualAppt,
-        runs
+        runs,
+        description
     )
 
     fun toTermin() = when (category) {
@@ -180,6 +185,18 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             school.id.value.toString(),
             school.toDto(),
             internCategory?.let { BeiUnsTyp.getById(it) }
+        )
+
+        3 -> BeiDrittenTermin(
+            id.value.toString(),
+            schoolyear,
+            date,
+            contact_school,
+            contact_university,
+            other,
+            school.id.value.toString(),
+            school.toDto(),
+            description
         )
         else -> throw Exception("Terminart nicht erkannt")
     }
@@ -213,5 +230,6 @@ data class TerminDto(
     val talentscoutCategory: TalentscoutTyp?,
     val thSpecificCategory: THSpezifischTyp?,
     val isIndividualAppt: Boolean?,
-    val runs: Int?
+    val runs: Int?,
+    val description: String?
 )

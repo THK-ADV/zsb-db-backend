@@ -77,6 +77,7 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
     var thSpecificCategory: THSpezifischTyp? = null
     var isIndividualAppt: Boolean? = null
     var runs: Int? = null
+    var description: String? = null
     if (abstrakterTermin is AnSchuleTermin) {
         category = Kategorie.SCHOOL
         schoolCategory = abstrakterTermin.schoolCategory
@@ -88,6 +89,8 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
     } else if (abstrakterTermin is BeiUnsTermin) {
         category = Kategorie.INTERN
         internCategory = abstrakterTermin.internCategory
+    } else if (abstrakterTermin is BeiDrittenTermin) {
+        description = abstrakterTermin.description
     }
     return TerminDto(
         uuid = abstrakterTermin.uuid,
@@ -105,7 +108,8 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
         talentscoutCategory = talentscoutCategory,
         thSpecificCategory = thSpecificCategory,
         isIndividualAppt = isIndividualAppt,
-        runs = runs
+        runs = runs,
+        description = description
     )
 }
 

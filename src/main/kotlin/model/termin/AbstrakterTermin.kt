@@ -50,17 +50,16 @@ class BeiUnsTermin(
     val internCategory: BeiUnsTyp?,
 ) : AbstrakterTermin()
 
-/*
 @Serializable
 @SerialName("BeiDrittenTermin")
 class BeiDrittenTermin(
-    uuid: String?,
-    schoolyear: String,
-    date: String,
-    contact_school: String,
-    contact_university: String,
-    other: String,
-    school_id: String,
-    school: SchuleDto? = null,
-    category: Kategorie,
-) : AbstrakterTermin(uuid, schoolyear, date, contact_school, contact_university, other, school_id, school, category)*/
+    override val uuid: String?,
+    override val schoolyear: String,
+    override val date: String,
+    override val contact_school: String,
+    override val contact_university: String,
+    override val other: String,
+    override val school_id: String,
+    override val school: SchuleDto? = null,
+    val description: String?
+) : AbstrakterTermin()
