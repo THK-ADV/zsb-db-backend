@@ -39,10 +39,10 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val matchedOrt = if (matchedOrte.empty()) null else matchedOrte.first()
 
             val ort: Ort = when {
-                dto.city_id != null -> {
+                dto.id != null -> {
                     // parse UUID
-                    val uuid = anyOrNull { UUID.fromString(dto.city_id) }
-                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.city_id}"))
+                    val uuid = anyOrNull { UUID.fromString(dto.id) }
+                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.id}"))
 
                     // fetch current Ort
                     val currentOrt = anyOrNull { Ort[uuid] }
@@ -74,7 +74,7 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
 @Serializable
 data class OrtDto(
-    val city_id: String? = null,
+    val id: String? = null,
     val postcode: Int,
     val designation: String,
     val constituency: String,

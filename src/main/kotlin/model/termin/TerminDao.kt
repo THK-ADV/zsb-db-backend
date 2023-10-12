@@ -9,10 +9,10 @@ import utilty.anyOrNull
 import java.util.*
 
 object TerminDao {
-    fun getAll(atomic: Boolean = false): Result<String> = transaction {
+    fun getAll(): Result<String> = transaction {
         val result = anyOrNull {
             Termin.all().map {
-                if (atomic) it.toAtomicDto() else it.toDto()
+                it.toTermin()
             }
         }
 
@@ -22,9 +22,9 @@ object TerminDao {
             Result.success(mapJsonResultList(result))
     }
 
-    fun getById(id: UUID, atomic: Boolean = false): Result<String> = transaction {
+    fun getById(id: UUID): Result<String> = transaction {
         val result = anyOrNull {
-            if (atomic) Termin[id].toAtomicDto() else Termin[id].toDto()
+            Termin[id].toTermin()
         }
 
         if (result == null)
@@ -34,16 +34,16 @@ object TerminDao {
 
     }
 
-    fun createOrUpdate(terminDto: TerminDto): Result<String> = transaction {
-        Termin.save(terminDto).map { mapJsonResult(it.toDto()) }
+    fun createOrUpdate(dto: TerminDto): Result<String> = transaction {
+        Termin.save(dto).map { mapJsonResult(it.toTermin()) }
     }
 
 
     fun delete(uuid: UUID): Boolean = Termin.delete(uuid)
 
-    private fun mapJsonResult(result: TerminDto) =
+    private fun mapJsonResult(result: AbstrakterTermin) =
         Json.encodeToString(result)
 
-    private fun mapJsonResultList(result: List<TerminDto>) =
+    private fun mapJsonResultList(result: List<AbstrakterTermin>) =
         Json.encodeToString(result)
 }

@@ -1,11 +1,14 @@
 package model.address
 
 import error_handling.HttpServerResponse
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import model.schule.SchuleDao
+import model.schule.SchuleDto
 import utilty.*
 
 fun Route.adressenApi() {
@@ -19,17 +22,25 @@ fun Route.adressenApi() {
 
         get("/{id}") {
             call.logRequest()
-            val adressId = call.parseParamAsUUID("id") ?: return@get
-            val result = AdresseDao.getById(adressId, call.parameters["resolve_ids"] == "true")
+            val addressId = call.parseParamAsUUID("id") ?: return@get
+            val result = AdresseDao.getById(addressId, call.parameters["resolve_ids"] == "true")
             val json = Json.encodeToJsonElement(result)
             call.respondJsonOk(json)
         }
 
         put {
             call.logRequest()
-            val adresseDto = call.receive<AdresseDto>()
-            val result = AdresseDao.createOrUpdate(adresseDto)
+            val addressDto = call.receive<AdresseDto>()
+            val result = AdresseDao.createOrUpdate(addressDto)
             call.respond(HttpServerResponse.map(result))
+        }
+
+        post {
+            call.logRequest()
+            val addressDto = call.receive<AdresseDto>()
+            if (call.checkId(addressDto.id)) return@post
+            val result = AdresseDao.createOrUpdate(addressDto)
+            call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
         }
     }
 }
