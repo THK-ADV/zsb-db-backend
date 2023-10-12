@@ -1,7 +1,6 @@
 package database
 
 import model.address.Adressen
-import model.kaoaarbeit.KAoAArbeiten
 import model.kontakt.Kontakte
 import model.ort.Orte
 import model.schule.SchulKontakte
@@ -15,7 +14,6 @@ fun recreateDatabase() {
         // recreate DB
         SchemaUtils.drop(Termine)
         SchemaUtils.drop(SchulKontakte)
-        SchemaUtils.drop(KAoAArbeiten)
         SchemaUtils.drop(Schulen)
         SchemaUtils.drop(Adressen)
         SchemaUtils.drop(Orte)
@@ -27,8 +25,7 @@ fun recreateDatabase() {
             Schulen,
             Kontakte,
             SchulKontakte,
-            Termine,
-            KAoAArbeiten
+            Termine
         )
     }
 }

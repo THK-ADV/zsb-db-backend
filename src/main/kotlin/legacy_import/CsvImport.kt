@@ -3,8 +3,6 @@ package legacy_import
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import model.address.Adresse
 import model.address.AdresseDto
-import model.kaoaarbeit.KAoAArbeit
-import model.kaoaarbeit.KAoAArbeitDto
 import model.kontakt.Kontakt
 import model.kontakt.KontaktDto
 import model.kontakt.enum.Anrede
@@ -102,15 +100,6 @@ object CsvImport {
     fun toTalentscout(s: String?): Talentscout =
         s?.let { Talentscout.fromDesc(it.trim()) } ?: Talentscout.KEINE
 
-    fun toKAoAWork(name: String, content: String, school: Schule): KAoAArbeit {
-        val kaoaWorkDto = KAoAArbeitDto(
-            name = name,
-            content = content,
-            school_id = school.id.value.toString()
-        )
-        return KAoAArbeit.save(kaoaWorkDto).getOrThrow()
-    }
-
     fun parseSchool(file: File) {
         val rows = csvReader {
             delimiter = ';'
@@ -162,11 +151,6 @@ object CsvImport {
 
             print(schoolDto)
             val school = Schule.save(schoolDto).getOrThrow()
-
-            /*toKAoAWork("KAoA-Arbeit* 2021/22", row["KAoA-Arbeit* 2021/22"]?.trim() ?: "", school)
-            toKAoAWork("KAoA-Arbeit* 2022/23", row["KAoA-Arbeit* 2022/23"]?.trim() ?: "", school)
-            toKAoAWork("KAoA-Arbeit* 2023/24", row["KAoA-Arbeit* 2023/24"]?.trim() ?: "", school)
-            toKAoAWork("KAoA-Arbeit* 2024/25", row["KAoA-Arbeit* 2024/25"]?.trim() ?: "", school)*/
         }
     }
 
