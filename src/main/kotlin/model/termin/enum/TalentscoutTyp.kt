@@ -12,6 +12,12 @@ enum class TalentscoutTyp(val id: Int, val desc: String) {
             2 -> SCOUTING
             else -> OTHER
         }
+
+        fun getByDesc(desc: String) = when (desc) {
+            "Gespräch" -> CONVERSATION
+            "Scouting" -> SCOUTING
+            else -> OTHER
+        }
     }
 }
 

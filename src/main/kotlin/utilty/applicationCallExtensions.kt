@@ -52,7 +52,7 @@ suspend fun ApplicationCall.checkIdAndRespondUsePostIfNull(id: String?): Boolean
 }
 
 /**
- * @return true if the id is given and a respond was send
+ * @return true if the id is given and a response was sent
  */
 suspend fun ApplicationCall.checkId(id: String?): Boolean {
     if (id != null) {

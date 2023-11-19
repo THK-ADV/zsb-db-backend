@@ -70,30 +70,43 @@ fun Route.termineApi() {
 
 private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
     var category = Kategorie.UNKNOWN
-    var internCategory: BeiUnsTyp? = null
-    var schoolCategory: AnSchuleTyp? = null
-    var kAoACategory: KAoATyp? = null
-    var talentscoutCategory: TalentscoutTyp? = null
-    var thSpecificCategory: THSpezifischTyp? = null
-    var isIndividualAppt: Boolean? = null
-    var runs: Int? = null
-    var description: String? = null
+    var schoolCategory: List<AnSchuleTyp>? = null
+    var kAoACategory: List<KAoATyp>? = null
+    var kAoARuns: Int? = null
+    var kAoAOther: String? = null
+    var talentscoutCategory: List<TalentscoutTyp>? = null
+    var talentscoutOther: String? = null
+    var thSpecificCategory: List<THSpezifischTyp>? = null
+    var thRunsSingle: Int? = null
+    var thOtherSingle: String? = null
+    var thRunsFair: Int? = null
+    var thOtherFair: String? = null
+    var internCategory: List<BeiUnsTyp>? = null
+    var internOther: String? = null
+
     if (abstrakterTermin is AnSchuleTermin) {
         category = Kategorie.SCHOOL
-        schoolCategory = abstrakterTermin.schoolCategory
-        kAoACategory = abstrakterTermin.kAoACategory
-        talentscoutCategory = abstrakterTermin.talentscoutCategory
-        thSpecificCategory = abstrakterTermin.thSpecificCategory
-        isIndividualAppt = abstrakterTermin.isIndividualAppt
-        runs = abstrakterTermin.runs
+        schoolCategory = abstrakterTermin.schoolCategory?.map { AnSchuleTyp.getByDesc(it) }
+        kAoACategory = abstrakterTermin.kAoACategory?.map { KAoATyp.getByDesc(it) }
+        kAoARuns = abstrakterTermin.kAoARuns
+        kAoAOther = abstrakterTermin.kAoAOther
+        talentscoutCategory = abstrakterTermin.talentscoutCategory?.map { TalentscoutTyp.getByDesc(it) }
+        talentscoutOther = abstrakterTermin.talentscoutOther
+        thSpecificCategory = abstrakterTermin.thSpecificCategory?.map { THSpezifischTyp.getByDesc(it) }
+        thRunsSingle = abstrakterTermin.thRunsSingle
+        thOtherSingle = abstrakterTermin.thOtherSingle
+        thRunsFair = abstrakterTermin.thRunsFair
+        thOtherFair = abstrakterTermin.thOtherFair
     } else if (abstrakterTermin is BeiUnsTermin) {
+        print("test beiuns")
         category = Kategorie.INTERN
-        internCategory = abstrakterTermin.internCategory
-    } else if (abstrakterTermin is BeiDrittenTermin) {
-        description = abstrakterTermin.description
+        internCategory = abstrakterTermin.internCategory?.map { BeiUnsTyp.getByDesc(it) }
+        internOther = abstrakterTermin.internOther
     }
+    print("test3")
     return TerminDto(
         uuid = abstrakterTermin.uuid,
+        designation = abstrakterTermin.designation,
         schoolyear = abstrakterTermin.schoolyear,
         date = abstrakterTermin.date,
         contact_school = abstrakterTermin.contact_school,
@@ -101,15 +114,21 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
         other = abstrakterTermin.other,
         school_id = abstrakterTermin.school_id,
         school = abstrakterTermin.school,
+        rating = abstrakterTermin.rating,
         category = category,
-        internCategory = internCategory,
         schoolCategory = schoolCategory,
         kAoACategory = kAoACategory,
+        kAoARuns = kAoARuns,
+        kAoAOther = kAoAOther,
         talentscoutCategory = talentscoutCategory,
+        talentscoutOther = talentscoutOther,
         thSpecificCategory = thSpecificCategory,
-        isIndividualAppt = isIndividualAppt,
-        runs = runs,
-        description = description
+        thRunsSingle = thRunsSingle,
+        thOtherSingle = thOtherSingle,
+        thRunsFair = thRunsFair,
+        thOtherFair = thOtherFair,
+        internCategory = internCategory,
+        internOther = internOther,
     )
 }
 
