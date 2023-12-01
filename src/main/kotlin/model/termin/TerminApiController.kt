@@ -84,26 +84,28 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
     var internCategory: List<BeiUnsTyp>? = null
     var internOther: String? = null
 
-    if (abstrakterTermin is AnSchuleTermin) {
-        category = Kategorie.SCHOOL
-        schoolCategory = abstrakterTermin.schoolCategory?.map { AnSchuleTyp.getByDesc(it) }
-        kAoACategory = abstrakterTermin.kAoACategory?.map { KAoATyp.getByDesc(it) }
-        kAoARuns = abstrakterTermin.kAoARuns
-        kAoAOther = abstrakterTermin.kAoAOther
-        talentscoutCategory = abstrakterTermin.talentscoutCategory?.map { TalentscoutTyp.getByDesc(it) }
-        talentscoutOther = abstrakterTermin.talentscoutOther
-        thSpecificCategory = abstrakterTermin.thSpecificCategory?.map { THSpezifischTyp.getByDesc(it) }
-        thRunsSingle = abstrakterTermin.thRunsSingle
-        thOtherSingle = abstrakterTermin.thOtherSingle
-        thRunsFair = abstrakterTermin.thRunsFair
-        thOtherFair = abstrakterTermin.thOtherFair
-    } else if (abstrakterTermin is BeiUnsTermin) {
-        print("test beiuns")
-        category = Kategorie.INTERN
-        internCategory = abstrakterTermin.internCategory?.map { BeiUnsTyp.getByDesc(it) }
-        internOther = abstrakterTermin.internOther
+    when (abstrakterTermin) {
+        is AnSchuleTermin -> {
+            category = Kategorie.SCHOOL
+            schoolCategory = abstrakterTermin.schoolCategory?.map { AnSchuleTyp.getByDesc(it) }
+            kAoACategory = abstrakterTermin.kAoACategory?.map { KAoATyp.getByDesc(it) }
+            kAoARuns = abstrakterTermin.kAoARuns
+            kAoAOther = abstrakterTermin.kAoAOther
+            talentscoutCategory = abstrakterTermin.talentscoutCategory?.map { TalentscoutTyp.getByDesc(it) }
+            talentscoutOther = abstrakterTermin.talentscoutOther
+            thSpecificCategory = abstrakterTermin.thSpecificCategory?.map { THSpezifischTyp.getByDesc(it) }
+            thRunsSingle = abstrakterTermin.thRunsSingle
+            thOtherSingle = abstrakterTermin.thOtherSingle
+            thRunsFair = abstrakterTermin.thRunsFair
+            thOtherFair = abstrakterTermin.thOtherFair
+        }
+        is BeiUnsTermin -> {
+            category = Kategorie.INTERN
+            internCategory = abstrakterTermin.internCategory?.map { BeiUnsTyp.getByDesc(it) }
+            internOther = abstrakterTermin.internOther
+        }
+        is BeiDrittenTermin -> category = Kategorie.THIRD
     }
-    print("test3")
     return TerminDto(
         uuid = abstrakterTermin.uuid,
         designation = abstrakterTermin.designation,
@@ -138,8 +140,9 @@ private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
     val terminDto = toTerminDto(abstrakterTermin)
     if (isPost) {
         if (call.checkId(abstrakterTermin.uuid)) return
-    } else
+    } else {
         if (call.checkIdAndRespondUsePostIfNull(abstrakterTermin.uuid)) return
+    }
 
     val result = TerminDao.createOrUpdate(terminDto)
     call.respond(HttpServerResponse.map(result))
