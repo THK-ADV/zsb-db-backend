@@ -12,6 +12,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
 import legacy_import.CsvImport
 import model.address.adressenApi
 import model.communication.mailApi
@@ -74,6 +75,8 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         env?.let { mailApi(MailSettings.fromEnvironment(it)) }
     }
     server.install(ContentNegotiation) {
-        json()
+        json(Json {
+            ignoreUnknownKeys = true
+        })
     }
 }

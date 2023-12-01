@@ -255,7 +255,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             rating
         )
 
-        else -> throw Exception("Terminart nicht erkannt")
+        else -> throw Exception("Terminart nicht erkannt: $category")
     }
 }
 
