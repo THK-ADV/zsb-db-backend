@@ -7,6 +7,8 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import model.schule.SchuleDao
+import model.schule.SchuleDto
 import model.termin.enum.*
 import utilty.*
 
@@ -50,10 +52,24 @@ fun Route.termineApi() {
         }
 
         // create
-        post { postOrPut(call, isPost = true) }
+        post {
+            call.logRequest()
+            val abstrakterTermin = call.receive<AbstrakterTermin>()
+            val terminDto = toTerminDto(abstrakterTermin)
+            if (call.checkId(abstrakterTermin.uuid)) return@post
+            val result = TerminDao.createOrUpdate(terminDto)
+            call.respond(HttpServerResponse.map(result))
+        }
 
         // update
-        put { postOrPut(call) }
+        put {
+            call.logRequest()
+            val abstrakterTermin = call.receive<AbstrakterTermin>()
+            val terminDto = toTerminDto(abstrakterTermin)
+            if (call.checkIdAndRespondUsePostIfNull(abstrakterTermin.uuid)) return@put
+            val result = TerminDao.createOrUpdate(terminDto)
+            call.respond(HttpServerResponse.map(result))
+        }
 
         // delete
         delete("/{uuid}") {
@@ -99,11 +115,13 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
             thRunsFair = abstrakterTermin.thRunsFair
             thOtherFair = abstrakterTermin.thOtherFair
         }
+
         is BeiUnsTermin -> {
             category = Kategorie.INTERN
             internCategory = abstrakterTermin.internCategory?.map { BeiUnsTyp.getByDesc(it) }
             internOther = abstrakterTermin.internOther
         }
+
         is BeiDrittenTermin -> category = Kategorie.THIRD
     }
     return TerminDto(
@@ -132,18 +150,4 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
         internCategory = internCategory,
         internOther = internOther,
     )
-}
-
-private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
-    call.logRequest()
-    val abstrakterTermin = call.receive<AbstrakterTermin>()
-    val terminDto = toTerminDto(abstrakterTermin)
-    if (isPost) {
-        if (call.checkId(abstrakterTermin.uuid)) return
-    } else {
-        if (call.checkIdAndRespondUsePostIfNull(abstrakterTermin.uuid)) return
-    }
-
-    val result = TerminDao.createOrUpdate(terminDto)
-    call.respond(HttpServerResponse.map(result))
 }

@@ -192,6 +192,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         thSpecificCategory?.let { THSpezifischTyp.getById(it) }
     )*/
 
+    // TODO: replace [ und ] sollte nicht nötig sein
     fun toTermin() = when (category) {
         1 -> AnSchuleTermin(
             id.value.toString(),
@@ -205,19 +206,19 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             school.toDto(),
             rating,
             schoolCategory?.let {
-                it.split(",").map { it.trim() }
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
             },
             kAoACategory?.let {
-                it.split(",").map { it.trim() }
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
             },
             kAoARuns,
             kAoAOther,
             talentscoutCategory?.let {
-                it.split(",").map { it.trim() }
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
             },
             talentscoutOther,
             thSpecificCategory?.let {
-                it.split(",").map { it.trim() }
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
             },
             thRunsSingle,
             thOtherSingle,
@@ -237,7 +238,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             school.toDto(),
             rating,
             internCategory?.let {
-                it.split(",").map { it.trim() }
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
             },
             internOther
         )
