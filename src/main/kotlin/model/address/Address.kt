@@ -63,9 +63,7 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         this.city = ort
     }
 
-    fun toDto() = AdresseDto(id.value.toString(), street, houseNumber, city.id.value.toString())
-
-    fun toAtomicDto() = AdresseDto(id.value.toString(), street, houseNumber, city.id.value.toString(), city.toDto())
+    fun toDto() = AdresseDto(id.value.toString(), street, houseNumber, city.id.value.toString(), city.toDto())
 }
 
 @Serializable

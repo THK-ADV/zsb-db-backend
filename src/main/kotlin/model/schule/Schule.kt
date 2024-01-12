@@ -189,7 +189,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         talentscout,
         cooperationcontract,
         address.id.value.toString(),
-        address.toAtomicDto(),
+        address.toDto(),
         contacts.map { it.id.value.toString() },
         contacts.map { it.toDto() }
     )

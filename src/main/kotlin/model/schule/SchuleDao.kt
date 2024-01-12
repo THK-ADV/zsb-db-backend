@@ -10,8 +10,8 @@ object SchuleDao {
         Schule.all().map { if (atomic) it.toAtomicDto() else it.toDto() }
     }
 
-    fun getById(id: UUID, atomic: Boolean = false): SchuleDto = transaction {
-        if (atomic) Schule[id].toAtomicDto() else Schule[id].toDto()
+    fun getById(id: UUID): SchuleDto = transaction {
+        Schule[id].toDto()
     }
 
     fun createOrUpdate(schuleDto: SchuleDto): Result<String> = transaction {

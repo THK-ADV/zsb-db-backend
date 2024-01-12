@@ -49,14 +49,19 @@ fun Route.schoolsApi() = route("schools") {
     get("/{uuid}") {
         call.logRequest()
         val uuid = call.parseParamAsUUID("uuid") ?: return@get
-        val schule = SchuleDao.getById(uuid, call.parameters["resolve_ids"] == "true")
+        val schule = SchuleDao.getById(uuid)
+        println(schule)
         val json = Json.encodeToJsonElement(schule)
         call.respondJsonOk(json)
     }
 
     post {
         call.logRequest()
+        println("Schule")
+        println(SchuleDto)
         val schuleDto = call.receive<SchuleDto>()
+        println("schuleDto")
+        println(schuleDto)
         if (call.checkId(schuleDto.id)) return@post
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))

@@ -6,12 +6,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 object AdresseDao {
-    fun getAll(atomic: Boolean = false): List<AdresseDto> = transaction {
-        Adresse.all().map { if (atomic) it.toAtomicDto() else it.toDto() }
+    fun getAll(): List<AdresseDto> = transaction {
+        Adresse.all().map { it.toDto() }
     }
 
-    fun getById(id: UUID, atomic: Boolean = false): AdresseDto = transaction {
-        if (atomic) Adresse[id].toAtomicDto() else Adresse[id].toDto()
+    fun getById(id: UUID): AdresseDto = transaction {
+        Adresse[id].toDto()
     }
 
     fun createOrUpdate(adresseDto: AdresseDto): Result<String> = transaction {
