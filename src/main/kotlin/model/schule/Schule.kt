@@ -11,6 +11,7 @@ import model.kontakt.KontaktDto
 import model.kontakt.Kontakte
 import model.schule.enum.Kooperationspartner
 import model.schule.enum.Schulform
+import model.termin.Termine
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -106,6 +107,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val result = anyOrNull {
 
                 transaction {
+                    Termine.deleteWhere { Termine.school_id eq schuleId }
                     SchulKontakte.deleteWhere { SchulKontakte.school eq schuleId }
                     Schulen.deleteWhere { Schulen.id eq schuleId }
                 }

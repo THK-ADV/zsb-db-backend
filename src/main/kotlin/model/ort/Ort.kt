@@ -42,7 +42,7 @@ class Ort(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                 dto.id != null -> {
                     // parse UUID
                     val uuid = anyOrNull { UUID.fromString(dto.id) }
-                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could parse UUID: ${dto.id}"))
+                        ?: return@transaction Result.failure(CouldNotParseUuidException("Could not parse UUID: ${dto.id}"))
 
                     // fetch current Ort
                     val currentOrt = anyOrNull { Ort[uuid] }

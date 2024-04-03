@@ -20,6 +20,8 @@ import model.kontakt.kontakteApi
 import model.ort.orteApi
 import model.schule.schoolsApi
 import model.termin.termineApi
+import model.termin.kontakte.kontakteSchuleApi
+import model.termin.kontakte.kontakteHochschuleApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
 import word.wordApi
@@ -36,11 +38,11 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    recreateDatabase()
+    //recreateDatabase()
 
     val fileName = "data-import.csv"
     val file = File("src/main/resources/legacy_import/$fileName")
-    CsvImport.parseSchool(file)
+    //CsvImport.parseSchool(file)
     log.info("loaded data from '$fileName'")
 
     val server = embeddedServer(Netty, port = 9000) {
@@ -70,6 +72,8 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         orteApi()
         kontakteApi()
         termineApi()
+        kontakteSchuleApi()
+        kontakteHochschuleApi()
         wordApi()
         excelApi()
         env?.let { mailApi(MailSettings.fromEnvironment(it)) }

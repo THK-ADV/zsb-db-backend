@@ -7,8 +7,6 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
-import model.schule.SchuleDao
-import model.schule.SchuleDto
 import model.termin.enum.*
 import utilty.*
 
@@ -129,7 +127,9 @@ private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
         designation = abstrakterTermin.designation,
         schoolyear = abstrakterTermin.schoolyear,
         date = abstrakterTermin.date,
+        contact_school_id = abstrakterTermin.contact_school_id,
         contact_school = abstrakterTermin.contact_school,
+        contact_university_id = abstrakterTermin.contact_university_id,
         contact_university = abstrakterTermin.contact_university,
         other = abstrakterTermin.other,
         school_id = abstrakterTermin.school_id,
