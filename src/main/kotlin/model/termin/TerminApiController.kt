@@ -50,10 +50,24 @@ fun Route.termineApi() {
         }
 
         // create
-        post { postOrPut(call, isPost = true) }
+        post {
+            call.logRequest()
+            val abstrakterTermin = call.receive<AbstrakterTermin>()
+            val terminDto = toTerminDto(abstrakterTermin)
+            if (call.checkId(abstrakterTermin.uuid)) return@post
+            val result = TerminDao.createOrUpdate(terminDto)
+            call.respond(HttpServerResponse.map(result))
+        }
 
         // update
-        put { postOrPut(call) }
+        put {
+            call.logRequest()
+            val abstrakterTermin = call.receive<AbstrakterTermin>()
+            val terminDto = toTerminDto(abstrakterTermin)
+            if (call.checkIdAndRespondUsePostIfNull(abstrakterTermin.uuid)) return@put
+            val result = TerminDao.createOrUpdate(terminDto)
+            call.respond(HttpServerResponse.map(result))
+        }
 
         // delete
         delete("/{uuid}") {
@@ -70,58 +84,70 @@ fun Route.termineApi() {
 
 private fun toTerminDto(abstrakterTermin: AbstrakterTermin): TerminDto {
     var category = Kategorie.UNKNOWN
-    var internCategory: BeiUnsTyp? = null
-    var schoolCategory: AnSchuleTyp? = null
-    var kAoACategory: KAoATyp? = null
-    var talentscoutCategory: TalentscoutTyp? = null
-    var thSpecificCategory: THSpezifischTyp? = null
-    var isIndividualAppt: Boolean? = null
-    var runs: Int? = null
-    var description: String? = null
-    if (abstrakterTermin is AnSchuleTermin) {
-        category = Kategorie.SCHOOL
-        schoolCategory = abstrakterTermin.schoolCategory
-        kAoACategory = abstrakterTermin.kAoACategory
-        talentscoutCategory = abstrakterTermin.talentscoutCategory
-        thSpecificCategory = abstrakterTermin.thSpecificCategory
-        isIndividualAppt = abstrakterTermin.isIndividualAppt
-        runs = abstrakterTermin.runs
-    } else if (abstrakterTermin is BeiUnsTermin) {
-        category = Kategorie.INTERN
-        internCategory = abstrakterTermin.internCategory
-    } else if (abstrakterTermin is BeiDrittenTermin) {
-        description = abstrakterTermin.description
+    var schoolCategory: List<AnSchuleTyp>? = null
+    var kAoACategory: List<KAoATyp>? = null
+    var kAoARuns: Int? = null
+    var kAoAOther: String? = null
+    var talentscoutCategory: List<TalentscoutTyp>? = null
+    var talentscoutOther: String? = null
+    var thSpecificCategory: List<THSpezifischTyp>? = null
+    var thRunsSingle: Int? = null
+    var thOtherSingle: String? = null
+    var thRunsFair: Int? = null
+    var thOtherFair: String? = null
+    var internCategory: List<BeiUnsTyp>? = null
+    var internOther: String? = null
+
+    when (abstrakterTermin) {
+        is AnSchuleTermin -> {
+            category = Kategorie.SCHOOL
+            schoolCategory = abstrakterTermin.schoolCategory?.map { AnSchuleTyp.getByDesc(it) }
+            kAoACategory = abstrakterTermin.kAoACategory?.map { KAoATyp.getByDesc(it) }
+            kAoARuns = abstrakterTermin.kAoARuns
+            kAoAOther = abstrakterTermin.kAoAOther
+            talentscoutCategory = abstrakterTermin.talentscoutCategory?.map { TalentscoutTyp.getByDesc(it) }
+            talentscoutOther = abstrakterTermin.talentscoutOther
+            thSpecificCategory = abstrakterTermin.thSpecificCategory?.map { THSpezifischTyp.getByDesc(it) }
+            thRunsSingle = abstrakterTermin.thRunsSingle
+            thOtherSingle = abstrakterTermin.thOtherSingle
+            thRunsFair = abstrakterTermin.thRunsFair
+            thOtherFair = abstrakterTermin.thOtherFair
+        }
+
+        is BeiUnsTermin -> {
+            category = Kategorie.INTERN
+            internCategory = abstrakterTermin.internCategory?.map { BeiUnsTyp.getByDesc(it) }
+            internOther = abstrakterTermin.internOther
+        }
+
+        is BeiDrittenTermin -> category = Kategorie.THIRD
     }
     return TerminDto(
         uuid = abstrakterTermin.uuid,
+        designation = abstrakterTermin.designation,
         schoolyear = abstrakterTermin.schoolyear,
         date = abstrakterTermin.date,
+        contact_school_id = abstrakterTermin.contact_school_id,
         contact_school = abstrakterTermin.contact_school,
+        contact_university_id = abstrakterTermin.contact_university_id,
         contact_university = abstrakterTermin.contact_university,
         other = abstrakterTermin.other,
         school_id = abstrakterTermin.school_id,
         school = abstrakterTermin.school,
+        rating = abstrakterTermin.rating,
         category = category,
-        internCategory = internCategory,
         schoolCategory = schoolCategory,
         kAoACategory = kAoACategory,
+        kAoARuns = kAoARuns,
+        kAoAOther = kAoAOther,
         talentscoutCategory = talentscoutCategory,
+        talentscoutOther = talentscoutOther,
         thSpecificCategory = thSpecificCategory,
-        isIndividualAppt = isIndividualAppt,
-        runs = runs,
-        description = description
+        thRunsSingle = thRunsSingle,
+        thOtherSingle = thOtherSingle,
+        thRunsFair = thRunsFair,
+        thOtherFair = thOtherFair,
+        internCategory = internCategory,
+        internOther = internOther,
     )
-}
-
-private suspend fun postOrPut(call: ApplicationCall, isPost: Boolean = false) {
-    call.logRequest()
-    val abstrakterTermin = call.receive<AbstrakterTermin>()
-    val terminDto = toTerminDto(abstrakterTermin)
-    if (isPost) {
-        if (call.checkId(abstrakterTermin.uuid)) return
-    } else
-        if (call.checkIdAndRespondUsePostIfNull(abstrakterTermin.uuid)) return
-
-    val result = TerminDao.createOrUpdate(terminDto)
-    call.respond(HttpServerResponse.map(result))
 }

@@ -14,6 +14,13 @@ enum class AnSchuleTyp(val id: Int, val desc: String) {
             3 -> THSPECIFIC
             else -> OTHER
         }
+
+        fun getByDesc(desc: String) = when (desc) {
+            "KAoA" -> KAOA
+            "Talentscouting" -> TALENTSCOUT
+            "TH-spezifisch" -> THSPECIFIC
+            else -> OTHER
+        }
     }
 }
 

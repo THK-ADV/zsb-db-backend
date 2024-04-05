@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 enum class Kategorie(val id: Int, val desc: String) {
     UNKNOWN(0, "Unbekannt"),
-    SCHOOL(1, "An Schule"),
-    INTERN(2, "Bei Uns"),
-    THIRD(3, "An 3. Orten");
+    SCHOOL(1, "AnSchuleTermin"),
+    INTERN(2, "BeiUnsTermin"),
+    THIRD(3, "BeiDrittenTermin");
 
     companion object {
         fun getById(id: Int) = when (id) {

@@ -16,6 +16,14 @@ enum class KAoATyp(val id: Int, val desc: String) {
             4 -> YEARPLANNING
             else -> OTHER
         }
+
+        fun getByDesc(desc: String) = when (desc) {
+            "Last Minute Information" -> LASTMINUTE
+            "Vortrag Allgemeine StuOri" -> GENERALORIENTATION
+            "Schuljahresendgespräch" -> YEARENDING
+            "Schuljahresplanungsgespräch" -> YEARPLANNING
+            else -> OTHER
+        }
     }
 }
 

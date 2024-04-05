@@ -29,8 +29,10 @@ fun Route.orteApi() {
         }
 
         put {
+            println("test")
             call.logRequest()
             val ortDto = call.receive<OrtDto>()
+            println(ortDto)
             val result = OrtDao.createOrUpdate(ortDto)
             call.respond(HttpServerResponse.map(result))
         }

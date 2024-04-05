@@ -12,6 +12,12 @@ enum class BeiUnsTyp(val id: Int, val desc: String) {
             2 -> LAB
             else -> OTHER
         }
+
+        fun getByDesc(desc: String) = when(desc) {
+            "Campustag(e)" -> CAMPUSDAY
+            "Schülerlabor" -> LAB
+            else -> OTHER
+        }
     }
 }
 

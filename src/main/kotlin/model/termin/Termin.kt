@@ -4,56 +4,83 @@ import error_handling.CouldNotParseUuidException
 import error_handling.InstitutionIdNotValidException
 import error_handling.UuidNotFound
 import kotlinx.serialization.Serializable
+import model.address.Adresse
 import model.schule.Schule
 import model.schule.SchuleDto
 import model.schule.Schulen
 import model.termin.enum.*
+import model.termin.kontakte.*
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 import utilty.anyOrNull
 import java.util.*
 
 object Termine : UUIDTable() {
+    val designation = text("bezeichnung")
     val schoolyear = text("schuljahr")
     val date = text("datum")
-    val contact_school = text("kontaktperson schule")
-    val contact_university = text("kontaktperson hochschule")
+    val contact_school = reference("schulkontakt", KontakteSchule)
+    val contact_university = reference("hochschulkontakt", KontakteHochschule)
     val other = text("freitextfeld")
     val school_id = reference("schule_id", Schulen)
+    val rating = text("bewertung")
     val category = integer("terminart")
-    val internCategory = integer("bei uns typ").nullable()
-    val schoolCategory = integer("an schule typ").nullable()
-    val kAoACategory = integer("kaoa typ").nullable()
-    val talentscoutCategory = integer("talentscout typ").nullable()
-    val thSpecificCategory = integer("th spezifisch typ").nullable()
-    val isIndividualAppt = bool("ist einzeltermin").nullable()
-    val runs = integer("durchläufe").nullable()
-    val description = text("beschreibung").nullable()
+    val schoolCategory = text("an schule typ").nullable()
+    val kAoACategory = text("kaoa typ").nullable()
+    val kAoARuns = integer("kaoa - durchläufe").nullable()
+    val kAoAOther = text("kaoa - sonstiges").nullable()
+    val talentscoutCategory = text("talentscout typ").nullable()
+    val talentscoutOther = text("ts - sonstiges").nullable()
+    val thSpecificCategory = text("th spezifisch typ").nullable()
+    val thRunsSingle = integer("th spezifisch - durchläufe einzeltermin").nullable()
+    val thOtherSingle = text("th spezifisch - sonstiges einzeltermin").nullable()
+    val thRunsFair = integer("th spezifisch - durchläufe schulmesse").nullable()
+    val thOtherFair = text("th spezifisch - sonstiges schulmesse").nullable()
+    val internCategory = text("bei uns typ").nullable()
+    val internOther = text("bei uns - sonstiges").nullable()
 }
 
 class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
+    private var designation by Termine.designation
     private var schoolyear by Termine.schoolyear
     private var date by Termine.date
-    private var contact_school by Termine.contact_school
-    private var contact_university by Termine.contact_university
+    private var contact_school by KontaktSchule referencedOn Termine.contact_school
+    private var contact_university by KontaktHochschule referencedOn Termine.contact_university
     private var other by Termine.other
     private var school by Schule referencedOn Termine.school_id
+    private var rating by Termine.rating
     private var category by Termine.category
-    private var internCategory by Termine.internCategory
     private var schoolCategory by Termine.schoolCategory
     private var kAoACategory by Termine.kAoACategory
+    private var kAoARuns by Termine.kAoARuns
+    private var kAoAOther by Termine.kAoAOther
     private var talentscoutCategory by Termine.talentscoutCategory
+    private var talentscoutOther by Termine.talentscoutOther
     private var thSpecificCategory by Termine.thSpecificCategory
-    private var isIndividualAppt by Termine.isIndividualAppt
-    private var runs by Termine.runs
-    private var description by Termine.description
+    private var thRunsSingle by Termine.thRunsSingle
+    private var thOtherSingle by Termine.thOtherSingle
+    private var thRunsFair by Termine.thRunsFair
+    private var thOtherFair by Termine.thOtherFair
+    private var internCategory by Termine.internCategory
+    private var internOther by Termine.internOther
 
     companion object : UUIDEntityClass<Termin>(Termine) {
         fun save(dto: TerminDto): Result<Termin> = transaction {
+            val kontaktSchuleUUID = UUID.fromString(dto.contact_school_id)
+            val kontaktHochschuleUUID = UUID.fromString(dto.contact_university_id)
+
+            val kontaktSchule = anyOrNull { KontaktSchule[kontaktSchuleUUID] }
+                ?: return@transaction Result.failure<Termin>(Exception("Couldn't update due to wrong ID (${dto.contact_school_id})"))
+
+            val kontaktHochschule = anyOrNull { KontaktHochschule[kontaktHochschuleUUID] }
+                ?: return@transaction Result.failure<Termin>(Exception("Couldn't update due to wrong ID (${dto.contact_university_id})"))
+
             // validate ids
             val schulId = anyOrNull { UUID.fromString(dto.school_id) }
                 ?: return@transaction Result.failure(
@@ -68,20 +95,17 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             // finding a matched Termin is skipped here due to the unique
 
             // update/create Termin
-            val termin = if (dto.uuid != null) {
-                val uuid = anyOrNull { UUID.fromString(dto.uuid) }
-                    ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Termin is not valid."))
-                val old = anyOrNull { Termin[uuid] }
-                    ?: return@transaction Result.failure(UuidNotFound("Couldn't find Termin with UUID: $uuid"))
-
-                // update and safe
-                old.update(dto, schule)
-                Termin[uuid]
-            } else {
-                new { update(dto, schule) }
+            val termin = when {
+                dto.uuid != null -> {
+                    val uuid = anyOrNull { UUID.fromString(dto.uuid) }
+                        ?: return@transaction Result.failure(CouldNotParseUuidException("UUID for Termin is not valid."))
+                    val old = anyOrNull { Termin[uuid] }
+                        ?: return@transaction Result.failure(UuidNotFound("Couldn't find Termin with UUID: $uuid"))
+                    old.update(dto, schule, kontaktSchule, kontaktHochschule)
+                    Termin[uuid]
+                }
+                else -> new { update(dto, schule, kontaktSchule, kontaktHochschule) }
             }
-
-            // return result
             Result.success(termin)
         }
 
@@ -99,45 +123,71 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(dto: TerminDto, schule: Schule) {
+    private fun update(dto: TerminDto, school: Schule, kontaktSchule: KontaktSchule, kontaktHochschule: KontaktHochschule) {
+        this.designation = dto.designation
         this.schoolyear = dto.schoolyear
         this.date = dto.date
-        this.contact_school = dto.contact_school
-        this.contact_university = dto.contact_university
+        this.contact_school = kontaktSchule
+        this.contact_university = kontaktHochschule
         this.other = dto.other
-        this.school = schule
+        this.school = school
+        this.rating = dto.rating
         this.category = dto.category.id
-        this.internCategory = dto.internCategory?.id
-        this.schoolCategory = dto.schoolCategory?.id
-        this.kAoACategory = dto.kAoACategory?.id
-        this.talentscoutCategory = dto.talentscoutCategory?.id
-        this.thSpecificCategory = dto.thSpecificCategory?.id
-        this.isIndividualAppt = dto.isIndividualAppt
-        this.runs = dto.runs
-        this.description = dto.description
+        this.schoolCategory = dto.schoolCategory.toString()
+        this.kAoACategory = dto.kAoACategory.toString()
+        this.kAoARuns = dto.kAoARuns
+        this.kAoAOther = dto.kAoAOther
+        this.talentscoutCategory = dto.talentscoutCategory.toString()
+        this.talentscoutOther = dto.talentscoutOther
+        this.thSpecificCategory = dto.thSpecificCategory.toString()
+        this.thRunsSingle = dto.thRunsSingle
+        this.thOtherSingle = dto.thOtherSingle
+        this.thRunsFair = dto.thRunsFair
+        this.thOtherFair = dto.thOtherFair
+        this.internCategory = dto.internCategory.toString()
+        this.internOther = dto.internOther
     }
 
     fun toDto() = TerminDto(
         id.value.toString(),
+        designation,
         schoolyear,
         date,
-        contact_school,
-        contact_university,
+        contact_school.id.value.toString(),
+        contact_school.toDto(),
+        contact_university.id.value.toString(),
+        contact_university.toDto(),
         other,
         school.id.value.toString(),
         null,
+        rating,
         Kategorie.getById(category),
-        internCategory?.let { BeiUnsTyp.getById(it) },
-        schoolCategory?.let { AnSchuleTyp.getById(it) },
-        kAoACategory?.let { KAoATyp.getById(it) },
-        talentscoutCategory?.let { TalentscoutTyp.getById(it) },
-        thSpecificCategory?.let { THSpezifischTyp.getById(it) },
-        isIndividualAppt,
-        runs,
-        description
+        schoolCategory?.let {
+            it.drop(1).dropLast(1).split(", ").map { id -> AnSchuleTyp.getById(id.toInt()) }
+        },
+        kAoACategory?.let {
+            it.drop(1).dropLast(1).split(", ").map { id -> KAoATyp.getById(id.toInt()) }
+        },
+        kAoARuns,
+        kAoAOther,
+        talentscoutCategory?.let {
+            it.drop(1).dropLast(1).split(", ").map { id -> TalentscoutTyp.getById(id.toInt()) }
+        },
+        talentscoutOther,
+        thSpecificCategory?.let {
+            it.drop(1).dropLast(1).split(", ").map { id -> THSpezifischTyp.getById(id.toInt()) }
+        },
+        thRunsSingle,
+        thOtherSingle,
+        thRunsFair,
+        thOtherFair,
+        internCategory?.let {
+            it.drop(1).dropLast(1).split(", ").map { id -> BeiUnsTyp.getById(id.toInt()) }
+        },
+        internOther,
     )
 
-    fun toAtomicDto() = TerminDto(
+    /*fun toAtomicDto() = TerminDto(
         id.value.toString(),
         schoolyear,
         date,
@@ -151,54 +201,80 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         schoolCategory?.let { AnSchuleTyp.getById(it) },
         kAoACategory?.let { KAoATyp.getById(it) },
         talentscoutCategory?.let { TalentscoutTyp.getById(it) },
-        thSpecificCategory?.let { THSpezifischTyp.getById(it) },
-        isIndividualAppt,
-        runs,
-        description
-    )
+        thSpecificCategory?.let { THSpezifischTyp.getById(it) }
+    )*/
 
+    // TODO: replace [ und ] sollte nicht nötig sein
     fun toTermin() = when (category) {
         1 -> AnSchuleTermin(
             id.value.toString(),
+            designation,
             schoolyear,
             date,
-            contact_school,
-            contact_university,
+            contact_school.id.value.toString(),
+            contact_school.toDto(),
+            contact_university.id.value.toString(),
+            contact_university.toDto(),
             other,
             school.id.value.toString(),
             school.toDto(),
-            schoolCategory?.let { AnSchuleTyp.getById(it) },
-            kAoACategory?.let { KAoATyp.getById(it) },
-            talentscoutCategory?.let { TalentscoutTyp.getById(it) },
-            thSpecificCategory?.let { THSpezifischTyp.getById(it) },
-            isIndividualAppt,
-            runs
+            rating,
+            schoolCategory?.let {
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
+            },
+            kAoACategory?.let {
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
+            },
+            kAoARuns,
+            kAoAOther,
+            talentscoutCategory?.let {
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
+            },
+            talentscoutOther,
+            thSpecificCategory?.let {
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
+            },
+            thRunsSingle,
+            thOtherSingle,
+            thRunsFair,
+            thOtherFair
         )
 
         2 -> BeiUnsTermin(
             id.value.toString(),
+            designation,
             schoolyear,
             date,
-            contact_school,
-            contact_university,
+            contact_school.id.value.toString(),
+            contact_school.toDto(),
+            contact_university.id.value.toString(),
+            contact_university.toDto(),
             other,
             school.id.value.toString(),
             school.toDto(),
-            internCategory?.let { BeiUnsTyp.getById(it) }
+            rating,
+            internCategory?.let {
+                it.split(",").map { it.replace("[", "").replace("]", "").trim() }
+            },
+            internOther
         )
 
         3 -> BeiDrittenTermin(
             id.value.toString(),
+            designation,
             schoolyear,
             date,
-            contact_school,
-            contact_university,
+            contact_school.id.value.toString(),
+            contact_school.toDto(),
+            contact_university.id.value.toString(),
+            contact_university.toDto(),
             other,
             school.id.value.toString(),
             school.toDto(),
-            description
+            rating
         )
-        else -> throw Exception("Terminart nicht erkannt")
+
+        else -> throw Exception("Terminart nicht erkannt: $category")
     }
 }
 
@@ -215,21 +291,30 @@ private fun transformMultiSelect(ids: String): List<Int> {
 data class TerminDto(
     // generelle Eigenschaften
     val uuid: String?,
+    val designation: String,
     val schoolyear: String,
     val date: String,
-    val contact_school: String,
-    val contact_university: String,
+    val contact_school_id: String,
+    val contact_school: KontaktSchuleDto? = null,
+    val contact_university_id: String,
+    val contact_university: KontaktHochschuleDto? = null,
     val other: String,
     val school_id: String,
     val school: SchuleDto? = null,
+    val rating: String,
     val category: Kategorie,
     // spezifische Eigenschaften
-    val internCategory: BeiUnsTyp?,
-    val schoolCategory: AnSchuleTyp?,
-    val kAoACategory: KAoATyp?,
-    val talentscoutCategory: TalentscoutTyp?,
-    val thSpecificCategory: THSpezifischTyp?,
-    val isIndividualAppt: Boolean?,
-    val runs: Int?,
-    val description: String?
+    val schoolCategory: List<AnSchuleTyp>?,
+    val kAoACategory: List<KAoATyp>?,
+    val kAoARuns: Int?,
+    val kAoAOther: String?,
+    val talentscoutCategory: List<TalentscoutTyp>?,
+    val talentscoutOther: String?,
+    val thSpecificCategory: List<THSpezifischTyp>?,
+    val thRunsSingle: Int?,
+    val thOtherSingle: String?,
+    val thRunsFair: Int?,
+    val thOtherFair: String?,
+    val internCategory: List<BeiUnsTyp>?,
+    val internOther: String?,
 )

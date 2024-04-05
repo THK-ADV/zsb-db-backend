@@ -59,13 +59,14 @@ dependencies {
     implementation "org.apache.poi:poi-ooxml:4.1.2"
 
     // excel export
-    compile "org.apache.poi:poi:3.17"         // For `.xls` files
+    implementation "org.apache.poi:poi:3.17"         // For `.xls` files
 
     // csv-import
     implementation "com.github.doyaaaaaken:kotlin-csv-jvm:0.11.1"
 
     // logging
-    implementation 'io.github.microutils:kotlin-logging:1.7.7'
+    implementation "io.github.microutils:kotlin-logging:1.7.7"
+    //implementation "io.github.microutils:kotlin-logging:1.10.3"
 
     // exposed, postgres (database)
     implementation "org.jetbrains.exposed:exposed-core:$exposed_version"

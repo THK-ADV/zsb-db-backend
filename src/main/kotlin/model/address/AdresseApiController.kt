@@ -15,7 +15,7 @@ fun Route.adressenApi() {
     route("addresses") {
         get {
             call.logRequest()
-            val result = AdresseDao.getAll(call.parameters["resolve_ids"] == "true")
+            val result = AdresseDao.getAll()
             val json = Json.encodeToJsonElement(result)
             call.respondJsonOk(json)
         }
@@ -23,7 +23,7 @@ fun Route.adressenApi() {
         get("/{id}") {
             call.logRequest()
             val addressId = call.parseParamAsUUID("id") ?: return@get
-            val result = AdresseDao.getById(addressId, call.parameters["resolve_ids"] == "true")
+            val result = AdresseDao.getById(addressId)
             val json = Json.encodeToJsonElement(result)
             call.respondJsonOk(json)
         }
@@ -31,6 +31,7 @@ fun Route.adressenApi() {
         put {
             call.logRequest()
             val addressDto = call.receive<AdresseDto>()
+            println(addressDto)
             val result = AdresseDao.createOrUpdate(addressDto)
             call.respond(HttpServerResponse.map(result))
         }
