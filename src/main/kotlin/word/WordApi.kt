@@ -21,9 +21,12 @@ fun Route.wordApi() {
         post {
             call.logRequest()
             val serialLetterDto = call.receive<SerialLetterDto>()
-            val fileId = UUID.randomUUID()
-            val file = File("$fileId.doc")
-            val generator = WordGenerator(file)
+            //val fileId = UUID.randomUUID()
+            //val file = File("$fileId.doc")
+            //val path = "$fileId.doc"
+            //val file = File(path)
+            //TODO: Pfad anpassen
+            val generator = WordGenerator(template)
             val result = generator.generateLetter(serialLetterDto)
 
             if (!result) {
@@ -35,9 +38,10 @@ fun Route.wordApi() {
                 return@post
             }
 
-            call.respondFile(file)
+            call.respondText("Datei wurde erstellt.")
+            //call.respondFile(file)
 
-            file.delete()
+            //file.delete()
         }
     }
 
