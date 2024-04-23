@@ -21,7 +21,6 @@ fun Route.wordApi() {
         post {
             call.logRequest()
             val serialLetterDto = call.receive<SerialLetterDto>()
-            //val fileId = UUID.randomUUID()
             //val file = File("$fileId.doc")
             //val path = "$fileId.doc"
             //val file = File(path)
