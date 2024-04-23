@@ -14,7 +14,7 @@ fun Route.mailApi(mailSettings: MailSettings) = route("email") {
     post {
         call.logRequest()
         val content = call.receive<MailDto>()
-        mail.sendMail(content)
+        val result = mail.sendMail(content).getOrThrow()
         call.respond(HttpStatusCode.OK)
     }
 }
