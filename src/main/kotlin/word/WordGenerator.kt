@@ -6,6 +6,7 @@ import model.schule.SchuleDto
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.apache.poi.xwpf.usermodel.XWPFTable
+import utilty.ColoredLogging
 import utilty.anyOrNull
 import word.enum.ZsbSignatur
 import java.io.File
@@ -19,7 +20,7 @@ import java.util.zip.ZipOutputStream
 class WordGenerator(templateFile: File) {
     private val templateDoc = XWPFDocument(FileInputStream(templateFile))
 
-    fun generateLetter(letter: SerialLetterDto): Boolean {
+    fun generateLetter(letter: SerialLetterDto): File? {
         val zipId = UUID.randomUUID()
         val output = "letters_$zipId.zip"
         val files = mutableListOf<String>()
@@ -49,10 +50,11 @@ class WordGenerator(templateFile: File) {
                 File(file).delete()
             }
             files.clear()
-            return true
+            return File(output)
         } catch (e: Exception) {
             log.error(e)
-            return false
+            ColoredLogging.LOG.error("Could not generate letter.")
+            return null
         }
     }
 

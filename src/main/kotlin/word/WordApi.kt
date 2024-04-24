@@ -21,14 +21,11 @@ fun Route.wordApi() {
         post {
             call.logRequest()
             val serialLetterDto = call.receive<SerialLetterDto>()
-            //val file = File("$fileId.doc")
-            //val path = "$fileId.doc"
-            //val file = File(path)
-            //TODO: Pfad anpassen
+            val template = File("src/main/resources/files/serialletter-template.docx")
             val generator = WordGenerator(template)
-            val result = generator.generateLetter(serialLetterDto)
+            val file = generator.generateLetter(serialLetterDto)
 
-            if (!result) {
+            if (file == null) {
                 val error = HttpServerResponse.map(
                     Result.failure(CouldNotGenerateSerialLetterException("Word generation currently not working."))
                 )
@@ -36,11 +33,8 @@ fun Route.wordApi() {
                 call.respond(error)
                 return@post
             }
-
-            call.respondText("Datei wurde erstellt.")
-            //call.respondFile(file)
-
-            //file.delete()
+            call.respondFile(file)
+            file.delete()
         }
     }
 
