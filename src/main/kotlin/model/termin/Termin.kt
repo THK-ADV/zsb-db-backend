@@ -15,6 +15,7 @@ import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.SizedCollection
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -25,8 +26,8 @@ object Termine : UUIDTable() {
     val designation = text("bezeichnung")
     val schoolyear = text("schuljahr")
     val date = text("datum")
-    val contact_school = reference("schulkontakt", KontakteSchule)
-    val contact_university = reference("hochschulkontakt", KontakteHochschule)
+    val contact_school = reference("schulkontakt", KontakteSchule).nullable()
+    val contact_university = reference("hochschulkontakt", KontakteHochschule).nullable()
     val other = text("freitextfeld")
     val school_id = reference("schule_id", Schulen)
     val rating = text("bewertung")
@@ -50,8 +51,8 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var designation by Termine.designation
     private var schoolyear by Termine.schoolyear
     private var date by Termine.date
-    private var contact_school by KontaktSchule referencedOn Termine.contact_school
-    private var contact_university by KontaktHochschule referencedOn Termine.contact_university
+    private var contact_school by KontaktSchule.optionalReferencedOn(Termine.contact_school)
+    private var contact_university by KontaktHochschule.optionalReferencedOn(Termine.contact_university)
     private var other by Termine.other
     private var school by Schule referencedOn Termine.school_id
     private var rating by Termine.rating
@@ -72,14 +73,20 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
 
     companion object : UUIDEntityClass<Termin>(Termine) {
         fun save(dto: TerminDto): Result<Termin> = transaction {
-            val kontaktSchuleUUID = UUID.fromString(dto.contact_school_id)
-            val kontaktHochschuleUUID = UUID.fromString(dto.contact_university_id)
-
-            val kontaktSchule = anyOrNull { KontaktSchule[kontaktSchuleUUID] }
-                ?: return@transaction Result.failure<Termin>(Exception("Couldn't update due to wrong ID (${dto.contact_school_id})"))
-
-            val kontaktHochschule = anyOrNull { KontaktHochschule[kontaktHochschuleUUID] }
-                ?: return@transaction Result.failure<Termin>(Exception("Couldn't update due to wrong ID (${dto.contact_university_id})"))
+            val kontaktSchule: KontaktSchule? = if (!dto.contact_school_id.isNullOrEmpty()) {
+                val kontaktSchuleUUID = UUID.fromString(dto.contact_school_id)
+                anyOrNull { KontaktSchule[kontaktSchuleUUID] }
+                    ?: return@transaction Result.failure<Termin>(Exception("Couldn't update due to wrong ID (${dto.contact_school_id})"))
+            } else {
+                null
+            }
+            val kontaktHochschule: KontaktHochschule? = if (!dto.contact_university_id.isNullOrEmpty()) {
+                val kontaktHochschuleUUID = UUID.fromString(dto.contact_university_id)
+                anyOrNull { KontaktHochschule[kontaktHochschuleUUID] }
+                    ?: return@transaction Result.failure<Termin>(Exception("Couldn't update due to wrong ID (${dto.contact_university_id})"))
+            } else {
+                null
+            }
 
             // validate ids
             val schulId = anyOrNull { UUID.fromString(dto.school_id) }
@@ -123,7 +130,7 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
     }
 
-    private fun update(dto: TerminDto, school: Schule, kontaktSchule: KontaktSchule, kontaktHochschule: KontaktHochschule) {
+    private fun update(dto: TerminDto, school: Schule, kontaktSchule: KontaktSchule?, kontaktHochschule: KontaktHochschule?) {
         this.designation = dto.designation
         this.schoolyear = dto.schoolyear
         this.date = dto.date
@@ -153,10 +160,10 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         designation,
         schoolyear,
         date,
-        contact_school.id.value.toString(),
-        contact_school.toDto(),
-        contact_university.id.value.toString(),
-        contact_university.toDto(),
+        contact_school?.id?.value.toString(),
+        contact_school?.toDto(),
+        contact_university?.id?.value.toString(),
+        contact_university?.toDto(),
         other,
         school.id.value.toString(),
         null,
@@ -211,10 +218,10 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             designation,
             schoolyear,
             date,
-            contact_school.id.value.toString(),
-            contact_school.toDto(),
-            contact_university.id.value.toString(),
-            contact_university.toDto(),
+            contact_school?.id?.value?.toString(),
+            contact_school?.toDto(),
+            contact_university?.id?.value?.toString(),
+            contact_university?.toDto(),
             other,
             school.id.value.toString(),
             school.toDto(),
@@ -245,10 +252,10 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             designation,
             schoolyear,
             date,
-            contact_school.id.value.toString(),
-            contact_school.toDto(),
-            contact_university.id.value.toString(),
-            contact_university.toDto(),
+            contact_school?.id?.value?.toString(),
+            contact_school?.toDto(),
+            contact_university?.id?.value?.toString(),
+            contact_university?.toDto(),
             other,
             school.id.value.toString(),
             school.toDto(),
@@ -264,10 +271,10 @@ class Termin(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             designation,
             schoolyear,
             date,
-            contact_school.id.value.toString(),
-            contact_school.toDto(),
-            contact_university.id.value.toString(),
-            contact_university.toDto(),
+            contact_school?.id?.value?.toString(),
+            contact_school?.toDto(),
+            contact_university?.id?.value?.toString(),
+            contact_university?.toDto(),
             other,
             school.id.value.toString(),
             school.toDto(),
@@ -294,9 +301,9 @@ data class TerminDto(
     val designation: String,
     val schoolyear: String,
     val date: String,
-    val contact_school_id: String,
+    val contact_school_id: String? = null,
     val contact_school: KontaktSchuleDto? = null,
-    val contact_university_id: String,
+    val contact_university_id: String? = null,
     val contact_university: KontaktHochschuleDto? = null,
     val other: String,
     val school_id: String,

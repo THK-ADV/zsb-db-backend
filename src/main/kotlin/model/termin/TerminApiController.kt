@@ -7,7 +7,9 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import log
 import model.termin.enum.*
+import mu.KotlinLogging
 import utilty.*
 
 fun Route.termineApi() {

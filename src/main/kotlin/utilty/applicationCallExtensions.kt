@@ -45,7 +45,11 @@ suspend fun ApplicationCall.respondTextAsJson(msg: String, status: HttpStatusCod
  */
 suspend fun ApplicationCall.checkIdAndRespondUsePostIfNull(id: String?): Boolean {
     if (id == null) {
-        this.respondText("ID not given. Use post to create.", ContentType.Text.Plain, HttpStatusCode.BadRequest)
+        this.respondText(
+            "ID not given. Use post to create.",
+            ContentType.Text.Plain,
+            HttpStatusCode.BadRequest
+        )
         return true
     }
     return false

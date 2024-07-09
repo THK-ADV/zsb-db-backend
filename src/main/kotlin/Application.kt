@@ -38,15 +38,16 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    //recreateDatabase()
+    recreateDatabase()
 
     val fileName = "data-import.csv"
     val file = File("src/main/resources/legacy_import/$fileName")
-    //CsvImport.parseSchool(file)
-    log.info("loaded data from '$fileName'")
+    CsvImport.parseSchool(file)
+    // log.info("loaded data from '$fileName'")
 
     val server = embeddedServer(Netty, port = 9000) {
-        configureServer(this, null)
+        log.info(environment.config.propertyOrNull("ktor.deployment.port")?.getString())
+        configureServer(this, environment)
     }
 
     log.info("## Start Server ##")
@@ -76,7 +77,10 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         kontakteHochschuleApi()
         wordApi()
         excelApi()
-        env?.let { mailApi(MailSettings.fromEnvironment(it)) }
+        env?.let {
+            log.info("env gefunden")
+            mailApi(MailSettings.fromEnvironment(it))
+        }
     }
     server.install(ContentNegotiation) {
         json(Json {

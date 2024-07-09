@@ -34,6 +34,10 @@ enum class KontaktFunktion(val id: Int, val desc: String) {
     OTHER(25, "Sonstiges");
 
     companion object {
+        fun getDescById(id: Int): String {
+            return values().find { it.id == id }?.desc ?: "Unbekannt"
+        }
+
         fun fromDesc(desc: String) = when (desc) {
             "Unbekannt" -> KEINE
             "Schulleitung" -> SCHULLEITUNG

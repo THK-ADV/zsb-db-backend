@@ -17,6 +17,7 @@ import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.SizedCollection
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -107,8 +108,8 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
             val result = anyOrNull {
 
                 transaction {
-                    Termine.deleteWhere { Termine.school_id eq schuleId }
-                    SchulKontakte.deleteWhere { SchulKontakte.school eq schuleId }
+                    Termine.deleteWhere { school_id eq schuleId }
+                    SchulKontakte.deleteWhere { school eq schuleId }
                     Schulen.deleteWhere { Schulen.id eq schuleId }
                 }
             }
