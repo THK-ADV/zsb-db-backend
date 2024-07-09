@@ -45,7 +45,7 @@ fun Route.mailApi(mailSettings: MailSettings) = route("email") {
                 addressees.add(school.email)
             }
         }
-        // mail.sendMail(content, adressees)
+        mail.sendMail(content, addressees)
         call.respond(HttpStatusCode.OK)
     }
 

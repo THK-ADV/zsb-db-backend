@@ -14,14 +14,14 @@ import utilty.respond
 import utilty.respondJsonOk
 import word.enum.ZsbSignaturDto
 import java.io.File
-import java.util.*
 
-fun Route.wordApi() {
+fun Route.wordApi(letterPath: String) {
     route("serialletter") {
         post {
             call.logRequest()
             val serialLetterDto = call.receive<SerialLetterDto>()
-            val template = File("src/main/resources/files/serialletter-template.docx")
+            val template = File(letterPath)
+            println(template.path)
             val generator = WordGenerator(template)
             val file = generator.generateLetter(serialLetterDto)
 
@@ -34,7 +34,7 @@ fun Route.wordApi() {
                 return@post
             }
             call.respondFile(file)
-            file.delete()
+            //file.delete()
         }
     }
 
