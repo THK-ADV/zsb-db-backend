@@ -1,113 +1,124 @@
 package word
 
-import model.address.AdresseDto
+import io.ktor.util.logging.*
+import log
 import model.schule.SchuleDto
-import mu.KotlinLogging
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment
 import org.apache.poi.xwpf.usermodel.XWPFDocument
+import org.apache.poi.xwpf.usermodel.XWPFParagraph
+import org.apache.poi.xwpf.usermodel.XWPFTable
 import utilty.ColoredLogging
 import utilty.anyOrNull
 import word.enum.ZsbSignatur
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.util.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 
-class WordGenerator(private val file: File) {
-    private val log = ColoredLogging(KotlinLogging.logger {})
-    private val doc = XWPFDocument()
+class WordGenerator(templateFile: File) {
+    private val templateDoc = XWPFDocument(FileInputStream(templateFile))
 
-
-    fun generateLetter(letter: SerialLetterDto): Boolean {
-        val outputStream = FileOutputStream(file)
-        var header = false
-        var body = false
-        var footer = false
-
-        letter.addressees.forEachIndexed { i, it ->
-            // check if adresse is valid
-            if (it.address == null) return@forEachIndexed
-
-            // create new page for every page except the first
-            if (i != 0) generateNewPage()
-
-            header = writeHeader(it, it.address)
-            body = writeBody(letter.msg)
-            footer = writeFooter(letter.signature_id)
+    fun generateLetter(letter: SerialLetterDto): File? {
+        val zipId = UUID.randomUUID()
+        val output = "letters_$zipId.zip"
+        val files = mutableListOf<String>()
+        try {
+            for (school in letter.addressees) {
+                replaceHeader(school)
+                replaceBody(letter)
+                val id = UUID.randomUUID()
+                val name = "${school.name}_$id.docx"
+                val out = FileOutputStream(name)
+                templateDoc.write(out)
+                out.close()
+                files.add(name)
+            }
+            val stream = FileOutputStream(output)
+            val zipOutput = ZipOutputStream(stream)
+            for (file in files) {
+                val entry = ZipEntry(File(file).name)
+                zipOutput.putNextEntry(entry)
+                val input = File(file).inputStream()
+                input.copyTo(zipOutput)
+                input.close()
+            }
+            zipOutput.close()
+            stream.close()
+            for (file in files) {
+                File(file).delete()
+            }
+            files.clear()
+            return File(output)
+        } catch (e: Exception) {
+            log.error(e)
+            ColoredLogging.LOG.error("Could not generate letter.")
+            return null
         }
+    }
 
-        // check for errors
-        if (!header || !body || !footer) {
-            log.error("Error while writing. (Header: $header | Body: $body | Footer: $footer)")
-            return false
+    private fun replaceHeader(school: SchuleDto) {
+        val schoolName = school.name
+        val street = school.address?.street ?: ""
+        val houseNumber = school.address?.houseNumber ?: ""
+        val postcode = school.address?.city?.postcode.toString() ?: ""
+        val designation = school.address?.city?.designation ?: ""
+        for (table in templateDoc.tables) {
+            replaceTextInTable(table, "SCHOOL_NAME", schoolName)
+            replaceTextInTable(table, "STREET", street)
+            replaceTextInTable(table, "HOUSE_NUMBER", houseNumber)
+            replaceTextInTable(table, "POSTCODE", postcode)
+            replaceTextInTable(table, "CITY", designation)
         }
-
-        // write to file
-        doc.write(outputStream)
-        outputStream.close()
-
-        return true
     }
 
-    private fun writeHeader(schule: SchuleDto, adresse: AdresseDto): Boolean {
-        val paragraph = doc.createParagraph()
-        val run = paragraph.createRun()
-        val ort = adresse.city ?: return false
-
-        repeat(3) { run.addBreak() }
-        run.setText(schule.name.trim())
-        run.addBreak()
-        run.setText("${adresse.street.trim()} ${adresse.houseNumber.trim()}\n")
-        run.addBreak()
-        run.setText("${ort.postcode} ${ort.designation.trim()}\n")
-        repeat(2) { run.addBreak() }
-
-        val formatter = DateTimeFormatter.ofPattern("d. MMMM yyyy")
-        val date = LocalDate.now().format(formatter)
-        val paragraph2 = doc.createParagraph()
-        paragraph2.alignment = ParagraphAlignment.RIGHT
-        paragraph2.createRun().setText(date)
-        return true
-    }
-
-    private fun writeBody(text: String): Boolean = writeTextWithLineBreaks(text)
-
-    private fun writeFooter(signatureId: Int): Boolean {
-        val signatur = anyOrNull { ZsbSignatur.values()[signatureId] } ?: return false
-
-        if (signatur === ZsbSignatur.NONE) return true
-
-        val paragraph = doc.createParagraph()
-        paragraph.createRun()
-
-        writeTextWithLineBreaks(signatur.text)
-
-        return true
-    }
-
-    private fun writeTextWithLineBreaks(text: String): Boolean {
-        var remainingText = text
-
-        // search for line breaks
-        while (remainingText.contains("\n")) {
-            // split text by the next line break -> \n
-            val split = remainingText.split("\n", limit = 2)
-
-            // write current paragraph
-            doc.createParagraph().createRun().setText(split.first())
-
-            // save next paragraph
-            remainingText = split.last()
+    private fun replaceTextInTable(table: XWPFTable, originalText: String, updatedText: String) {
+        for (row in table.rows) {
+            for (cell in row.tableCells) {
+                for (paragraph in cell.paragraphs) {
+                    for (run in paragraph.runs) {
+                        val text = run.getText(0)
+                        if (text != null && text.contains(originalText)) {
+                            val updatedRunText = text.replace(originalText, updatedText)
+                            run.setText(updatedRunText, 0)
+                        }
+                    }
+                }
+            }
         }
-
-        // fill last paragraph
-        doc.createParagraph().createRun().setText(remainingText)
-
-        return true
     }
 
-    private fun generateNewPage() {
-        doc.createParagraph().isPageBreak = true
+    private fun replaceBody(letter: SerialLetterDto) {
+        var signature: ZsbSignatur = ZsbSignatur.NONE
+        if (letter.signature_id != ZsbSignatur.NONE.ordinal) {
+            signature = anyOrNull { ZsbSignatur.values()[letter.signature_id] }!!
+        }
+        val paragraphs = ArrayList(templateDoc.paragraphs)
+        for (paragraph in paragraphs) {
+            replaceTextInParagraph(paragraph, "MESSAGE", letter.msg)
+            replaceTextInParagraph(paragraph, "SIGNATURE", signature.text)
+        }
+    }
+
+    private fun replaceTextInParagraph(paragraph: XWPFParagraph, originalText: String, updatedText: String) {
+        val runs = paragraph.runs
+        for (run in runs) {
+            val text = run.getText(0)
+            if (text != null && text.contains(originalText)) {
+                if (updatedText.contains("\n")) {
+                    val updatedLines = updatedText.split("\n")
+                    run.setText(updatedLines[0], 0)
+                    for (i in 1 until updatedLines.size) {
+                        val newParagraph = templateDoc.createParagraph() // Neuen Absatz erstellen
+                        val newRun = newParagraph.createRun()
+                        newRun.setText(updatedLines[i])
+                    }
+                } else {
+                    val updatedRunText = text.replace(originalText, updatedText)
+                    run.setText(updatedRunText, 0)
+                }
+            }
+        }
     }
 }
