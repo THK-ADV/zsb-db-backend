@@ -9,6 +9,7 @@ import io.ktor.server.routing.*
 import model.kontakt.KontaktDao
 import model.kontakt.enum.KontaktFunktion
 import model.schule.Schule
+import model.schule.SchuleDao
 import model.schule.SchuleDto
 import utilty.logRequest
 import java.util.*
@@ -20,14 +21,10 @@ fun Route.mailApi(mailSettings: MailSettings) = route("email") {
         call.logRequest()
         val content = call.receive<MailDto>()
         val addressees = mutableListOf<String>()
-        val unsendables = mutableListOf<SchuleDto>()
-        content.schools.forEach { school ->
+        content.schoolIds.forEach { id ->
+            val school = SchuleDao.getById(UUID.fromString(id))
             var sendable = false
             content.addressees.forEach { feature ->
-                if (feature == "Standard") {
-                    addressees.add(school.email)
-                    sendable = true
-                }
                 if (school.contacts_ids.isNotEmpty()) {
                     school.contacts_ids.forEach { id ->
                         val uuid = UUID.fromString(id)
@@ -39,30 +36,32 @@ fun Route.mailApi(mailSettings: MailSettings) = route("email") {
                         }
                     }
                 }
+                if (feature == "Standard") {
+                    addressees.add(school.email)
+                    sendable = true
+                }
             }
             if (!sendable) {
-                unsendables.add(school)
+                addressees.add(school.email)
             }
         }
-        // TODO: Wie sollen wir mit Schulen umgehen, die nur eine Mailadresse haben? Aktuell hat trotzdem die Adressatenauswahl Priorität. Man könnte es auch so machen, dass es bei diesen Schulen immer an diese Mail Adresse geht, egal, ob sie der Adressatenauswahl entspricht oder nicht.
         // mail.sendMail(content, adressees)
-        call.respond(HttpStatusCode.OK, unsendables)
+        call.respond(HttpStatusCode.OK)
     }
 
     post("addressees") {
-        val schools = call.receive<List<SchuleDto>>()
+        val start = System.currentTimeMillis()
+        val ids = call.receive<List<String>>()
         val allContactFunctions = mutableSetOf<String>()
-        schools.forEach { school ->
-            if (school.email.isNotEmpty()) {
-                allContactFunctions.add("Standard")
-            }
-            school.contacts_ids.forEach { id ->
-                val uuid = UUID.fromString(id)
-                val kontakt = KontaktDao.getById(uuid)
-                val function = KontaktFunktion.getDescById(kontakt.feature ?: 0)
-                allContactFunctions.add(function)
-            }
+        val uuids = ids.map { UUID.fromString(it) }
+        allContactFunctions.add("Standard")
+        val contactFeatures = SchuleDao.getContactsByIds(uuids)
+        contactFeatures.forEach { feature ->
+            val function = KontaktFunktion.getDescById(feature)
+            allContactFunctions.add(function)
         }
+        val end = System.currentTimeMillis()
+        println(end - start)
         call.respond(HttpStatusCode.OK, allContactFunctions)
     }
 }

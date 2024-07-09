@@ -13,9 +13,9 @@ sealed class AbstrakterTermin {
     abstract val designation: String
     abstract val schoolyear: String
     abstract val date: String
-    abstract val contact_school_id: String
+    abstract val contact_school_id: String?
     abstract val contact_school: KontaktSchuleDto?
-    abstract val contact_university_id: String
+    abstract val contact_university_id: String?
     abstract val contact_university: KontaktHochschuleDto?
     abstract val other: String
     abstract val school_id: String
@@ -30,9 +30,9 @@ class AnSchuleTermin (
     override val designation: String,
     override val schoolyear: String,
     override val date: String,
-    override val contact_school_id: String,
+    override val contact_school_id: String?,
     override val contact_school: KontaktSchuleDto?,
-    override val contact_university_id: String,
+    override val contact_university_id: String?,
     override val contact_university: KontaktHochschuleDto?,
     override val other: String,
     override val school_id: String,
@@ -58,9 +58,9 @@ class BeiUnsTermin(
     override val designation: String,
     override val schoolyear: String,
     override val date: String,
-    override val contact_school_id: String,
+    override val contact_school_id: String?,
     override val contact_school: KontaktSchuleDto?,
-    override val contact_university_id: String,
+    override val contact_university_id: String?,
     override val contact_university: KontaktHochschuleDto?,
     override val other: String,
     override val school_id: String,
@@ -77,9 +77,9 @@ class BeiDrittenTermin(
     override val designation: String,
     override val schoolyear: String,
     override val date: String,
-    override val contact_school_id: String,
+    override val contact_school_id: String?,
     override val contact_school: KontaktSchuleDto?,
-    override val contact_university_id: String,
+    override val contact_university_id: String?,
     override val contact_university: KontaktHochschuleDto?,
     override val other: String,
     override val school_id: String,

@@ -4,6 +4,7 @@ import error_handling.HttpServerResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
@@ -12,6 +13,8 @@ import model.kontakt.enum.TalentscoutDto
 import model.schule.enum.KooperationspartnerDto
 import model.schule.enum.SchulformDto
 import utilty.*
+import utilty.respond
+import java.util.*
 
 fun Route.schoolsApi() = route("schools") {
 
@@ -19,6 +22,14 @@ fun Route.schoolsApi() = route("schools") {
         call.logRequest()
         val result = SchuleDao.getAll(call.parameters["resolve_ids"] == "true")
         val json = Json.encodeToJsonElement(result)
+        call.respondJsonOk(json)
+    }
+
+    get("/{uuid}") {
+        call.logRequest()
+        val uuid = call.parseParamAsUUID("uuid") ?: return@get
+        val schule = SchuleDao.getById(uuid)
+        val json = Json.encodeToJsonElement(schule)
         call.respondJsonOk(json)
     }
 
@@ -43,15 +54,6 @@ fun Route.schoolsApi() = route("schools") {
     get("/schooltypes") {
         call.logRequest()
         val json = Json.encodeToJsonElement(SchulformDto.generate())
-        call.respondJsonOk(json)
-    }
-
-    get("/{uuid}") {
-        call.logRequest()
-        val uuid = call.parseParamAsUUID("uuid") ?: return@get
-        val schule = SchuleDao.getById(uuid)
-        println(schule)
-        val json = Json.encodeToJsonElement(schule)
         call.respondJsonOk(json)
     }
 

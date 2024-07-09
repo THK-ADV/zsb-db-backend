@@ -7,6 +7,6 @@ import model.schule.SchuleDto
 data class MailDto(
     val msg: String,
     var addressees: List<String>,
-    var schools: List<SchuleDto>,
+    var schoolIds: List<String>,
     val subject: String
 )

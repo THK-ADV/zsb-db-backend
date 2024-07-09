@@ -5,7 +5,7 @@ import org.apache.commons.mail.Email
 import org.apache.commons.mail.SimpleEmail
 
 class MailerService(val mailSettings: MailSettings) {
-    
+
     fun sendMail(mail: MailDto, addressees: List<String>): Result<String> =
         kotlin.runCatching {
             val client: Email = SimpleEmail().apply {
