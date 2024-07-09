@@ -3,6 +3,7 @@ package database
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.Database
 import tryNonEmptyString
+import tryString
 
 object DbSettings {
     val db by lazy {
@@ -16,7 +17,6 @@ object DbSettings {
 
     fun connect(env: ApplicationEnvironment): Database {
         val (url, user, password) = loadDbSettings(env)
-
         return Database.connect(
             url,
             driver = "org.postgresql.Driver",
@@ -29,6 +29,6 @@ object DbSettings {
         Triple(
             env.config.tryNonEmptyString("db.url"),
             env.config.tryNonEmptyString("db.user"),
-            env.config.tryNonEmptyString("db.password")
+            env.config.tryString("db.password") // DB password can be empty
         )
 }

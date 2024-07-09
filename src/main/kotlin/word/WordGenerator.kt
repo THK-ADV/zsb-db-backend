@@ -3,7 +3,9 @@ package word
 import io.ktor.util.logging.*
 import log
 import model.schule.SchuleDto
+import org.apache.poi.poifs.filesystem.DocumentFactoryHelper
 import org.apache.poi.xwpf.usermodel.XWPFDocument
+import org.apache.poi.xwpf.usermodel.XWPFFactory
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.apache.poi.xwpf.usermodel.XWPFTable
 import utilty.ColoredLogging
@@ -18,7 +20,8 @@ import java.util.zip.ZipOutputStream
 
 
 class WordGenerator(templateFile: File) {
-    private val templateDoc = XWPFDocument(FileInputStream(templateFile))
+    private val stream = FileInputStream(templateFile)
+    private val templateDoc = XWPFDocument(stream)
 
     fun generateLetter(letter: SerialLetterDto): File? {
         val zipId = UUID.randomUUID()

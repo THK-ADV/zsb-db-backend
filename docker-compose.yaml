@@ -20,6 +20,9 @@ services:
     restart: always
     ports:
       - 9000:9000
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       DB_URL: jdbc:postgresql://psql:5432/${ZSB_USER}
       DB_USER: ${ZSB_USER}
@@ -41,6 +44,9 @@ services:
     volumes:
       - nginx_cert_vol:/etc/cert
       - nginx_config_vol:/etc/nginx/conf.d
+    build:
+      context: ../zsb-frontend
+      dockerfile: Dockerfile
 
 volumes:
   psql_vol:

@@ -19,9 +19,9 @@ import model.communication.mailApi
 import model.kontakt.kontakteApi
 import model.ort.orteApi
 import model.schule.schoolsApi
-import model.termin.termineApi
-import model.termin.kontakte.kontakteSchuleApi
 import model.termin.kontakte.kontakteHochschuleApi
+import model.termin.kontakte.kontakteSchuleApi
+import model.termin.termineApi
 import mu.KotlinLogging
 import utilty.ColoredLogging
 import word.wordApi
@@ -32,18 +32,20 @@ val log = ColoredLogging(KotlinLogging.logger {})
 fun Application.main() {
     DbSettings.connect(environment)
     configureServer(this, environment)
+    //bootstrapDb("/app/zsb-backend/data-import.csv")
+}
+
+fun bootstrapDb(csvPath: String) {
+    recreateDatabase()
+    val file = File(csvPath)
+    CsvImport.parseSchool(file)
 }
 
 fun main() {
     // connect to db
     DbSettings.db
 
-    recreateDatabase()
-
-    val fileName = "data-import.csv"
-    val file = File("src/main/resources/legacy_import/$fileName")
-    CsvImport.parseSchool(file)
-    // log.info("loaded data from '$fileName'")
+    //bootstrapDb("src/main/resources/legacy_import/data-import.csv")
 
     val server = embeddedServer(Netty, port = 9000) {
         log.info(environment.config.propertyOrNull("ktor.deployment.port")?.getString())
@@ -75,12 +77,9 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         termineApi()
         kontakteSchuleApi()
         kontakteHochschuleApi()
-        wordApi()
+        wordApi(env?.config?.propertyOrNull("letter.path")?.getString() ?: "src/main/resources/files/serialletter-template.docx")
         excelApi()
-        env?.let {
-            log.info("env gefunden")
-            mailApi(MailSettings.fromEnvironment(it))
-        }
+        env?.let { mailApi(MailSettings.fromEnvironment(it)) }
     }
     server.install(ContentNegotiation) {
         json(Json {

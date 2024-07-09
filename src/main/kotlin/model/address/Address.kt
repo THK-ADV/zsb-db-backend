@@ -26,9 +26,6 @@ class Adresse(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
     private var city by Ort referencedOn Adressen.city
 
     companion object : UUIDEntityClass<Adresse>(Adressen) {
-        /**
-         * persist in db
-         */
         fun save(dto: AdresseDto): Result<Adresse> = transaction {
             val ortUUID = UUID.fromString(dto.city_id)
 
