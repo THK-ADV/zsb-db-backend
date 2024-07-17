@@ -31,7 +31,6 @@ fun Route.adressenApi() {
         put {
             call.logRequest()
             val addressDto = call.receive<AdresseDto>()
-            println(addressDto)
             val result = AdresseDao.createOrUpdate(addressDto)
             call.respond(HttpServerResponse.map(result))
         }

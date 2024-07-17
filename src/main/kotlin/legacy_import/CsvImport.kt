@@ -148,8 +148,6 @@ object CsvImport {
                 address.id.value.toString(),
                 contacts_ids = contacts.map { it.id.value.toString() }
             )
-
-            print(schoolDto)
             val school = Schule.save(schoolDto).getOrThrow()
         }
     }
