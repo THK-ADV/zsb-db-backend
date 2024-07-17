@@ -23,6 +23,7 @@ COPY --from=build /app/src/main/resources/legacy_import/data-import.csv /app/zsb
 COPY --from=build /app/src/main/resources/files/serialletter-template.docx /app/zsb-backend/serialletter-template.docx
 
 ENV LETTER_PATH=/app/zsb-backend/serialletter-template.docx
+ENV DATA_IMPORT=/app/zsb-backend/data-import.csv
 
 EXPOSE 9000
 
