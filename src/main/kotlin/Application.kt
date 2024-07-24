@@ -68,6 +68,9 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         allowMethod(HttpMethod.Get)
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Options)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+        allowNonSimpleContentTypes = true
     }
     server.install(Routing) {
         index()
