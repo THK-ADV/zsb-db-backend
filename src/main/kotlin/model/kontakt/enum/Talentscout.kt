@@ -4,23 +4,31 @@ import kotlinx.serialization.Serializable
 
 enum class Talentscout(val id: Int, val desc: String) {
     KEINE(0, "Keine"),
-    AA(1, "Abdirahman, Amal"),
+    FN(1, "Nieter, Franziska"),
     SH(2, "Hopp, Sebastian"),
-    TY(3, "Yares, Thiemo"),
+    TJ(3, "Jares, Thiemo"),
     LS(4, "Schröder, Lena"),
-    SY(5, "Yilmaz-Dreger, Serap"),
+    GZ(5, "Zimmermann, Gillian"),
     VP(6, "Pfeifer, Verena"),
-    SR(7, "Ruetz, Stefanie");
+    SR(7, "Ruetz, Stefanie"),
+    KW(8, "Werner, Katharina"),
+    MG(9, "Grzonka, Moritz"),
+    MH(10, "Hamoud, Marwa"),
+    SB(11, "Berhane, Sara");
 
     companion object {
         fun fromDesc(desc: String) = when (desc) {
-            "Abdirahman, Amal" -> AA
+            "Nieter, Franziska" -> FN
             "Hopp, Sebastian" -> SH
-            "Yares, Thiemo" -> TY
+            "Jares, Thiemo" -> TJ
             "Schröder, Lena" -> LS
-            "Yilmaz-Dreger, Serap" -> SY
+            "Zimmermann, Gillian" -> GZ
             "Pfeifer, Verena" -> VP
             "Ruetz, Stefanie" -> SR
+            "Werner, Katharina" -> KW
+            "Grzonka, Moritz" -> MG
+            "Hamoud, Marwa" -> MH
+            "Berhane, Sara" -> SB
             else -> KEINE
         }
     }
