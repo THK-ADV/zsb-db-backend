@@ -33,7 +33,7 @@ var importPath = "src/main/resources/legacy_import/data-import.csv"
 fun Application.main() {
     DbSettings.connect(environment)
     configureServer(this, environment)
-    importPath = environment.config.propertyOrNull("import.path")?.getString() ?: "src/main/resources/legacy_import/data-import.csv"
+    //importPath = environment.config.propertyOrNull("import.path")?.getString() ?: "src/main/resources/legacy_import/data-import.csv"
     //bootstrapDb(importPath)
 }
 
@@ -47,10 +47,10 @@ fun main() {
     // connect to db
     DbSettings.db
 
-    bootstrapDb(importPath)
+    //bootstrapDb(importPath)
     val server = embeddedServer(Netty, port = 9000) {
         log.info(environment.config.propertyOrNull("ktor.deployment.port")?.getString())
-        configureServer(this, environment)
+        configureServer(this, null)
     }
 
     log.info("## Start Server ##")
