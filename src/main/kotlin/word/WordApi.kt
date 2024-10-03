@@ -21,7 +21,6 @@ fun Route.wordApi(letterPath: String) {
             call.logRequest()
             val serialLetterDto = call.receive<SerialLetterDto>()
             val template = File(letterPath)
-            println(template.path)
             val generator = WordGenerator(template)
             val file = generator.generateLetter(serialLetterDto)
 

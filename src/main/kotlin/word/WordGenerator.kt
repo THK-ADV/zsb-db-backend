@@ -113,9 +113,10 @@ class WordGenerator(templateFile: File) {
                     val updatedLines = updatedText.split("\n")
                     run.setText(updatedLines[0], 0)
                     for (i in 1 until updatedLines.size) {
-                        val newParagraph = templateDoc.createParagraph() // Neuen Absatz erstellen
+                        val newParagraph = templateDoc.createParagraph()
                         val newRun = newParagraph.createRun()
                         newRun.setText(updatedLines[i])
+                        newRun.fontSize = runs[0].fontSizeAsDouble?.toInt() ?: 0
                     }
                 } else {
                     val updatedRunText = text.replace(originalText, updatedText)

@@ -7,28 +7,38 @@ enum class KAoABetreuung(val id: Int, val desc: String) {
     SM(1, "Meusel, Sebastian"),
     FP(2, "Pavel, Florian"),
     GI(3, "Intveen, Geesche"),
-    DS(4, "Schulz, Denise"),
-    AA(5, "Abdirahman, Amal"),
+    UP(4, "Pitsch, Ursula"),
+    DL(5, "Lieske, Dominik"),
     SH(6, "Hopp, Sebastian"),
-    TY(7, "Yares, Thiemo"),
+    TJ(7, "Jares, Thiemo"),
     LS(8, "Schröder, Lena"),
-    SY(9, "Yilmaz-Dreger, Serap"),
+    FN(9, "Nieter, Franziska"),
     VP(10, "Pfeifer, Verena"),
-    SR(11, "Ruetz, Stefanie");
+    SR(11, "Ruetz, Stefanie"),
+    GZ(12, "Zimmermann, Gillian"),
+    KW(13, "Werner, Katharina"),
+    MB(14, "Baron, Mari"),
+    MG(15, "Grzonka, Moritz"),
+    PL(16, "Labinski, Patricia");
 
     companion object {
         fun fromDesc(desc: String) = when (desc) {
             "Meusel, Sebastian" -> SM
             "Pavel, Florian" -> FP
             "Intveen, Geesche" -> GI
-            "Schulz, Denise" -> DS
-            "Abdirahman, Amal" -> AA
+            "Pitsch, Ursula" -> UP
+            "Lieske, Dominik" -> DL
             "Hopp, Sebastian" -> SH
-            "Yares, Thiemo" -> TY
+            "Jares, Thiemo" -> TJ
             "Schröder, Lena" -> LS
-            "Yilmaz-Dreger, Serap" -> SY
+            "Nieter, Franziska" -> FN
             "Pfeifer, Verena" -> VP
             "Ruetz, Stefanie" -> SR
+            "Zimmermann, Gillian" -> GZ
+            "Werner, Katharina" -> KW
+            "Baron, Mari" -> MB
+            "Grzonka, Moritz" -> MG
+            "Labinski, Patricia" -> PL
             else -> KEINE
         }
     }

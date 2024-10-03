@@ -59,11 +59,7 @@ fun Route.schoolsApi() = route("schools") {
 
     post {
         call.logRequest()
-        println("Schule")
-        println(SchuleDto)
         val schuleDto = call.receive<SchuleDto>()
-        println("schuleDto")
-        println(schuleDto)
         if (call.checkId(schuleDto.id)) return@post
         val result = SchuleDao.createOrUpdate(schuleDto)
         call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))

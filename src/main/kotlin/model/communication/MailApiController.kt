@@ -61,7 +61,6 @@ fun Route.mailApi(mailSettings: MailSettings) = route("email") {
             allContactFunctions.add(function)
         }
         val end = System.currentTimeMillis()
-        println(end - start)
         call.respond(HttpStatusCode.OK, allContactFunctions)
     }
 }
