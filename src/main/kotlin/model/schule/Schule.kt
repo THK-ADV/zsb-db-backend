@@ -118,7 +118,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
         }
 
         private fun validateDto(dto: SchuleDto): ZsbException? {
-            if (!Kooperationspartner.values().any { it.id == dto.cooperationpartner })
+            /*if (!Kooperationspartner.values().any { it.id == dto.cooperationpartner })
                 return CooperationPartnerNotValidException("This is not a valid index for Kooperationspartner.")
 
             // valid id for AnzahlSus?
@@ -127,7 +127,7 @@ class Schule(uuid: EntityID<UUID>) : UUIDEntity(uuid) {
                         dto.amount_students13 in 0..150)
             ) {
                 return AmountStudentsNotValidException("This is not a valid index for AnzahlSus.")
-            }
+            }*/
 
             // valid id for schulform?
             if (Schulform.getDescById(dto.type) == null)
@@ -203,17 +203,17 @@ data class SchuleDto(
     val id: String? = null,
     val name: String,
     val type: Int,
-    val comment: String,
-    val amount_students11: Int,
-    val amount_students12: Int,
-    val amount_students13: Int,
-    val phonenumber: String,
+    val comment: String = "",
+    val amount_students11: Int = 0,
+    val amount_students12: Int = 0,
+    val amount_students13: Int = 0,
+    val phonenumber: String = "",
     val email: String,
-    val website: String,
-    val cooperationpartner: Int,
-    val kaoaSupervisor: Int,
-    val talentscout: Int,
-    val cooperationcontract: Boolean,
+    val website: String = "",
+    val cooperationpartner: Int = 0,
+    val kaoaSupervisor: Int = 0,
+    val talentscout: Int = 0,
+    val cooperationcontract: Boolean = false,
     val address_id: String,
     val address: AdresseDto? = null,
     val contacts_ids: List<String> = listOf(),
