@@ -1,7 +1,6 @@
 package model.communication
 
 import kotlinx.serialization.Serializable
-import model.schule.SchuleDto
 
 @Serializable
 data class MailDto(
