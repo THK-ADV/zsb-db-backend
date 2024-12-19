@@ -7,6 +7,7 @@ import model.address.Adressen.entityId
 import model.kontakt.Kontakte
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
@@ -31,7 +32,6 @@ object SchuleDao {
         Schule.save(schuleDto).map {
             val dto = it.toDto()
             val json = Json.encodeToJsonElement(dto)
-
             json.toString()
         }
     }
