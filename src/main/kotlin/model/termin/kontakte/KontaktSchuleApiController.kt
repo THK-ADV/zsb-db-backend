@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import model.schule.SchuleDao
 import utilty.*
 
 fun Route.kontakteSchuleApi() {
@@ -24,6 +25,11 @@ fun Route.kontakteSchuleApi() {
             if (call.checkId(kontaktSchuleDto.id)) return@post
             val result = KontaktSchuleDao.create(kontaktSchuleDto)
             call.respond(HttpServerResponse.map(result, HttpStatusCode.Created))
+        }
+
+        delete("/{uuid}") {
+            call.logRequest()
+            val kontaktId = call.parseParamAsUUID("uuid") ?: return@delete
         }
     }
 }
