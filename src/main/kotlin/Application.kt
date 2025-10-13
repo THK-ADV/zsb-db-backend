@@ -81,9 +81,12 @@ fun configureServer(server: Application, env: ApplicationEnvironment?) {
         termineApi()
         kontakteSchuleApi()
         kontakteHochschuleApi()
-        wordApi(env?.config?.propertyOrNull("letter.path")?.getString() ?: "src/main/resources/files/serialletter-template.docx")
+        wordApi(
+            env?.config?.propertyOrNull("letter.path")?.getString()
+                ?: "src/main/resources/files/serialletter-template.docx"
+        )
         excelApi()
-        env?.let { mailApi(MailSettings.fromEnvironment(it)) }
+        mailApi(env?.let { MailSettings.fromEnvironment(it) } ?: MailSettings.fromDev())
     }
     server.install(ContentNegotiation) {
         json(Json {

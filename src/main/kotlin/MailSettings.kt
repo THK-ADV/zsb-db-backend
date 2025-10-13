@@ -9,6 +9,9 @@ data class MailSettings(val sender: String, val host: String, val timeout: Int, 
                 env.config.tryNonEmptyInt("mail.timeout"),
                 env.config.tryNonEmptyInt("mail.chunkSize")
             )
+
+        fun fromDev(): MailSettings =
+            MailSettings("anja.bertels@th-koeln.de", "mail.gm.fh-koeln.de", 1000, 10)
     }
 }
 
